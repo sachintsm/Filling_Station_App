@@ -1,0 +1,34 @@
+.navBack{
+    height: 60px;
+    background-color: #e53935;
+    max-width: 100%;
+    
+}
+
+.companyName{
+    color: white;
+    font-size: 2em;
+    font-weight: 500;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    margin-left: 20px;
+    padding-top: 5px;
+}
+
+.navLink{
+    height: 60px;
+    color: white;   
+    cursor: pointer;
+}
+.navLink:hover{
+    background-color: #e95451;
+    transition: 0.5s;
+}
+
+.navContent{
+    margin-top: 15px;
+    text-align: center;
+    color: white;
+}
+.logo{
+    width: 20%;
+}
