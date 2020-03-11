@@ -70,16 +70,19 @@ export default class registration extends Component {
                                     <input type="text" className="form-control" value={this.state.person_name}
                                         onChange={this.onChangePersonName}></input>
                                 </div>
+                                <div className="form-group">
+                                    <label>Password : </label>
+                                    <input type="text" className="form-control" value={this.state.person_name}
+                                        onChange={this.onChangePersonName}></input>
+                                </div>
 
                                 <Row>
-
                                     <Col>
                                         <div className="form-group">
                                             <label>User ID : </label>
                                             <input type="text" className="form-control" value={this.state.person_name}
                                                 onChange={this.onChangePersonName}></input>
                                         </div>
-
                                     </Col>
                                     <Col>
                                         <div className="form-group">
@@ -95,7 +98,6 @@ export default class registration extends Component {
                                         <label>Birthday : </label>
                                         <div className="form-group sex">
                                             <DatePicker
-
                                                 className="form-control"
                                                 selected={this.state.startDate}
                                                 onChange={this.handleChangeBirthday}

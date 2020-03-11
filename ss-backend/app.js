@@ -21,7 +21,6 @@ app.use(bodyParser.json());
 
 app.use('/users', users);
 
-
 app.get("/", function (req, res) {
     res.send("Hello world");
 });
