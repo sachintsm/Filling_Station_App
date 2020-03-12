@@ -3,6 +3,7 @@ const app = express();
 const path = require('path');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+var cors = require('cors')
 
 const config = require('./config/database')
 const users = require('./routes/users')
@@ -16,6 +17,7 @@ else {
 }
 
 
+app.use(cors())
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
@@ -28,5 +30,6 @@ app.get("/", function (req, res) {
 app.listen(4000, function () {
     console.log("listening to port 4000");
 });
+
 
 module.exports = app;  

@@ -10,9 +10,10 @@ export default class navbar extends Component {
                 <div className="container-fluid">
                     <div className="row">
                         <div className="col-md-9">
-                            <img style={{width:"8%", marginTop:"8px"}} src={require('../../Assets/logo/Logo_white.png')}/>
+                            {/* eslint-disable-next-line */}
+                            <img style={{ width: "8%", marginTop: "8px" }} src={require('../../Assets/logo/Logo_white.png')} />
                         </div>
-                        
+
                         <div className="col-md-3">
                             <div className="row">
                                 <div className="col-md-4 navLink">

@@ -8,21 +8,16 @@ import { Row, Col } from 'reactstrap';
 import '../../Css/Admin/registration.css';
 
 const options = [
-    { value: 'chocolate', label: 'Chocolate' },
-    { value: 'strawberry', label: 'Strawberry' },
-    { value: 'vanilla', label: 'Vanilla' },
+    { value: 'Administartor', label: 'Administrator' },
+    { value: 'Manager', label: 'Manager' },
+    { value: 'Pumper', label: 'Pumper' },
 ];
 
 export default class registration extends Component {
 
     constructor(props) {
         super(props);
-        this.onChangePersonName = this.onChangePersonName.bind(this);
-        this.onSubmit = this.onSubmit.bind(this);
-
-        this.state = {
-            person_name: '',
-        }
+        this.handleSubmit = this.handleSubmit.bind(this);
     }
     state = {
         selectedOption: null,
@@ -39,14 +34,15 @@ export default class registration extends Component {
         this.setState({ selectedOption });
         console.log(`Option selected:`, selectedOption);
     };
-    onChangePersonName(e) {
-        this.setState({
-            person_name: e.target.value
+
+    handleSubmit(event) {
+        event.preventDefault();
+        const data = new FormData(event.target);
+        console.log(data)
+        fetch('http://localhost:4000/users/register', {
+            method: 'POST',
+            body: data,
         });
-    }
-
-    onSubmit() {
-
     }
 
     render() {
@@ -54,9 +50,7 @@ export default class registration extends Component {
 
         return (
             <React.Fragment>
-
                 <Row>
-
                     <h3>User Registration</h3>
                 </Row>
 
@@ -64,24 +58,21 @@ export default class registration extends Component {
                     <CardContent>
                         <div style={{ width: "90%", margin: 'auto' }}>
 
-                            <form onSubmit="onSubmit">
+                            <form onSubmit={this.handleSubmit}>
                                 <div className="form-group">
                                     <label>Full Name : </label>
-                                    <input type="text" className="form-control" value={this.state.person_name}
-                                        onChange={this.onChangePersonName}></input>
+                                    <input id="fullName" name="fullName" type="text" className="form-control" value={this.state.person_name}></input>
                                 </div>
                                 <div className="form-group">
                                     <label>Password : </label>
-                                    <input type="text" className="form-control" value={this.state.person_name}
-                                        onChange={this.onChangePersonName}></input>
+                                    <input type="text" className="form-control" value={this.state.person_name}></input>
                                 </div>
 
                                 <Row>
                                     <Col>
                                         <div className="form-group">
                                             <label>User ID : </label>
-                                            <input type="text" className="form-control" value={this.state.person_name}
-                                                onChange={this.onChangePersonName}></input>
+                                            <input type="text" className="form-control" value={this.state.person_name}></input>
                                         </div>
                                     </Col>
                                     <Col>
@@ -89,7 +80,6 @@ export default class registration extends Component {
                                             <label>Usertype : </label>
                                             <Select
                                                 value={selectedOption}
-                                                onChange={this.handleChangeUsertype}
                                                 options={options}
                                             />
                                         </div>
@@ -100,7 +90,6 @@ export default class registration extends Component {
                                             <DatePicker
                                                 className="form-control"
                                                 selected={this.state.startDate}
-                                                onChange={this.handleChangeBirthday}
                                             />
                                         </div>
 
@@ -110,15 +99,13 @@ export default class registration extends Component {
                                     <Col>
                                         <div className="form-group">
                                             <label>E-mail : </label>
-                                            <input type="text" className="form-control" value={this.state.person_name}
-                                                onChange={this.onChangePersonName}></input>
+                                            <input type="text" className="form-control" value={this.state.person_name}></input>
                                         </div>
                                     </Col>
                                     <Col>
                                         <div className="form-group">
                                             <label>NIC Number : </label>
-                                            <input type="text" className="form-control" value={this.state.person_name}
-                                                onChange={this.onChangePersonName}></input>
+                                            <input type="text" className="form-control" value={this.state.person_name}></input>
                                         </div>
                                     </Col>
                                 </Row>
@@ -126,15 +113,13 @@ export default class registration extends Component {
                                     <Col>
                                         <div className="form-group">
                                             <label>Mobile Number 1 : </label>
-                                            <input type="text" className="form-control" value={this.state.person_name}
-                                                onChange={this.onChangePersonName}></input>
+                                            <input type="text" className="form-control" value={this.state.person_name}></input>
                                         </div>
                                     </Col>
                                     <Col>
                                         <div className="form-group">
                                             <label>Mobile Number 2 : </label>
-                                            <input type="text" className="form-control" value={this.state.person_name}
-                                                onChange={this.onChangePersonName}></input>
+                                            <input type="text" className="form-control" value={this.state.person_name}></input>
                                         </div>
                                     </Col>
 
@@ -143,27 +128,26 @@ export default class registration extends Component {
                                     <Col>
                                         <div className="form-group">
                                             <label>EPF Number : </label>
-                                            <input type="text" className="form-control" value={this.state.person_name}
-                                                onChange={this.onChangePersonName}></input>
+                                            <input type="text" className="form-control" value={this.state.person_name}></input>
                                         </div>
                                     </Col>
                                     <Col>
                                         <div className="form-group">
                                             <label>ETF Number : </label>
-                                            <input type="text" className="form-control" value={this.state.person_name}
-                                                onChange={this.onChangePersonName}></input>
+                                            <input type="text" className="form-control" value={this.state.person_name}></input>
                                         </div>
                                     </Col>
                                 </Row>
                                 <div className="form-group">
                                     <label>Address : </label>
-                                    <textarea type="text" className="form-control" value={this.state.person_name}
-                                        onChange={this.onChangePersonName}></textarea>
+                                    <textarea type="text" className="form-control" value={this.state.person_name}></textarea>
                                 </div>
                                 <div className="form-group">
                                     <label>Others : </label>
-                                    <textarea type="text" className="form-control" value={this.state.person_name}
-                                        onChange={this.onChangePersonName}></textarea>
+                                    <textarea type="text" className="form-control" value={this.state.person_name}></textarea>
+                                </div>
+                                <div className="form-group">
+                                    <button className="btn btn-info my-4 btn-block " type="submit">Register Now</button>
                                 </div>
                             </form>
                         </div>
