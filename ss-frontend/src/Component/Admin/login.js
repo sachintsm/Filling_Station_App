@@ -5,7 +5,6 @@ import CardContent from '@material-ui/core/CardContent';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import { Form } from 'reactstrap';
-// import logo from '../Assets/logo/Logo_reg.png'
 import '../../Css/Admin/login.css';
 import axios from 'axios';
 
@@ -38,11 +37,8 @@ export default class login extends Component {
             .then((res) => {
                 console.log(res)
             })
-        console.log(this.state.form)
-
-        
+        console.log(this.state.form)        
     }
-
 
     render() {
         const { form} = this.state;

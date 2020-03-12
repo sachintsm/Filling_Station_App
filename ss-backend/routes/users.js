@@ -32,7 +32,7 @@ router.post('/register', function (req, res) {
     //         birthday: req.body.birthday,
     //         email: req.body.email,
     //         nic: req.body.nic,
-    //         mobileOne: req.body.mobileOne,
+    //         mobileOne: req.body.mobileOne,ss
     //         mobileTwo: req.body.mobileTwo,
     //         epf: req.body.epf,
     //         etf: req.body.etf,
