@@ -17,10 +17,10 @@ function App() {
       <Router>
 
         <Switch>
-          <Route exact path="/"><Login /></Route>
-          <Route exact path="/registration">
-            <Registration />
-          </Route>
+
+          <Route exact path="/" component={Login}></Route>
+          <Route exact path="/registration" component={Registration}></Route>
+
         </Switch>
 
       </Router>

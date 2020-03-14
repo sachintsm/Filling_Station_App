@@ -11,7 +11,7 @@ import axios from 'axios';
 export default class login extends Component {
 
     constructor(props) {
-        super();
+        super(props);
 
         this.state = {
             form: {
@@ -36,19 +36,27 @@ export default class login extends Component {
         axios.post('http://localhost:4000/users/login', this.state.form)
             .then((res) => {
                 console.log(res)
+                if (res.data.state === true) {
+                    this.props.history.push("/registration")
+                }
+                else {
+                    alert(res.data.msg);
+                }
             })
-        console.log(this.state.form)        
+        console.log(this.state.form)
     }
 
+
+
     render() {
-        const { form} = this.state;
+        const { form } = this.state;
 
         return (
             <div className="container-fluid">
                 <div className="row">
                     <div className="container login-card-div">
                         <Card className="login-card">
-                            <Form onSubmit={this.onSubmit}>
+                            <Form >
                                 {/* eslint-disable-next-line */}
                                 <img src={require('../../Assets/logo/Logo_reg.png')} className="logo" />
                                 <CardContent style={{ marginLeft: "20px", marginRight: "20px" }}>
@@ -62,7 +70,7 @@ export default class login extends Component {
                                     <input className="form-control" type="text" name="password" value={form.password} onChange={this.onChange}></input>
                                 </CardContent>
                                 <CardActions >
-                                    <Button style={{ margin: "auto", width: "50%" }} type="submit" variant="outlined" color="primary">
+                                    <Button onClick={this.onSubmit} style={{ margin: "auto", width: "50%" }} type="submit" variant="outlined" color="primary">
                                         Login
                                     </Button>
                                 </CardActions>

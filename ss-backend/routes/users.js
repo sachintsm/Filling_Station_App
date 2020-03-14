@@ -21,55 +21,55 @@ const upload = multer({ storage: storage }).single('profileImage')
 //User registration
 router.post('/register', function (req, res) {
     console.log(req.body)
-    // upload(req, res, (err) => {
-    //     var fullPath = req.file.originalname;
+    upload(req, res, (err) => {
+        var fullPath = req.file.originalname;
 
-    //     const newUser = new User({
-    //         fullName: req.body.fullName,
-    //         password: req.body.password,
-    //         userId: req.body.userId,
-    //         userType: req.body.userType,
-    //         birthday: req.body.birthday,
-    //         email: req.body.email,
-    //         nic: req.body.nic,
-    //         mobileOne: req.body.mobileOne,ss
-    //         mobileTwo: req.body.mobileTwo,
-    //         epf: req.body.epf,
-    //         etf: req.body.etf,
-    //         address: req.body.address,
-    //         other: req.body.other,
-    //         path: fullPath
-    //     })
-    //     User.findOne({userId: newUser.userId}, function(error, user){
-    //         if(error) throw error
-    //         if(user != null){
-    //             if(user.userId == newUser.userId){
-    //                 res.json({state: false, msg: "This userId already in use..!"}) 
-    //             }
-    //         }
-    //         else{
-    //             bcrypt.genSalt(10, function (err, salt) {
-    //                 bcrypt.hash(newUser.password, salt, function (err, hash) {
-    //                     newUser.password = hash;
+        const newUser = new User({
+            fullName: req.body.fullName,
+            password: req.body.password,
+            userId: req.body.userId,
+            userType: req.body.userType,
+            birthday: req.body.birthday,
+            email: req.body.email,
+            nic: req.body.nic,
+            mobileOne: req.body.mobileOne,
+            mobileTwo: req.body.mobileTwo,
+            epf: req.body.epf,
+            etf: req.body.etf,
+            address: req.body.address,
+            other: req.body.other,
+            path: fullPath
+        })
+        User.findOne({userId: newUser.userId}, function(error, user){
+            if(error) throw error
+            if(user != null){
+                if(user.userId == newUser.userId){
+                    res.json({state: false, msg: "This userId already in use..!"}) 
+                }
+            }
+            else{
+                bcrypt.genSalt(10, function (err, salt) {
+                    bcrypt.hash(newUser.password, salt, function (err, hash) {
+                        newUser.password = hash;
 
-    //                     if (err) {
-    //                         throw err;
-    //                     }
-    //                     else {
-    //                         newUser.save()
-    //                             .then(req => {
-    //                                 res.json({ state: true, msg: "User Registered Successfully..!" })
-    //                             })
-    //                             .catch(err => {
-    //                                 console.log(err);
-    //                                 res.json({ state: false, msg: "User Registration Unsuccessfull..!" })
-    //                             })
-    //                     }
-    //                 })
-    //             })
-    //         }
-    //     })
-    // })
+                        if (err) {
+                            throw err;
+                        }
+                        else {
+                            newUser.save()
+                                .then(req => {
+                                    res.json({ state: true, msg: "User Registered Successfully..!" })
+                                })
+                                .catch(err => {
+                                    console.log(err);
+                                    res.json({ state: false, msg: "User Registration Unsuccessfull..!" })
+                                })
+                        }
+                    })
+                })
+            }
+        })
+    })
 })
 
 //User Login
