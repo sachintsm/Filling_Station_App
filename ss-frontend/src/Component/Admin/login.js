@@ -35,7 +35,7 @@ export default class login extends Component {
 
         axios.post('http://localhost:4000/users/login', this.state.form)
             .then((res) => {
-                console.log(res)
+                // console.log(res)
                 if (res.data.state === true) {
                     this.props.history.push("/registration")
                 }

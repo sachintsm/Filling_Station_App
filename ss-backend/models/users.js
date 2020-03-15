@@ -6,7 +6,7 @@ var userSchema = mongoose.Schema({
     password: {type: String},
     userId: {type: String},
     userType: {type: String},
-    birthday: {type: String},
+    birthday: {type: String},  
     email: {type: String},
     nic: {type: String},
     mobileOne: {type: String},
@@ -16,6 +16,7 @@ var userSchema = mongoose.Schema({
     address: {type: String},
     other: {type: String},
     path: { type: String },
+    isDeleted:{type:String}
 });
 
 const Users = module.exports = mongoose.model("Users", userSchema);
