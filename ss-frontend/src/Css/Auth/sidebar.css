@@ -1,6 +1,17 @@
 .full-side-bar{
     height: 1200px;
-    width: 100%;
-    margin-left: -15px;
-    background-color: #2b2a2a;
+    /* margin-left: -15px; */
+    background-color: blue;
+}
+
+.side-row-div{
+    height: 50px;
+    background-color: #009688;
+}
+.side-icn{
+    margin-top: 15px;
+}
+
+.side-txt{
+    padding-top: 15px;
 }
