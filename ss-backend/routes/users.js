@@ -7,6 +7,9 @@ const multer = require('multer');
 const bcrypt = require('bcryptjs');
 var path = require('path');
 const fs = require('fs');
+var jwt = require('jsonwebtoken');
+const verify = require('../authentication');
+
 
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -20,11 +23,17 @@ var storage = multer.diskStorage({
 const upload = multer({ storage: storage }).single('profileImage')
 
 //User registration
-router.post('/register', function (req, res) {
+router.post('/register', async function (req, res) {
+
+    //checking if the userId is already in the database
+    const userIdExist = await User.findOne({ userId: req.body.userId })
+    if (userIdExist) return res.status(400).send({ state: false, msg: "This userId already in use..!" })
+
     console.log(req.body)
     // upload(req, res, (err) => {
     //     var fullPath = req.file.originalname;
 
+    //create a new user
     const newUser = new User({
         fullName: req.body.fullName,
         password: req.body.password,
@@ -41,113 +50,66 @@ router.post('/register', function (req, res) {
         other: req.body.other,
         // path: fullPath
     })
-    User.findOne({ userId: newUser.userId }, function (error, user) {
-        if (error) throw error
-        if (user != null) {
-            if (user.userId == newUser.userId) {
-                res.json({ state: false, msg: "This userId already in use..!" })
-            }
-        }
-        else {
-            bcrypt.genSalt(10, function (err, salt) {
-                bcrypt.hash(newUser.password, salt, function (err, hash) {
-                    newUser.password = hash;
 
-                    if (err) {
-                        throw err;
-                    }
-                    else {
-                        newUser.save()
-                            .then(req => {
-                                res.json({ state: true, msg: " User Registered Successfully..!" })
-                            })
-                            .catch(err => {
-                                console.log(err);
-                                res.json({ state: false, msg: "User Registration Unsuccessfull..!" })
-                            })
-                    }
-                })
-            })
-        }
+    bcrypt.genSalt(10, await function (err, salt) {
+        bcrypt.hash(newUser.password, salt, function (err, hash) {
+            newUser.password = hash;
+
+            if (err) {
+                throw err;
+            }
+            else {
+                newUser.save()
+                    .then(req => {
+                        res.json({ state: true, msg: " User Registered Successfully..!" })
+                    })
+                    .catch(err => {
+                        console.log(err);
+                        res.json({ state: false, msg: "User Registration Unsuccessfull..!" })
+                    })
+            }
+        })
     })
     // })
 })
 
 //User Login
-router.post('/account/login', function (req, res) {
-    const userId = req.body.userId
+router.post('/account/login', async function (req, res) {
     const password = req.body.password
-    console.log(req.body);
 
-    User.findOne({ userId: userId }, function (err, user) {
+    //checking if the userId is already in the database
+    const user = await User.findOne({ userId: req.body.userId })
+    if (!user) return res.status(400).send({ state: false, msg: "This is not valid userId!" })
+
+    bcrypt.compare(password, user.password, function (err, match) {
         if (err) throw err;
 
-        if (user == null) {
-            res.json({ state: false, msg: "Invalid User ID..!" })
+        if (match) {
+            if (err) {
+                console.log(err)
+                return res.send({ state: false, msg: "Error : Server error" })
+            }
+            else {
+                const token = jwt.sign({ _id: user._id }, config.secret)
+                res.header('auth-token', token).send({ state: true, msg: " Sign in Successfully..!", token: token })
+            }
         }
         else {
-            bcrypt.compare(password, user.password, function (err, match) {
-                if (err) throw err;
+            res.json({ state: false, msg: "Password Incorrect..!" })
+        }
+    })
 
-                if (match) {
-                    const userSession = new UserSession();
-                    userSession.userId = user._id;
+})
 
-                    userSession.save(function (err, doc) {
-                        if (err) {
-                            console.log(err)
-                            return res.send({ state: false, msg: "Error : Server error" })
-                        }
-                        else {
-                            return res.send({ state: true, msg: " Valid Signin ..!", token: doc._id })
-                        }
-                    })
-                }
-                else {
-                    res.json({ state: false, msg: "Password Incorrect..!" })
-                }
-            })
+router.get('/test', verify, function (req, res, next) {
+    res.json({
+        post: {
+            title: "Hello sachin",
+            escription: "Sachin is a good boy"
         }
     })
 })
 
-//account verify
-router.get('/account/verify', function (req, res) {
-    const { query } = req;
-    const { token } = query;
-
-    UserSession.find({ _id: token, isDeleted: false },
-        (err, sessions) => {
-            if (err) {
-                return res.send({ state: false, msg: 'Error , Server Error' })
-            }
-            if (sessions.length != 1) {
-                return res.send({ state: false, msg: 'Error , Invalid' })
-            }
-            else {
-                return res.send({ state: true, msg: 'Successful..!' })
-            }
-        })
-}) 
-
-//account logout
-router.get('/account/logout', function (req, res) {
-    const { query } = req;
-    const { token } = query;
-    UserSession.findOneAndUpdate({ _id: token, isDeleted: false },
-        {
-            $set: { isDeleted: true }
-        },
-        null,
-        (err, sessions) => { 
-            if (err) {
-                return res.send({ state: false, msg: 'Error , Server Error' })
-            }  
-            else {
-                return res.send({ state: true, msg: 'Successful..!' })
-            }
-        })
-})
 
 //Profile Image visible
 router.get("/profileImage/:filename", function (req, res) {

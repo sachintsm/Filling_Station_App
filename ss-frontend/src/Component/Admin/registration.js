@@ -79,7 +79,7 @@ export default class registration extends Component {
 
         return (
             <Col className="row">
-                <div className="col-md-2.5">
+                <div className="col-md-2"  style={{ backgroundColor: "#009688"}}>
                     <Sidebar />
                 </div>
                 <div className="col-md-10">

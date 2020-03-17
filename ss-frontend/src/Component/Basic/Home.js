@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import 'whatwg-fetch';
 import { getFromStorage, setInStorage } from '../../utils/storage';
-import { MDBInput, MDBBtn, MDBCard, MDBCardTitle,  MDBCol } from "mdbreact";
+import { MDBInput, MDBBtn, MDBCard, MDBCardTitle, MDBCol } from "mdbreact";
 // import Login from '../Admin/login'
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
@@ -176,7 +176,29 @@ export default class Home extends Component {
                                         <MDBCardTitle style={{ margin: "auto", color: 'black' }} >Pumps Registration</MDBCardTitle>
                                     </MDBCard>
                                 </Link>
-                                
+
+                            </MDBCol>
+                        </div>
+                        <div className="col-md-4">
+                            <MDBCol>
+
+                                <Link to="/registration">
+                                    <MDBCard style={{ width: "100%", minHeight: "80px" }}>
+                                        <MDBCardTitle style={{ margin: "auto", color: 'black' }} >User Registration</MDBCardTitle>
+                                    </MDBCard>
+                                </Link>
+
+                            </MDBCol>
+                        </div>
+                        <div className="col-md-4">
+                            <MDBCol>
+
+                                <Link to="/daily$pumpers$calculations">
+                                    <MDBCard style={{ width: "100%", minHeight: "80px" }}>
+                                        <MDBCardTitle style={{ margin: "auto", color: 'black' }} >Daily Pumper Calculations</MDBCardTitle>
+                                    </MDBCard>
+                                </Link>
+
                             </MDBCol>
                         </div>
                     </div>

@@ -62,9 +62,10 @@ export default class pumpsRegistration extends Component {
                                                 </div>
                                                 <div className="col-md-4">
                                                     <select class="form-control">
-                                                        <option>Select the Pumper</option>
-                                                        <option>Pumper 1</option>
-                                                        <option>Pumper 2</option>
+                                                        <option>Select the Pumpe Set</option>
+                                                        <option>Pump set 1</option>
+                                                        <option>Pump set 2</option>
+                                                        <option>Pump set 3</option>
                                                     </select>
 
                                                 </div>
