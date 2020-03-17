@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import '../../Css/Auth/navbar.css'
-import { getFromStorage, deleteStorage } from '../../utils/storage';
+import { deleteStorage } from '../../utils/storage';
 import {
     MDBNavbar, MDBNavbarBrand, MDBNavbarNav, MDBNavItem, MDBNavbarToggler, MDBCollapse,
 } from "mdbreact";
@@ -24,32 +24,14 @@ export default class navbar extends Component {
     }
 
     logout() {
-
-        const obj = getFromStorage('the_main_app');
-        const { token } = obj;
-        if (obj && obj.token) {
-            //verify token
-            fetch('http://localhost:4000/users/account/logout?token=' + token)
-                .then(res => res.json())
-                .then(json => {
-                    if (json.state) {
-                        this.setState({
-                            token: '',
-                            isLoading: false
-                        })
-                    }
-                })
-            deleteStorage();
-
-        }
+        deleteStorage('auth-token');
         window.location.reload(false);
-
     }
 
     render() {
         return (
             <Router >
-                <MDBNavbar dark expand="md" className="navbar"> 
+                <MDBNavbar dark expand="md" className="navbar">
                     <MDBNavbarBrand>
                         {/* eslint-disable-next-line */}
                         <img style={{ width: "12%" }} src={require('../../Assets/logo/Logo_white.png')} />

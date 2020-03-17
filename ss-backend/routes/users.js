@@ -102,12 +102,8 @@ router.post('/account/login', async function (req, res) {
 })
 
 router.get('/test', verify, function (req, res, next) {
-    res.json({
-        post: {
-            title: "Hello sachin",
-            escription: "Sachin is a good boy"
-        }
-    })
+    
+    res.send({ state: true, msg: 'Successful..!' })
 })
 
 

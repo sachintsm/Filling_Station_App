@@ -11,10 +11,10 @@ export default class pumpsRegistration extends Component {
             <React.Fragment>
                 <div className="container-fluid">
                     <div className="row">
-                        <div className="col-md-2" style={{ backgroundColor: "#009688"}}>
-                            <Sidebar/>
+                        <div className="col-md-2" style={{ backgroundColor: "#009688" }}>
+                            <Sidebar />
                         </div>
-                        <div className="col-md-10" style={{ backgroundColor: "#f5f5f5" , height:"1000px"}}>
+                        <div className="col-md-10" style={{ backgroundColor: "#f5f5f5", height: "1000px" }}>
                             <div className="main-div" >
                                 <div className="container reg-card">
                                     <Card>
@@ -25,7 +25,7 @@ export default class pumpsRegistration extends Component {
                                                     <MDBInput outline label="User ID" type="text" placeholder="userId" />
                                                 </div>
                                                 <div className="col-md-4 fuel-selector">
-                                                    <select class="form-control">
+                                                    <select className="form-control">
                                                         <option>Select the fuel</option>
                                                         <option>Lanka Auto Diesel</option>
                                                         <option>Lanka Super Diesel</option>
@@ -61,7 +61,7 @@ export default class pumpsRegistration extends Component {
                                                     <label >Meter Reading </label>
                                                 </div>
                                                 <div className="col-md-4">
-                                                    <select class="form-control">
+                                                    <select className="form-control">
                                                         <option>Select the Pumpe Set</option>
                                                         <option>Pump set 1</option>
                                                         <option>Pump set 2</option>
@@ -77,8 +77,6 @@ export default class pumpsRegistration extends Component {
                         </div>
                     </div>
                 </div>
-
-
             </React.Fragment>
         )
     }
