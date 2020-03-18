@@ -5,7 +5,7 @@ import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
 import { Form } from 'reactstrap';
 import '../../Css/Admin/login.css';
-import { getFromStorage, setInStorage } from '../../utils/storage';
+import {  setInStorage } from '../../utils/storage';
 import { MDBInput, MDBBtn } from "mdbreact";
 
 export default class login extends Component {
@@ -38,30 +38,6 @@ export default class login extends Component {
         })
     }
 
-    componentDidMount() {
-
-        const obj = getFromStorage('auth-token');
-        if (obj && obj.token) {
-            const { token } = obj;
-            //verify token
-            fetch('http://localhost:4000/users/test', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application-json',
-                    'auth-token': obj.token
-                }
-            })
-                .then(res => res.json())
-                .then(json => {
-                    if (json.state) {
-                        this.setState({
-                            token,
-                        })
-                    }
-                })
-        }
-    }
-    
     onSignIn() {
 
         const {

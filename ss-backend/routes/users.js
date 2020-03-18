@@ -101,8 +101,7 @@ router.post('/account/login', async function (req, res) {
 
 })
 
-router.get('/test', verify, function (req, res, next) {
-    
+router.get('/verify',verify, function (req, res, next) {  
     res.send({ state: true, msg: 'Successful..!' })
 })
 

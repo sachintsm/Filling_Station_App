@@ -1,10 +1,11 @@
 import React, { Component } from 'react'
-import { getFromStorage } from '../../utils/storage';
 import { MDBCard, MDBCardTitle, MDBCol } from "mdbreact";
 import Login from '../Admin/login'
 import '../../Css/Admin/login.css';
 import '../../Css/Basic/home.css';
 import { Link } from "react-router-dom";
+import { verifyAuth } from '../../utils/authentication'
+import { getFromStorage } from '../../utils/storage';
 
 export default class Home extends Component {
 
@@ -12,44 +13,45 @@ export default class Home extends Component {
         super(props);
 
         this.state = {
-            token: '',
+            authState: '',
         };
     }
 
     componentDidMount() {
-        const obj = getFromStorage('auth-token');
-
-        if (obj && obj.token) {
-            const { token } = obj;
-            //verify token
-            fetch('http://localhost:4000/users/test', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application-json',
-                    'auth-token': obj.token
-                }
-            })
-                .then(res => res.json())
-                .then(json => {
-                    if (json.state) {
-                        this.setState({
-                            token,
-                            isLoading: false
-                        })
-                    }
-                })
-        }
-        else {
-            this.setState({
-                isLoading: false
-            })
-        }
+        const authState = verifyAuth()
+        console.log(authState);
+        // const obj = getFromStorage('auth-token');
+        // if (!obj) {
+        //     return null
+        // }
+        // try {
+        //     //verify token
+        //     fetch('http://localhost:4000/users/verify', {
+        //         method: 'GET',
+        //         headers: {
+        //             'Content-Type': 'application-json',
+        //             'auth-token': obj.token
+        //         }
+        //     })
+        //         .then(res => res.json())
+        //         .then(json => {
+        //             this.setState({
+        //                 authState: json.state
+        //             })
+        //         })
+        // }
+        // catch (err) {
+        //     return err;
+        // }
+        this.setState({
+            authState: authState
+        })
     }
 
     render() {
-        const { token } = this.state;
+        const { authState } = this.state;
 
-        if (!token) {
+        if (!authState) {
             // window.location.reload()
             return (<Login />)
         }

@@ -6,7 +6,6 @@ import { Row, Col } from 'reactstrap';
 import '../../Css/Admin/registration.css';
 import axios from 'axios';
 import Sidebar from '../Auth/sidebar'
-import { getFromStorage } from '../../utils/storage';
 import Login from '../Admin/login'
 
 
@@ -42,27 +41,27 @@ export default class registration extends Component {
         }
     }
     componentDidMount() {
-        const obj = getFromStorage('auth-token');
+        // const obj = getFromStorage('auth-token');
 
-        if (obj && obj.token) {
-            const { token } = obj;
-            //verify token
-            fetch('http://localhost:4000/users/test', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application-json',
-                    'auth-token': obj.token
-                }
-            })
-                .then(res => res.json())
-                .then(json => {
-                    if (json.state) {
-                        this.setState({
-                            token,
-                        })
-                    }
-                })
-        }
+        // if (obj && obj.token) {
+        //     const { token } = obj;
+        //     //verify token
+        //     fetch('http://localhost:4000/users/test', {
+        //         method: 'GET',
+        //         headers: {
+        //             'Content-Type': 'application-json',
+        //             'auth-token': obj.token
+        //         }
+        //     })
+        //         .then(res => res.json())
+        //         .then(json => {
+        //             if (json.state) {
+        //                 this.setState({
+        //                     token,
+        //                 })
+        //             }
+        //         })
+        // }
     }
 
     state = {
