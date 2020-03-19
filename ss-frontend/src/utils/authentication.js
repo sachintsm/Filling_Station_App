@@ -1,14 +1,15 @@
 import { getFromStorage } from './storage';
 
-export const verifyAuth =  () => {
+export const verifyAuth = async () => {
     
+    let authState = false
     const obj = getFromStorage('auth-token');
     if (!obj) {
         return null
     }
     try {
     //verify token
-    fetch('http://localhost:4000/users/verify', {
+    await fetch('http://localhost:4000/users/verify', {
         method: 'GET',
         headers: {
             'Content-Type': 'application-json',
@@ -17,8 +18,9 @@ export const verifyAuth =  () => {
     })
         .then(res =>  res.json())
         .then(json => {
-            console.log(json.state)
+            authState =  json.state
         })
+        return authState
     }
     catch (err) {
         return err;

@@ -1,12 +1,9 @@
 import React, { Component } from 'react'
 import { MDBCard, MDBCardTitle, MDBCol } from "mdbreact";
-import Login from '../Admin/login'
 import '../../Css/Admin/login.css';
 import '../../Css/Basic/home.css';
 import { Link } from "react-router-dom";
 import { verifyAuth } from '../../utils/authentication'
-import { getFromStorage } from '../../utils/storage';
-
 export default class Home extends Component {
 
     constructor(props) {
@@ -17,45 +14,13 @@ export default class Home extends Component {
         };
     }
 
-    componentDidMount() {
-        const authState = verifyAuth()
-        console.log(authState);
-        // const obj = getFromStorage('auth-token');
-        // if (!obj) {
-        //     return null
-        // }
-        // try {
-        //     //verify token
-        //     fetch('http://localhost:4000/users/verify', {
-        //         method: 'GET',
-        //         headers: {
-        //             'Content-Type': 'application-json',
-        //             'auth-token': obj.token
-        //         }
-        //     })
-        //         .then(res => res.json())
-        //         .then(json => {
-        //             this.setState({
-        //                 authState: json.state
-        //             })
-        //         })
-        // }
-        // catch (err) {
-        //     return err;
-        // }
-        this.setState({
-            authState: authState
-        })
+    componentDidMount = async () => {
+        const authState = await verifyAuth()
+        this.setState({ authState: authState })
+        if (!authState) this.props.history.push('/login')
     }
 
     render() {
-        const { authState } = this.state;
-
-        if (!authState) {
-            // window.location.reload()
-            return (<Login />)
-        }
-
         return (
             <div className="home-div">
                 <div className="container">

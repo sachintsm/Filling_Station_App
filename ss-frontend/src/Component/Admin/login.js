@@ -67,6 +67,7 @@ export default class login extends Component {
                         userId: '',
                         token: json.token
                     })
+                    this.props.history.goBack();
                 }
                 else {
                     this.setState({
