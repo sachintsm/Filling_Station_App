@@ -58,7 +58,6 @@ export default class login extends Component {
         })
             .then(res => res.json())
             .then(json => {
-                console.log('josn', json);
                 if (json.state) {
                     setInStorage('auth-token', { token: json.token })
                     this.setState({

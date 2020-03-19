@@ -4,8 +4,24 @@ import { MDBInput } from "mdbreact";
 import { Button } from 'reactstrap';
 import Card from '@material-ui/core/Card';
 import Sidebar from '../Auth/sidebar'
+import {verifyAuth} from '../../utils/authentication';
 
 export default class pumpsRegistration extends Component {
+
+    constructor(props){
+        super(props);
+
+        this.state ={
+            authState : '',
+        }
+    }
+
+    componentDidMount = async () =>{
+        const authState = await verifyAuth();
+        this.setState({authState :authState})
+        if(!authState) this.props.history.push('/login');
+    }
+
     render() {
         return (
             <React.Fragment>

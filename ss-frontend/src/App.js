@@ -26,6 +26,7 @@ function App() {
           <Route exact path="/login" component={Login}></Route>
           <Route path="/pumpsRegistration" component={Pumps}></Route>
           <Route path="/daily$pumpers$calculations" component={DailyPumpersCalculations}></Route>
+          
         </Switch>
 
       </Router>

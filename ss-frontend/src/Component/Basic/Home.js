@@ -3,7 +3,8 @@ import { MDBCard, MDBCardTitle, MDBCol } from "mdbreact";
 import '../../Css/Admin/login.css';
 import '../../Css/Basic/home.css';
 import { Link } from "react-router-dom";
-import { verifyAuth } from '../../utils/authentication'
+import { verifyAuth } from '../../utils/authentication';
+
 export default class Home extends Component {
 
     constructor(props) {
