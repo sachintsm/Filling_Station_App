@@ -10,13 +10,13 @@ import Registration from './Component/Admin/registration';
 import Login from './Component/Admin/login';
 import Home from './Component/Basic/Home';
 import Pumps from './Component/Admin/pumpsRegistration';
-
+import DailyPumpersCalculations from './Component/Basic/dailyPumperCalculations'
 
 function App() {
   return (
     <React.Fragment>
       <Navbar />
-
+      
       <Router>
 
         <Switch>
@@ -25,7 +25,8 @@ function App() {
           <Route exact path="/registration" component={Registration}></Route>
           <Route exact path="/login" component={Login}></Route>
           <Route path="/pumpsRegistration" component={Pumps}></Route>
-
+          <Route path="/daily$pumpers$calculations" component={DailyPumpersCalculations}></Route>
+          
         </Switch>
 
       </Router>

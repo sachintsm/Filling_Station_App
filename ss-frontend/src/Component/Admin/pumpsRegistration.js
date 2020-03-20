@@ -4,17 +4,33 @@ import { MDBInput } from "mdbreact";
 import { Button } from 'reactstrap';
 import Card from '@material-ui/core/Card';
 import Sidebar from '../Auth/sidebar'
+import {verifyAuth} from '../../utils/authentication';
 
 export default class pumpsRegistration extends Component {
+
+    constructor(props){
+        super(props);
+
+        this.state ={
+            authState : '',
+        }
+    }
+
+    componentDidMount = async () =>{
+        const authState = await verifyAuth();
+        this.setState({authState :authState})
+        if(!authState) this.props.history.push('/login');
+    }
+
     render() {
         return (
             <React.Fragment>
                 <div className="container-fluid">
                     <div className="row">
-                        <div className="col-md-2" style={{ backgroundColor: "#009688"}}>
-                            <Sidebar/>
+                        <div className="col-md-2" style={{ backgroundColor: "#009688" }}>
+                            <Sidebar />
                         </div>
-                        <div className="col-md-10" style={{ backgroundColor: "#f5f5f5" , height:"1000px"}}>
+                        <div className="col-md-10" style={{ backgroundColor: "#f5f5f5", height: "1000px" }}>
                             <div className="main-div" >
                                 <div className="container reg-card">
                                     <Card>
@@ -25,7 +41,7 @@ export default class pumpsRegistration extends Component {
                                                     <MDBInput outline label="User ID" type="text" placeholder="userId" />
                                                 </div>
                                                 <div className="col-md-4 fuel-selector">
-                                                    <select class="form-control">
+                                                    <select className="form-control">
                                                         <option>Select the fuel</option>
                                                         <option>Lanka Auto Diesel</option>
                                                         <option>Lanka Super Diesel</option>
@@ -61,10 +77,11 @@ export default class pumpsRegistration extends Component {
                                                     <label >Meter Reading </label>
                                                 </div>
                                                 <div className="col-md-4">
-                                                    <select class="form-control">
-                                                        <option>Select the Pumper</option>
-                                                        <option>Pumper 1</option>
-                                                        <option>Pumper 2</option>
+                                                    <select className="form-control">
+                                                        <option>Select the Pumpe Set</option>
+                                                        <option>Pump set 1</option>
+                                                        <option>Pump set 2</option>
+                                                        <option>Pump set 3</option>
                                                     </select>
 
                                                 </div>
@@ -76,8 +93,6 @@ export default class pumpsRegistration extends Component {
                         </div>
                     </div>
                 </div>
-
-
             </React.Fragment>
         )
     }

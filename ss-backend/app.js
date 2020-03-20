@@ -4,8 +4,7 @@ const path = require('path');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 var cors = require('cors')
-// const passport = require('./config/passport');
-
+const jwt = require('jsonwebtoken');
 
 const config = require('./config/database')
 const users = require('./routes/users')

@@ -6,6 +6,7 @@ import { Row, Col } from 'reactstrap';
 import '../../Css/Admin/registration.css';
 import axios from 'axios';
 import Sidebar from '../Auth/sidebar'
+import { verifyAuth } from '../../utils/authentication'
 
 
 const options = [
@@ -37,6 +38,16 @@ export default class registration extends Component {
                 address: '',
                 other: ''
             }
+        }
+    }
+    async componentDidMount() {
+        const authState = await verifyAuth()
+        console.log(authState);
+        this.setState({
+            authState: authState
+        })
+        if (!authState) {
+            this.props.history.push('/login')
         }
     }
 
@@ -74,12 +85,12 @@ export default class registration extends Component {
     }
 
     render() {
-        const { selectedOption } = this.state;
-        const { form } = this.state;
+        const { selectedOption, form } = this.state;
+
 
         return (
             <Col className="row">
-                <div className="col-md-2.5">
+                <div className="col-md-2" style={{ backgroundColor: "#009688" }}>
                     <Sidebar />
                 </div>
                 <div className="col-md-10">
@@ -198,5 +209,6 @@ export default class registration extends Component {
             </Col>
 
         )
+
     }
 }
