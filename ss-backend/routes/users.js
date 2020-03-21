@@ -2,7 +2,6 @@ const express = require('express')
 const router = express.Router();
 const config = require('../config/database');
 const User = require('../models/users');
-const UserSession = require('../models/userSession')
 const multer = require('multer');
 const bcrypt = require('bcryptjs');
 var path = require('path');

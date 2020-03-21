@@ -4,25 +4,83 @@ import { MDBInput } from "mdbreact";
 import { Button } from 'reactstrap';
 import Card from '@material-ui/core/Card';
 import Sidebar from '../Auth/sidebar'
-import {verifyAuth} from '../../utils/authentication';
+import { verifyAuth } from '../../utils/authentication';
 
 export default class pumpsRegistration extends Component {
 
-    constructor(props){
+    constructor(props) {
         super(props);
 
-        this.state ={
-            authState : '',
+        this.state = {
+            authState: '',
+            machineNumber: '',
+            fuelType: '',
+            meterReading: ''
         }
+        this.onChangeFuelType = this.onChangeFuelType.bind(this);
+        this.onChangeMachineNumber = this.onChangeMachineNumber.bind(this)
+        this.onChangeMeterReading = this.onChangeMeterReading.bind(this)
+        this.onSubmit = this.onSubmit.bind(this)
     }
 
-    componentDidMount = async () =>{
+    componentDidMount = async () => {
         const authState = await verifyAuth();
-        this.setState({authState :authState})
-        if(!authState) this.props.history.push('/login');
+        this.setState({ authState: authState })
+        if (!authState) this.props.history.push('/login');
     }
+
+    onChangeMachineNumber(e) {
+        this.setState({
+            machineNumber: e.target.value
+        })
+    }
+
+    onChangeFuelType(e) {
+        this.setState({
+            fuelType: e.target.value
+        })
+    }
+
+    onChangeMeterReading(e) {
+        this.setState({
+            meterReading: e.target.value
+        })
+    }
+
+    onSubmit() {
+        const obj = localStorage.getItem('auth-token');
+
+        const data = {
+            machineNumber: this.state.machineNumber,
+            fuelType: this.state.fuelType,
+            meterReading: this.state.meterReading
+        }
+
+        fetch('http://localhost:4000/pumpsRegistration/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'auth-token': obj.token
+            },
+            body: JSON.stringify(data),
+        })
+            .then(res => res.json())
+            .then(json => {
+                alert(json.msg)
+                this.setState({
+                    machineNumber:'',
+                    fuelType: '',
+                    meterReading: ''
+                })
+            })
+            .catch(err => {
+                console.log(err)
+            })
+    }
+
 
     render() {
+
         return (
             <React.Fragment>
                 <div className="container-fluid">
@@ -34,32 +92,34 @@ export default class pumpsRegistration extends Component {
                             <div className="main-div" >
                                 <div className="container reg-card">
                                     <Card>
-                                        <div className="container">
+                                        <form>
+                                            <div className="container">
 
-                                            <div className="row">
-                                                <div className="col-md-2">
-                                                    <MDBInput outline label="User ID" type="text" placeholder="userId" />
-                                                </div>
-                                                <div className="col-md-4 fuel-selector">
-                                                    <select className="form-control">
-                                                        <option>Select the fuel</option>
-                                                        <option>Lanka Auto Diesel</option>
-                                                        <option>Lanka Super Diesel</option>
-                                                        <option>Lanka Karesine-oil</option>
-                                                        <option>Petrol Octane 92</option>
-                                                        <option>Petrol Octane 95</option>
-                                                    </select>
+                                                <div className="row">
+                                                    <div className="col-md-3">
+                                                        <MDBInput outline label="Machine Number" type="text" name="machineNumber" onChange={this.onChangeMachineNumber} />
+                                                    </div>
 
-                                                </div>
-                                                <div className="col-md-4">
-                                                    <MDBInput outline label="Merter Reading" type="text" placeholder="Merter Reading" />
+                                                    <div className="col-md-3 fuel-selector">
+                                                        <select className="form-control" onChange={this.onChangeFuelType}>
+                                                            <option >Select the fuel</option>
+                                                            <option value="Lanka Auto Diesel">Lanka Auto Diesel</option>
+                                                            <option value="Lanka Super Diesel">Lanka Super Diesel</option>
+                                                            <option value="Lanka Karesine-oil">Lanka Karesine-oil</option>
+                                                            <option value="Petrol Octane 92">Petrol Octane 92</option>
+                                                            <option value="Petrol Octane 95">Petrol Octane 95</option>
+                                                        </select>
 
-                                                </div>
-                                                <div className="col-md-2" style={{ marginTop: "18px" }}>
-                                                    <Button className="reg-btn" color="primary">+ Add</Button>
+                                                    </div>
+                                                    <div className="col-md-3">
+                                                        <MDBInput outline label="Merter Reading" type="text" name="meterReading" onChange={this.onChangeMeterReading} />
+                                                    </div>
+                                                    <div className="col-md-3" style={{ marginTop: "20px" }}>
+                                                        <Button className="reg-btn" color="primary" onClick={this.onSubmit}>Add Machine</Button>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                        </form>
                                     </Card>
                                 </div>
 
