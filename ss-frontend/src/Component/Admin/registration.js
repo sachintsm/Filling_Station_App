@@ -14,7 +14,7 @@ export default class registration extends Component {
         super();
         this.onSubmit = this.onSubmit.bind(this);
         this.onChange = this.onChange.bind(this);
-        // this.handleChangeBirthday = this.handleChangeBirthday.bind(this);
+        this.handleChangeBirthday = this.handleChangeBirthday.bind(this);
         this.handleDropdownChange = this.handleDropdownChange.bind(this);
 
 
@@ -24,7 +24,7 @@ export default class registration extends Component {
                 password: '',
                 userId: '',
                 userType: 'Administrator',
-                birthday: '',
+                birthday: new Date(),
                 email: '',
                 nic: '',
                 mobileOne: '',
@@ -47,16 +47,25 @@ export default class registration extends Component {
         }
     }
 
-    state = {
-        selectedOption: null,
-        startDate: new Date()
-    };
+    // state = {
+    //     selectedOption: null,
+    //     startDate: new Date()
+    // };
 
     handleChangeBirthday = date => {
-        this.setState({
-            startDate: date
-        });
+        // this.setState({
+        //     birthday: date
+        // });
+        const Val = date
+        this.setState(prevState => ({
+            form: {                   
+                ...prevState.form,    
+                birthday:Val  
+            }
+        }))
+        console.log( date);
     };
+
 
     handleDropdownChange = (e) => {
         const Val = e.target.value
@@ -139,11 +148,11 @@ export default class registration extends Component {
                                             <label>Birthday : </label>
                                             <div className="form-group">
                                                 <DatePicker
-                                                    className="form-control"
-                                                    selected={this.state.startDate}
+                                                    // className="form-control"
+                                                    selected={form.birthday}
                                                     onChange={this.handleChangeBirthday}
                                                     // name="birthday"
-                                                    value={form.birthday}
+                                                    // value={form.birthday}
                                                 />
                                             </div>
 
