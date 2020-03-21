@@ -6,13 +6,15 @@ import {
 } from "mdbreact";
 import { BrowserRouter as Router } from 'react-router-dom';
 import { withRouter } from "react-router-dom";
+import { Nav, Navbar } from 'react-bootstrap';
+
 
 export default class navbar extends Component {
 
     constructor(props) {
         super(props);
         this.logout = this.logout.bind(this);
-        this.home = this.home.bind(this);
+        // this.home = this.home.bind(this);
     }
 
     state = {
@@ -23,10 +25,10 @@ export default class navbar extends Component {
         this.setState({ isOpen: !this.state.isOpen });
     }
 
-    home(e) {
-        e.preventDefault();
-        this.props.history.push('/')
-    }
+    // home(e) {
+    //     e.preventDefault();
+    //     this.props.history.push('/')
+    // }
 
     logout() {
         deleteStorage('auth-token');
@@ -45,7 +47,8 @@ export default class navbar extends Component {
                     <MDBCollapse id="navbarCollapse3" isOpen={this.state.isOpen} navbar>
                         <MDBNavbarNav right>
                             <MDBNavItem>
-                                <div onClick={this.home}>Home</div>
+                                {/* <div onClick={this.home}>Home</div> */}
+                                <Nav.Link href="/">Home</Nav.Link>
                             </MDBNavItem>
                             &nbsp;
                             &nbsp;
