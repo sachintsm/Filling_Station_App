@@ -26,8 +26,8 @@ const upload = multer({ storage: storage }).single('profileImage')
 router.post('/register', async function (req, res) {
 
     //checking if the userId is already in the database
-    const userIdExist = await User.findOne({ userId: req.body.userId })
-    if (userIdExist) return res.status(400).send({ state: false, msg: "This userId already in use..!" })
+    // const userIdExist = await User.findOne({ userId: req.body.userId })
+    // if (userIdExist) return res.status(400).send({ state: false, msg: "This userId already in use..!" })
 
     console.log(req.body)
     // upload(req, res, (err) => {
@@ -69,8 +69,8 @@ router.post('/register', async function (req, res) {
                     })
             }
         })
-    })
     // })
+    })
 })
 
 //User Login
