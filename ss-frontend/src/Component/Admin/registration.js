@@ -6,14 +6,7 @@ import { Row, Col } from 'reactstrap';
 import '../../Css/Admin/registration.css';
 import axios from 'axios';
 import Sidebar from '../Auth/sidebar'
-import { verifyAuth } from '../../utils/authentication'
-
-
-const options = [
-    { value: 'Administartor', label: 'Administrator' },
-    { value: 'Manager', label: 'Manager' },
-    { value: 'Pumper', label: 'Pumper' },
-];
+import { verifyAuth } from '../../utils/authentication';
 
 export default class registration extends Component {
 
@@ -21,14 +14,17 @@ export default class registration extends Component {
         super();
         this.onSubmit = this.onSubmit.bind(this);
         this.onChange = this.onChange.bind(this);
+        this.handleChangeBirthday = this.handleChangeBirthday.bind(this);
+        this.handleDropdownChange = this.handleDropdownChange.bind(this);
+
 
         this.state = {
             form: {
                 fullName: '',
                 password: '',
                 userId: '',
-                userType: '',
-                birthday: '',
+                userType: 'Administrator',
+                birthday: new Date(),
                 email: '',
                 nic: '',
                 mobileOne: '',
@@ -37,7 +33,7 @@ export default class registration extends Component {
                 etf: '',
                 address: '',
                 other: ''
-            }
+            },
         }
     }
     async componentDidMount() {
@@ -51,21 +47,38 @@ export default class registration extends Component {
         }
     }
 
-    state = {
-        selectedOption: null,
-        startDate: new Date()
-    };
+    // state = {
+    //     selectedOption: null,
+    //     startDate: new Date()
+    // };
 
     handleChangeBirthday = date => {
-        this.setState({
-            startDate: date
-        });
+        // this.setState({
+        //     birthday: date
+        // });
+        const Val = date
+        this.setState(prevState => ({
+            form: {                   
+                ...prevState.form,    
+                birthday:Val  
+            }
+        }))
+        console.log( date);
     };
 
-    handleChangeUsertype = selectedOption => {
-        this.setState({ selectedOption });
-        console.log(`Option selected:`, selectedOption);
-    };
+
+    handleDropdownChange = (e) => {
+        const Val = e.target.value
+        this.setState(prevState => ({
+            form: {                   
+                ...prevState.form,    
+                userType:Val  
+            }
+        }))
+        console.log( e.target.value);
+        
+     }
+    
 
     onChange = (e) => {
         e.persist = () => { };
@@ -79,6 +92,7 @@ export default class registration extends Component {
 
         axios.post('http://localhost:4000/users/register', this.state.form)
             .then((res) => {
+                
                 console.log(res);
             })
         console.log(this.state.form);
@@ -122,24 +136,23 @@ export default class registration extends Component {
                                         <Col>
                                             <div className="form-group">
                                                 <label>Usertype : </label>
-                                                <Select
-                                                    value={selectedOption}
-                                                    options={options}
-                                                    onChange={this.onChange}
-                                                // name="userType"
-
-                                                />
+                                                <select id="dropdown" value={form.userType} onChange={this.handleDropdownChange}>
+                                                    <option value="Administrator">Administrator</option>
+                                                    <option value="Manager">Manager</option>
+                                                    <option value="Pumper">Pumper</option>
+                                                    
+                                                </select> 
                                             </div>
                                         </Col>
                                         <Col>
                                             <label>Birthday : </label>
                                             <div className="form-group">
                                                 <DatePicker
-                                                    className="form-control"
-                                                    selected={this.state.startDate}
-                                                    onChange={this.onChange}
+                                                    // className="form-control"
+                                                    selected={form.birthday}
+                                                    onChange={this.handleChangeBirthday}
                                                     // name="birthday"
-                                                    value={form.birthday}
+                                                    // value={form.birthday}
                                                 />
                                             </div>
 
