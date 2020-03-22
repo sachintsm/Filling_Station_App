@@ -5,7 +5,7 @@ module.exports = function (req, res, next) {
     const token = req.header('auth-token');
     // console.log(req.header('auth-token'))
     if (!token){
-        return res.status(400).send('Access Denied');
+        return res.status(400).send({loginState : false, msg :'Access Denied..!'});
     }
     try {
         const verified = jwt.verify(token, config.secret);
@@ -13,6 +13,6 @@ module.exports = function (req, res, next) {
         next();
     }
     catch (err) {
-        res.status(400).send('Invalied Token');
+        res.status(400).send({loginState : false, msg :'Invalid Token..!'});
     }
 }

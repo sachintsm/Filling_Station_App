@@ -101,16 +101,13 @@ router.post('/account/login', async function (req, res) {
 })
 
 router.get('/verify',verify, function (req, res, next) {  
-    res.send({ state: true, msg: 'Successful..!' })
+    res.send({ loginState: true, msg: 'Login Successful..!' })
 })
-
 
 //Profile Image visible
 router.get("/profileImage/:filename", function (req, res) {
     const filename = req.params.filename
     res.sendFile(path.join(__dirname, '../local_storage/profile_Images/' + filename))
 })
-
-
 
 module.exports = router

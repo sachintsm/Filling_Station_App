@@ -4,7 +4,7 @@ const config = require('../config/database');
 const PumpRegistration = require('../models/pumpsRegistration');
 const verify = require('../authentication');
 
-router.post('/add', function (req, res, next) {
+router.post('/add',verify, function (req, res, next) {
     console.log(req.body);
     const data = new PumpRegistration({
         machineNumber: req.body.machineNumber,
@@ -14,14 +14,24 @@ router.post('/add', function (req, res, next) {
     });
     data.save()
         .then(req => {
-            res.json({ state: true, msg: " User Registered Successfully..!" })
+            res.json({ state: true, msg: " Data Added Successfully..!" })
         })
         .catch(err => {
             console.log(err);
-            res.json({ state: false, msg: "User Registration Unsuccessfull..!" })
+            res.json({ state: false, msg: "Data Adding Unsuccessfull..!" })
         })
 
 })
 
+router.get('/get',function(req,res){
+    PumpRegistration.find()
+        .exec()
+        .then(result => {
+            res.json({ state: true, msg: "Data Transfer Successfully..!", data: result });
+        })
+        .catch(error => {
+            res.json({ state: false, msg: "Data Transfering Unsuccessfull..!" });
+        })
+})
 
 module.exports = router;
