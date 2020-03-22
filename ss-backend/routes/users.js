@@ -2,7 +2,6 @@ const express = require('express')
 const router = express.Router();
 const config = require('../config/database');
 const User = require('../models/users');
-const UserSession = require('../models/userSession')
 const multer = require('multer');
 const bcrypt = require('bcryptjs');
 const path = require('path');
@@ -116,9 +115,8 @@ router.post('/account/login', async function (req, res) {
 })
 
 router.get('/verify',verify, function (req, res, next) {  
-    res.send({ state: true, msg: 'Successful..!' })
+    res.send({ loginState: true, msg: 'Login Successful..!' })
 })
-
 
 //Profile Image visible
 router.get("/profileImage/:filename", function (req, res) {

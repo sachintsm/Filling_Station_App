@@ -1,12 +1,9 @@
 import React, { Component } from 'react'
 import '../../Css/Auth/navbar.css'
 import { deleteStorage } from '../../utils/storage';
-import {
-    MDBNavbar, MDBNavbarBrand, MDBNavbarNav, MDBNavItem, MDBNavbarToggler, MDBCollapse, MDBCard, MDBCardTitle, MDBCol 
-} from "mdbreact";
+import {MDBNavbar, MDBNavbarBrand, MDBNavbarNav, MDBNavItem, MDBNavbarToggler, MDBCollapse} from "mdbreact";
 import { BrowserRouter as Router } from 'react-router-dom';
-import { withRouter } from "react-router-dom";
-import { Nav, Navbar } from 'react-bootstrap';
+import { Nav } from 'react-bootstrap';
 
 
 export default class navbar extends Component {
@@ -14,7 +11,6 @@ export default class navbar extends Component {
     constructor(props) {
         super(props);
         this.logout = this.logout.bind(this);
-        // this.home = this.home.bind(this);
     }
 
     state = {
@@ -24,11 +20,6 @@ export default class navbar extends Component {
     toggleCollapse = () => {
         this.setState({ isOpen: !this.state.isOpen });
     }
-
-    // home(e) {
-    //     e.preventDefault();
-    //     this.props.history.push('/')
-    // }
 
     logout() {
         deleteStorage('auth-token');
@@ -55,14 +46,15 @@ export default class navbar extends Component {
                             &nbsp;
                             &nbsp;
                             <MDBNavItem>
-                                <div className="nav-button" >Profile</div>
+                                <Nav.Link href="/profile">Profile</Nav.Link>
+
                             </MDBNavItem>
                             &nbsp;
                             &nbsp;
                             &nbsp;
                             &nbsp;
                             <MDBNavItem>
-                                <div className="nav-button" onClick={this.logout}>Logout</div>
+                                <Nav.Link onClick={this.logout}>Logout</Nav.Link>
                             </MDBNavItem>
                         </MDBNavbarNav>
                     </MDBCollapse>

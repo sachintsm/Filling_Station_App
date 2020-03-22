@@ -18,7 +18,8 @@ export const verifyAuth = async () => {
     })
         .then(res =>  res.json())
         .then(json => {
-            authState =  json.state
+            // console.log(json.loginState);
+            authState =  json.loginState
         })
         return authState
     }

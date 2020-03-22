@@ -8,6 +8,7 @@ const jwt = require('jsonwebtoken');
 
 const config = require('./config/database')
 const users = require('./routes/users')
+const pumpsRegistration = require('./routes/pumpsRegistration')
 
 const connection = mongoose.connect(config.database, { useUnifiedTopology: true, useNewUrlParser: true })
 if (connection) {
@@ -25,6 +26,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 app.use('/users', users);
+app.use('/pumpsRegistration', pumpsRegistration)
 
 app.get("/", function (req, res) {
     res.send("Hello world");
