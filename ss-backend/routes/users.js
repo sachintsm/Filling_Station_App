@@ -11,29 +11,29 @@ var jwt = require('jsonwebtoken');
 const verify = require('../authentication');
 
 
-// var storage = multer.diskStorage({
-//     destination: function (req, file, cb) {
-//         cb(null, 'local_storage/profile_Images')
-//     },
-//     filename: function (req, file, cb) {
-//         cb(null, file.originalname)
-//     }
-// })
+var storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'local_storage/profile_Images')
+    },
+    filename: function (req, file, cb) {
+        cb(null, file.originalname)
+    }
+})
 
-// const upload = multer({ storage: storage }).single('profileImage')
+const upload = multer({ storage: storage }).single('profile-Image')
 
 
-const storage = multer.diskStorage({
-   destination: "./public/uploads/",
-   filename: function(req, file, cb){
-      cb(null,"IMAGE-" + Date.now() + path.extname(file.originalname));
-   }
-});
+// const storage = multer.diskStorage({
+//    destination: "./public/uploads/",
+//    filename: function(req, file, cb){
+//       cb(null,"IMAGE-" + Date.now() + path.extname(file.originalname));
+//    }
+// });
 
-const upload = multer({
-   storage: storage,
-   limits:{fileSize: 1000000},
-}).single("myImage");
+// const upload = multer({
+//    storage: storage,
+//    limits:{fileSize: 1000000},
+// }).single("myImage");
 
 //User registration
 router.post('/register', async function (req, res) {
@@ -61,6 +61,7 @@ router.post('/register', async function (req, res) {
         etf: req.body.etf,
         address: req.body.address,
         other: req.body.other,
+        path: req.body.path
         // path: fullPath
     })
 
@@ -125,15 +126,16 @@ router.get("/profileImage/:filename", function (req, res) {
     res.sendFile(path.join(__dirname, '../local_storage/profile_Images/' + filename))
 })
 
-    // router.post("/upload", {
-    //     upload(req, res, (err) => {
-    //        console.log("Request ---", req.body);
-    //        console.log("Request file ---", req.file);//Here you get file.
-    //        /*Now do where ever you want to do*/
-    //        if(!err)
-    //           return res.send(200).end();
-    //     });
-    //  };);
+// router.post('/upload', function (req, res) {
+//     upload(req, res, function (err) {
+//         iconsole.log("Request ---", req.body);
+//         console.log("Request file ---", req.file);//Here you get file.
+//         /*Now do where ever you want to do*/
+//         if(!err) {
+//             return res.send(200).end();
+//         }
+//     })
+// })
 
 
 module.exports = router
