@@ -28,7 +28,7 @@ export default class dailyPumperCalculations extends Component {
             <React.Fragment>
                 <div className="container-fluid">
                     <div className="row">
-                        <div className="col-md-2" style={{ backgroundColor: "#009688" }}>
+                        <div className="col-md-2" style={{ backgroundColor: "#1c2431" }}>
                             <Sidebar />
                         </div>
                         <div className="col-md-10" style={{ backgroundColor: "#f5f5f5", height: "1000px" }}>

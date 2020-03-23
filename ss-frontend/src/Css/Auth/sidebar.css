@@ -6,12 +6,15 @@
 
 .side-row-div{
     height: 50px;
-    background-color: #009688;
+    background-color: #1c2431;
 }
 .side-icn{
     margin-top: 15px;
+    color: #e8e7ff;
+
 }
 
 .side-txt{
     padding-top: 15px;
+    color: #e8e7ff;
 }

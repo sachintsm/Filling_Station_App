@@ -10,79 +10,78 @@ var jwt = require('jsonwebtoken');
 const verify = require('../authentication');
 
 
-// var storage = multer.diskStorage({
-//     destination: function (req, file, cb) {
-//         cb(null, 'local_storage/profile_Images')
-//     },
+var storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'local_storage/profile_Images')
+    },
+    filename: function (req, file, cb) {
+        cb(null, file.originalname)
+    }
+})
+
+const upload = multer({ storage: storage }).single('profileImage')
+
+
+// const storage = multer.diskStorage({
+//     destination: "./public/uploads/",
 //     filename: function (req, file, cb) {
-//         cb(null, file.originalname)
+//         cb(null, "IMAGE-" + Date.now() + path.extname(file.originalname));
 //     }
-// })
+// });
 
-// const upload = multer({ storage: storage }).single('profileImage')
-
-
-const storage = multer.diskStorage({
-   destination: "./public/uploads/",
-   filename: function(req, file, cb){
-      cb(null,"IMAGE-" + Date.now() + path.extname(file.originalname));
-   }
-});
-
-const upload = multer({
-   storage: storage,
-   limits:{fileSize: 1000000},
-}).single("myImage");
+// const upload = multer({
+//     storage: storage,
+//     limits: { fileSize: 1000000 },
+// }).single("myImage");
 
 //User registration
 router.post('/register', async function (req, res) {
-
-    //checking if the userId is already in the database
-    // const userIdExist = await User.findOne({ userId: req.body.userId })
-    // if (userIdExist) return res.status(400).send({ state: false, msg: "This userId already in use..!" })
+    console.log(req.body)
+    // checking if the userId is already in the database
+    const userIdExist = await User.findOne({ userId: req.body.userId })
+    if (userIdExist) return res.status(400).send({ state: false, msg: "This userId already in use..!" })
 
     console.log(req.body)
     // upload(req, res, (err) => {
-    //     var fullPath = req.file.originalname;
+    //     var fullPath = req.file;
 
-    //create a new user
-    const newUser = new User({
-        fullName: req.body.fullName,
-        password: req.body.password,
-        userId: req.body.userId,
-        userType: req.body.userType,
-        birthday: req.body.birthday,
-        email: req.body.email,
-        nic: req.body.nic,
-        mobileOne: req.body.mobileOne,
-        mobileTwo: req.body.mobileTwo,
-        epf: req.body.epf,
-        etf: req.body.etf,
-        address: req.body.address,
-        other: req.body.other,
-        // path: fullPath
-    })
+    //     //create a new user
+    //     const newUser = new User({
+    //         fullName: req.body.fullName,
+    //         password: req.body.password,
+    //         userId: req.body.userId,
+    //         userType: req.body.userType,
+    //         birthday: req.body.birthday,
+    //         email: req.body.email,
+    //         nic: req.body.nic,
+    //         mobileOne: req.body.mobileOne,
+    //         mobileTwo: req.body.mobileTwo,
+    //         epf: req.body.epf,
+    //         etf: req.body.etf,
+    //         address: req.body.address,
+    //         other: req.body.other,
+    //         path: fullPath
+    //     })
 
-    bcrypt.genSalt(10, await function (err, salt) {
-        bcrypt.hash(newUser.password, salt, function (err, hash) {
-            newUser.password = hash;
-
-            if (err) {
-                throw err;
-            }
-            else {
-                newUser.save()
-                    .then(req => {
-                        res.json({ state: true, msg: " User Registered Successfully..!" })
-                    })
-                    .catch(err => {
-                        console.log(err);
-                        res.json({ state: false, msg: "User Registration Unsuccessfull..!" })
-                    })
-            }
-        })
+    //     bcrypt.genSalt(10, function (err, salt) {
+    //         bcrypt.hash(newUser.password, salt, function (err, hash) {
+    //             newUser.password = hash;
+    //             if (err) {
+    //                 throw err;
+    //             }
+    //             else {
+    //                 newUser.save()
+    //                     .then(req => {
+    //                         res.json({ state: true, msg: " User Registered Successfully..!" })
+    //                     })
+    //                     .catch(err => {
+    //                         console.log(err);
+    //                         res.json({ state: false, msg: "User Registration Unsuccessfull..!" })
+    //                     })
+    //             }
+    //         })
+    //     })
     // })
-    })
 })
 
 //User Login
@@ -113,7 +112,7 @@ router.post('/account/login', async function (req, res) {
 
 })
 
-router.get('/verify',verify, function (req, res, next) {  
+router.get('/verify', verify, function (req, res, next) {
     res.send({ loginState: true, msg: 'Login Successful..!' })
 })
 
@@ -123,15 +122,15 @@ router.get("/profileImage/:filename", function (req, res) {
     res.sendFile(path.join(__dirname, '../local_storage/profile_Images/' + filename))
 })
 
-    // router.post("/upload", {
-    //     upload(req, res, (err) => {
-    //        console.log("Request ---", req.body);
-    //        console.log("Request file ---", req.file);//Here you get file.
-    //        /*Now do where ever you want to do*/
-    //        if(!err)
-    //           return res.send(200).end();
-    //     });
-    //  };);
+// router.post("/upload", {
+//     upload(req, res, (err) => {
+//        console.log("Request ---", req.body);
+//        console.log("Request file ---", req.file);//Here you get file.
+//        /*Now do where ever you want to do*/
+//        if(!err)
+//           return res.send(200).end();
+//     });
+//  };);
 
 
 module.exports = router
