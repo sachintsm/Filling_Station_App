@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import Select from 'react-select';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { Row, Col } from 'reactstrap';
@@ -16,8 +15,6 @@ export default class registration extends Component {
         this.onChange = this.onChange.bind(this);
         this.handleChangeBirthday = this.handleChangeBirthday.bind(this);
         this.handleDropdownChange = this.handleDropdownChange.bind(this);
-        // this.onFormSubmit = this.onFormSubmit.bind(this);
-
 
         this.state = {
             form: {
@@ -43,8 +40,9 @@ export default class registration extends Component {
     onSubmit(e) {
         e.preventDefault();
         const formData = new FormData();
-        formData.append('profile-Image', this.state.form.file);
+        formData.append("profileImage", this.state.form.file);
         formData.append('fullName', this.state.form.fullName);
+        formData.append('password',this.state.form.password);
         formData.append('userId', this.state.form.userId);
         formData.append('userType', this.state.form.userType);
         formData.append('birthday', this.state.form.birthday);
@@ -57,25 +55,14 @@ export default class registration extends Component {
         formData.append('other', this.state.form.other);
 
 
-        // const config = {
-        //     headers: {
-        //         'content-type': 'multipart/form-data'
-        //     }
-        // };
-        // axios.post("http://localhost:4000/users/register", formData, config)
-        axios( {method: 'post', url: 'http://localhost:4000/users/register', data: formData, headers: {'Content-Type': 'multipart/form-data' } })
-            .then((response) => {
-                alert(response);
-            }).catch((error) => {
-                console.log(error); 
-            });
-
-        // axios.post('http://localhost:4000/users/register', formData)
-        //     .then((res) => {
-
-        //         console.log(res);
-        //     })
-        console.log(this.state.form.file);
+        axios.post("http://localhost:4000/users/register", formData, { // receive two parameter endpoint url ,form data 
+        })
+            .then(res => { // then print response status
+                console.log(res)
+            })
+            .catch(err =>{
+                console.log(err);
+            })
     }
 
     async componentDidMount() {
@@ -134,20 +121,8 @@ export default class registration extends Component {
 
     }
 
-    // onSubmit(event) {
-    //     event.preventDefault();
-
-    //     axios.post('http://localhost:4000/users/register', this.state.form)
-    //         .then((res) => {
-
-    //             console.log(res);
-    //         })
-    //     console.log(this.state.form);
-    // }
-
     render() {
-        const { selectedOption, form } = this.state;
-
+        const { form } = this.state;
 
         return (
             <div>
@@ -197,7 +172,6 @@ export default class registration extends Component {
                                                 <label>Birthday : </label>
                                                 <div className="form-group">
                                                     <DatePicker
-                                                        // className="form-control"
                                                         selected={form.birthday}
                                                         onChange={this.handleChangeBirthday}
                                                     />
@@ -266,13 +240,6 @@ export default class registration extends Component {
 
                                     </form>
                                 </div>
-                                {/* <div>
-                                    <form onSubmit={this.onFormSubmit}>
-                                        <h1>File Upload</h1>
-                                        <input type="file" name="myImage" onChange={this.onChange} />
-                                        <button type="submit">Upload</button>
-                                    </form>
-                                </div> */}
                             </div>
                         </React.Fragment>
 

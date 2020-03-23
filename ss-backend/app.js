@@ -4,7 +4,10 @@ const path = require('path');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 var cors = require('cors')
-const jwt = require('jsonwebtoken');
+// const jwt = require('jsonwebtoken');
+const passport = require('passport');
+const { createServer } = require('http');
+
 
 const config = require('./config/database')
 const users = require('./routes/users')
@@ -20,10 +23,14 @@ else {
 
 
 // app.use(passport.initialize());
+app.use(express.static(path.join(__dirname, "public")));
 
 app.use(cors())
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+
+app.use(bodyParser.urlencoded({ extended: true, limit: '50mb', parameterLimit: 1000000 }));
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use('/users', users);
 app.use('/pumpsRegistration', pumpsRegistration)
