@@ -16,7 +16,7 @@ export default class registration extends Component {
         this.onChange = this.onChange.bind(this);
         this.handleChangeBirthday = this.handleChangeBirthday.bind(this);
         this.handleDropdownChange = this.handleDropdownChange.bind(this);
-        this.onFormSubmit = this.onFormSubmit.bind(this);
+        // this.onFormSubmit = this.onFormSubmit.bind(this);
 
 
         this.state = {
@@ -33,26 +33,49 @@ export default class registration extends Component {
                 epf: '',
                 etf: '',
                 address: '',
-                other: ''
+                other: '',
+                file: null,
             },
-            file: null,
+
         }
     }
 
-    onFormSubmit(e) {
+    onSubmit(e) {
         e.preventDefault();
         const formData = new FormData();
-        formData.append('myImage', this.state.file);
-        const config = {
-            headers: {
-                'content-type': 'multipart/form-data'
-            }
-        };
-        axios.post("/upload", formData, config)
+        formData.append('profile-Image', this.state.form.file);
+        formData.append('fullName', this.state.form.fullName);
+        formData.append('userId', this.state.form.userId);
+        formData.append('userType', this.state.form.userType);
+        formData.append('birthday', this.state.form.birthday);
+        formData.append('nic', this.state.form.nic);
+        formData.append('mobileOne', this.state.form.mobileOne);
+        formData.append('mobileTwo', this.state.form.mobileTwo);
+        formData.append('epf', this.state.form.epf);
+        formData.append('etf', this.state.form.etf);
+        formData.append('address', this.state.form.address);
+        formData.append('other', this.state.form.other);
+
+
+        // const config = {
+        //     headers: {
+        //         'content-type': 'multipart/form-data'
+        //     }
+        // };
+        // axios.post("http://localhost:4000/users/register", formData, config)
+        axios( {method: 'post', url: 'http://localhost:4000/users/register', data: formData, headers: {'Content-Type': 'multipart/form-data' } })
             .then((response) => {
-                alert("The file is successfully uploaded");
+                alert(response);
             }).catch((error) => {
+                console.log(error); 
             });
+
+        // axios.post('http://localhost:4000/users/register', formData)
+        //     .then((res) => {
+
+        //         console.log(res);
+        //     })
+        console.log(this.state.form.file);
     }
 
     async componentDidMount() {
@@ -90,6 +113,18 @@ export default class registration extends Component {
 
     }
 
+    handleImageChange = (e) => {
+        const Val = e.target.files[0]
+        this.setState(prevState => ({
+            form: {
+                ...prevState.form,
+                file: Val
+            }
+        }))
+        console.log(e.target.files[0]);
+
+    }
+
 
     onChange = (e) => {
         e.persist = () => { };
@@ -97,22 +132,18 @@ export default class registration extends Component {
         store.form[e.target.name] = e.target.value
         this.setState(store);
 
-        this.setState({ file: e.target.files[0] });
-
-        console.log(e.target.files[0]);
-        
     }
 
-    onSubmit(event) {
-        event.preventDefault();
+    // onSubmit(event) {
+    //     event.preventDefault();
 
-        axios.post('http://localhost:4000/users/register', this.state.form)
-            .then((res) => {
+    //     axios.post('http://localhost:4000/users/register', this.state.form)
+    //         .then((res) => {
 
-                console.log(res);
-            })
-        console.log(this.state.form);
-    }
+    //             console.log(res);
+    //         })
+    //     console.log(this.state.form);
+    // }
 
     render() {
         const { selectedOption, form } = this.state;
@@ -225,18 +256,23 @@ export default class registration extends Component {
                                             <label>Others : </label>
                                             <textarea type="text" className="form-control" name="other" value={form.other} onChange={this.onChange}></textarea>
                                         </div>
+                                        <div>
+                                            <h1>File Upload</h1>
+                                            <input type="file" name="myImage" onChange={this.handleImageChange} />
+                                        </div>
                                         <div className="form-group">
                                             <button className="btn btn-info my-4 btn-block " type="submit">Register Now</button>
                                         </div>
+
                                     </form>
                                 </div>
-                                <div>
+                                {/* <div>
                                     <form onSubmit={this.onFormSubmit}>
                                         <h1>File Upload</h1>
                                         <input type="file" name="myImage" onChange={this.onChange} />
                                         <button type="submit">Upload</button>
                                     </form>
-                                </div>
+                                </div> */}
                             </div>
                         </React.Fragment>
 
