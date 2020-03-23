@@ -38,52 +38,52 @@ const upload = multer({ storage: storage }).single('profile-Image')
 router.post('/register', async function (req, res) {
 
     //checking if the userId is already in the database
-    // const userIdExist = await User.findOne({ userId: req.body.userId })
-    // if (userIdExist) return res.status(400).send({ state: false, msg: "This userId already in use..!" })
+    const userIdExist = await User.findOne({ userId: req.body.userId })
+    if (userIdExist) return res.status(400).send({ state: false, msg: "This userId already in use..!" })
 
     console.log(req.body)
     // upload(req, res, (err) => {
     //     var fullPath = req.file.originalname;
 
-    //create a new user
-    const newUser = new User({
-        fullName: req.body.fullName,
-        password: req.body.password,
-        userId: req.body.userId,
-        userType: req.body.userType,
-        birthday: req.body.birthday,
-        email: req.body.email,
-        nic: req.body.nic,
-        mobileOne: req.body.mobileOne,
-        mobileTwo: req.body.mobileTwo,
-        epf: req.body.epf,
-        etf: req.body.etf,
-        address: req.body.address,
-        other: req.body.other,
-        path: req.body.path
-        // path: fullPath
-    })
+    //     //create a new user
+    //     const newUser = new User({
+    //         fullName: req.body.fullName,
+    //         password: req.body.password,
+    //         userId: req.body.userId,
+    //         userType: req.body.userType,
+    //         birthday: req.body.birthday,
+    //         email: req.body.email,
+    //         nic: req.body.nic,
+    //         mobileOne: req.body.mobileOne,
+    //         mobileTwo: req.body.mobileTwo,
+    //         epf: req.body.epf,
+    //         etf: req.body.etf,
+    //         address: req.body.address,
+    //         other: req.body.other,
+    //         // path: req.body.path
+    //         path: fullPath
+    //     })
 
-    bcrypt.genSalt(10, await function (err, salt) {
-        bcrypt.hash(newUser.password, salt, function (err, hash) {
-            newUser.password = hash;
+    //     bcrypt.genSalt(10, async function (err, salt) {
+    //         await bcrypt.hash(newUser.password, salt, function (err, hash) {
+    //             newUser.password = hash;
 
-            if (err) {
-                throw err;
-            }
-            else {
-                newUser.save()
-                    .then(req => {
-                        res.json({ state: true, msg: " User Registered Successfully..!" })
-                    })
-                    .catch(err => {
-                        console.log(err);
-                        res.json({ state: false, msg: "User Registration Unsuccessfull..!" })
-                    })
-            }
-        })
+    //             if (err) {
+    //                 throw err;
+    //             }
+    //             else {
+    //                 newUser.save()
+    //                     .then(req => {
+    //                         res.json({ state: true, msg: " User Registered Successfully..!" })
+    //                     })
+    //                     .catch(err => {
+    //                         console.log(err);
+    //                         res.json({ state: false, msg: "User Registration Unsuccessfull..!" })
+    //                     })
+    //             }
+    //         })
+    //     })
     // })
-    })
 })
 
 //User Login
@@ -114,7 +114,7 @@ router.post('/account/login', async function (req, res) {
 
 })
 
-router.get('/verify',verify, function (req, res, next) {  
+router.get('/verify', verify, function (req, res, next) {
     res.send({ loginState: true, msg: 'Login Successful..!' })
 })
 
