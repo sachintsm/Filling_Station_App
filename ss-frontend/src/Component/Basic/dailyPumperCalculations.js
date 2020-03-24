@@ -31,7 +31,7 @@ export default class dailyPumperCalculations extends Component {
                         <div className="col-md-2" style={{ backgroundColor: "#1c2431" }}>
                             <Sidebar />
                         </div>
-                        <div className="col-md-10" style={{ backgroundColor: "#f5f5f5", height: "1000px" }}>
+                        <div className="col-md-10" style={{ backgroundColor: "#f5f5f5"}}>
 
                             <div className="container main-div-box" >
                                 <div className="container">

@@ -2,3 +2,16 @@
     height: 300px;
     background-color: #232f3f;
 }
+
+.companey-name{
+    color: #eaf3ff;
+    font-size: 1.7em;
+    font-weight: 400;
+}
+
+.address{
+    color: #eaf3ff;
+    font-size: 1em;
+    font-weight: 300;
+    margin-top: -18px;
+}
