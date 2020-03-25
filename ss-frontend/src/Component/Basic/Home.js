@@ -28,13 +28,11 @@ export default class Home extends Component {
                     <div className="row">
                         <div className="col-md-4">
                             <MDBCol>
-
                                 <Link to="/pumpsRegistration">
                                     <MDBCard style={{ width: "100%", minHeight: "80px" }}>
                                         <MDBCardTitle style={{ margin: "auto", color: 'black' }} >Pumps Registration</MDBCardTitle>
                                     </MDBCard>
                                 </Link>
-
                             </MDBCol>
                         </div>
                         <div className="col-md-4">

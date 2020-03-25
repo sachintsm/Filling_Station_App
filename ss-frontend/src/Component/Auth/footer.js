@@ -57,11 +57,12 @@ export default class footer extends Component {
                                     <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d15863.873091019568!2d81.3007025!3d6.2679031!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0xea2f77018cc4b90e!2sS%20%26%20S%20Petroleum%20Traders!5e0!3m2!1sen!2slk!4v1585027810833!5m2!1sen!2slk"
                                         width="358"
                                         height="150"
-                                        frameborder="0"
+                                        frameBorder="0"
                                         style={{ border: "0" }}
-                                        allowfullscreen=""
+                                        allowFullScreen=""
                                         aria-hidden="false"
-                                        tabindex="0">
+                                        tabIndex="0"
+                                        title="gMap">
                                     </iframe>
                                 </span>
                             </div>

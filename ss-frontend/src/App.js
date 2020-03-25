@@ -12,6 +12,7 @@ import Home from './Component/Basic/Home';
 import Pumps from './Component/Admin/pumpsRegistration';
 import DailyPumpersCalculations from './Component/Basic/dailyPumperCalculations'
 import FuelLubricantPrice from './Component/Basic/fuelLubricantPrice'
+import DailySales from './Component/Basic/dailySales'
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
           <Route path="/pumpsRegistration" component={Pumps}></Route>
           <Route path="/daily$pumpers$calculations" component={DailyPumpersCalculations}></Route>
           <Route path="/fuel$lubricant$price" component={FuelLubricantPrice}></Route>
+          <Route path="/daily$sales" component={DailySales}></Route>
         </Switch>
 
       </Router>

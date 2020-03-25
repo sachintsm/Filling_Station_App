@@ -6,6 +6,7 @@ import LocalGasStationIcon from '@material-ui/icons/LocalGasStation';
 import PersonAddIcon from '@material-ui/icons/PersonAdd';
 import EvStationIcon from '@material-ui/icons/EvStation';
 import AttachMoneyIcon from '@material-ui/icons/AttachMoney';
+import MonetizationOnIcon from '@material-ui/icons/MonetizationOn';
 
 export default class sidebar extends Component {
     render() {
@@ -60,6 +61,19 @@ export default class sidebar extends Component {
                             </div>
                             <div className="col-md-10 side-txt">
                                 <p>Fuel / Lumbricant Price</p>
+                            </div>
+                        </div>
+                    </Link>
+                </div>
+                <div className="side-row-div">
+                    <Link to={'/daily$sales'}>
+
+                        <div className="row">
+                            <div className="col-md-2 side-icn">
+                                <MonetizationOnIcon />
+                            </div>
+                            <div className="col-md-10 side-txt">
+                                <p>Daily Sales</p>
                             </div>
                         </div>
                     </Link>
