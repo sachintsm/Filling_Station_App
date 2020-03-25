@@ -23,18 +23,19 @@ export default class dailyPumperCalculations extends Component {
             snackbarmsg: '',
             salesPId: '',
             salesQty: '',
-            pumperId: '',
-            pumperPId: '',
-            pumperQty: '',
             products: [],
-            salesPrice: ''
+            salesPrice: '',
+            sales: [],
+            salesTotal: 0,
+            lockerAmount: '',
+            lockerTotal : 0.00,
+            
         }
 
         this.onLocalChange = this.onLocalChange.bind(this)
-        this.onPumperChange = this.onPumperChange.bind(this)
         this.onLocalSubmit = this.onLocalSubmit.bind(this)
-        this.onPumperSubmit = this.onPumperSubmit.bind(this)
-
+        this.onLockerSubmit = this.onLockerSubmit.bind(this)
+        this.onLockerChange = this.onLocalChange.bind(this)
     }
     snackbarClose = (event) => {
         this.setState({ snackbaropen: false })
@@ -44,6 +45,19 @@ export default class dailyPumperCalculations extends Component {
         const authState = await verifyAuth();
         this.setState({ authState: authState })
         if (!authState) this.props.history.push('/login');
+
+        axios.get('http://localhost:4000/dailySales/get')
+            .then(res => {
+                this.setState({
+                    sales: res.data.data
+                })
+                for (var i = 0; i < this.state.sales.length; i++) {
+                    this.state.salesTotal = this.state.salesTotal + parseFloat(this.state.sales[i].price)
+                }
+                this.setState({
+                    salesTotal: this.state.salesTotal.toFixed(2)
+                })
+            })
     }
 
     onLocalChange(e) {
@@ -53,11 +67,47 @@ export default class dailyPumperCalculations extends Component {
         this.setState(store);
     }
 
-    onPumperChange(e) {
-        e.persist = () => { };
-        let store = this.state;
-        store[e.target.name] = e.target.value
-        this.setState(store);
+    onLockerChange(e) {
+        this.setState({
+            lockerAmount: e.target.value
+        })
+    }
+
+    async onLockerSubmit() {
+        const obj = getFromStorage('auth-token');
+
+        const data = {
+            lockerAmount: this.state.lockerAmount
+        }
+
+        if (this.state.lockerAmount === '') {
+            this.setState({
+                snackbaropen: true,
+                snackbarmsg: "Please Fill the Amount ..!"
+            })
+        }
+        await fetch('http://localhost:4000/lockerState/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'auth-token': obj.token
+            },
+            body: JSON.stringify(data),
+        })
+            .then(res => res.json())
+            .then(json => {
+                this.setState({
+                    snackbaropen: true,
+                    snackbarmsg: json.msg
+                })
+            })
+            .catch(err => {
+                console.log(err)
+                this.setState({
+                    snackbaropen: true,
+                    snackbarmsg: err
+                })
+            })
     }
 
     async onLocalSubmit() {
@@ -66,7 +116,7 @@ export default class dailyPumperCalculations extends Component {
         if (this.state.salesPId === '') {
             this.setState({
                 snackbaropen: true,
-                snackbarmsg: "Please Fill the Data ..!"
+                snackbarmsg: "Please Fill the product ID ..!"
             })
         }
         await axios.get('http://localhost:4000/fuelLubricantPrice/get')
@@ -84,9 +134,8 @@ export default class dailyPumperCalculations extends Component {
                             size: this.state.products[i].size,
                             qty: this.state.salesQty,
                             price: this.state.salesPrice,
-                            pState: 'sales',
                         }
-                        fetch('http://localhost:4000/', {
+                        fetch('http://localhost:4000/dailySales/add', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -96,17 +145,18 @@ export default class dailyPumperCalculations extends Component {
                         })
                             .then(res => res.json())
                             .then(json => {
+                                console.log(res);
                                 this.setState({
                                     snackbaropen: true,
                                     snackbarmsg: json.msg
                                 })
                             })
                             .catch(err => {
+                                console.log(err)
                                 this.setState({
                                     snackbaropen: true,
                                     snackbarmsg: err
                                 })
-                                console.log(err)
                             })
                     }
                 }
@@ -116,10 +166,6 @@ export default class dailyPumperCalculations extends Component {
             })
 
 
-
-    }
-
-    onPumperSubmit() {
 
     }
 
@@ -148,12 +194,12 @@ export default class dailyPumperCalculations extends Component {
                         </div>
                         <div className="col-md-10" style={{ backgroundColor: "#f5f5f5", minHeight: "1000px" }}>
 
-                            <Tabs defaultActiveKey="Sales" id="uncontrolled-tab-example">
+                            <Tabs defaultActiveKey="Sales" id="uncontrolled-tab-example" style={{ marginTop: "20px" }}>
 
                                 <Tab eventKey="Sales" title="Sales">
                                     <div className="first-div">
                                         <div className="row">
-                                            <div className="col-md-6">
+                                            <div className="col-md-7">
                                                 <p className="first-topic">Sales</p>
                                                 <Card className="container">
                                                     <div className="row">
@@ -168,113 +214,82 @@ export default class dailyPumperCalculations extends Component {
                                                         </div>
                                                     </div>
                                                 </Card>
-                                            </div>
-                                            <div className="col-md-6">
-                                                <p className="first-topic">Pumpers Lumbricant Sales</p>
-                                                <Card className="container">
-                                                    <div className="row">
-                                                        <div className="col-md-3">
-                                                            <MDBInput outline label="Product ID" type="text" name="pumperPId" onChange={this.onPumperChange} />
+                                                <Card className="container" style={{ marginTop: "20px" }}>
+                                                    <div className="row" style={{ marginTop: "10px" }}>
+                                                        <div className="col-md-2">
+                                                            <label className="topic-product">PID</label>
                                                         </div>
-                                                        <div className="col-md-3">
-                                                            <MDBInput outline label="Pumper ID" type="text" name="pumperId" onChange={this.onPumperChange} />
+                                                        <div className="col-md-4">
+                                                            <label className="topic-product">Product Name</label>
                                                         </div>
-                                                        <div className="col-md-3">
-                                                            <MDBInput outline label="Quentity" type="text" name="pumperQty" onChange={this.onPumperChange} />
+                                                        <div className="col-md-2" style={{ textAlign: "right" }}>
+                                                            <label className="topic-product">Size</label>
                                                         </div>
-                                                        <div className="col-md-3" style={{ marginTop: "16px" }}>
-                                                            <Button className="sub-btn" color="primary" onClick={this.onPumperSubmit}>Submit</Button>
+                                                        <div className="col-md-2" style={{ textAlign: "right" }}>
+                                                            <label className="topic-product">Qty</label>
+                                                        </div>
+                                                        <div className="col-md-2" style={{ textAlign: "right" }}>
+                                                            <label className="topic-product">Amount</label>
+
                                                         </div>
                                                     </div>
+                                                    {this.state.sales.map((data) => {
+                                                        return (
+                                                            <div className="row" key={data._id}>
+                                                                <div className="col-md-2">
+                                                                    <label className="product">{data.pId}</label>
+                                                                </div>
+                                                                <div className="col-md-4">
+                                                                    <label className="product">{data.pName}</label>
+                                                                </div>
+                                                                <div className="col-md-2" style={{ textAlign: "right" }}>
+                                                                    <label className="product">{data.size}</label>
+                                                                </div>
+                                                                <div className="col-md-2" style={{ textAlign: "right" }}>
+                                                                    <label className="product">{data.qty}</label>
+                                                                </div>
+                                                                <div className="col-md-2" style={{ textAlign: "right" }}>
+                                                                    <label className="product" >{data.price}</label>
+                                                                </div>
+                                                            </div>
+                                                        )
+                                                    })}
                                                 </Card>
+                                                <div>
+                                                    <div className="row" style={{ marginTop: "10px", marginRight: "0px" }}>
+                                                        <div className="col-md-7">
+                                                        </div>
+                                                        <div className="col-md-2">
+                                                            <p className="topic-product">Total : </p>
+                                                        </div>
+                                                        <div className="col-md-3" style={{ textAlign: "right" }}>
+                                                            <p className="topic-product">{this.state.salesTotal}</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div className="col-md-5">
+                                                <p className="first-topic">Locker State</p>
+
+                                                <div className="row">
+                                                    <Card className="container">
+                                                        <div className="row">
+                                                            <div className="col-md-8">
+                                                                <MDBInput outline label="Amount" type="text" name="lockerAmount" onChange={this.onLockerChange} />
+                                                            </div>
+
+                                                            <div className="col-md-4" style={{ marginTop: "16px" }}>
+                                                                <Button className="sub-btn" color="primary" onClick={this.onLockerSubmit}>Submit</Button>
+                                                            </div>
+                                                        </div>
+                                                    </Card>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                     {/******************************************************************************************/}
-                                    <div className="row" style={{ marginTop: "30px" }}>
-                                        <div className="col-md-6">
-                                            <Card className="container">
-                                                <div className="row" style={{ marginTop: "10px" }}>
-                                                    <div className="col-md-2">
-                                                        <label className="topic-product">PID</label>
-                                                    </div>
-                                                    <div className="col-md-4">
-                                                        <label className="topic-product">Product Name</label>
-                                                    </div>
-                                                    <div className="col-md-2">
-                                                        <label className="topic-product">Size</label>
-                                                    </div>
-                                                    <div className="col-md-2">
-                                                        <label className="topic-product">Qty</label>
-                                                    </div>
-                                                    <div className="col-md-2">
-                                                        <label className="topic-product">Pice</label>
 
-                                                    </div>
-                                                </div>
-                                                <div className="row">
-                                                    <div className="col-md-2">
-                                                        <label className="topic-product">PID</label>
-                                                    </div>
-                                                    <div className="col-md-4">
-                                                        <label className="topic-product">Product Name</label>
-                                                    </div>
-                                                    <div className="col-md-2">
-                                                        <label className="topic-product">Size</label>
-                                                    </div>
-                                                    <div className="col-md-2">
-                                                        <label className="topic-product">Qty</label>
-                                                    </div>
-                                                    <div className="col-md-2">
-                                                        <label className="topic-product">Pice</label>
-                                                    </div>
-                                                </div>
-                                            </Card>
-                                        </div>
-                                        <div className="col-md-6">
-                                            <Card className="container">
-                                                <div className="row" style={{ marginTop: "10px" }}>
-                                                    <div className="col-md-2">
-                                                        <label className="topic-product">PID</label>
-                                                    </div>
-                                                    <div className="col-md-4">
-                                                        <label className="topic-product">Product Name</label>
-                                                    </div>
-
-                                                    <div className="col-md-2">
-                                                        <label className="topic-product">Qty</label>
-                                                    </div>
-                                                    <div className="col-md-2">
-                                                        <label className="topic-product">Pice</label>
-
-                                                    </div>
-                                                    <div className="col-md-2">
-                                                        <label className="topic-product">Pumper</label>
-                                                    </div>
-                                                </div>
-                                                <div className="row">
-                                                    <div className="col-md-2">
-                                                        <label className="topic-product">PID</label>
-                                                    </div>
-                                                    <div className="col-md-4">
-                                                        <label className="topic-product">Product Name</label>
-                                                    </div>
-
-                                                    <div className="col-md-2">
-                                                        <label className="topic-product">Qty</label>
-                                                    </div>
-                                                    <div className="col-md-2">
-                                                        <label className="topic-product">Pice</label>
-
-                                                    </div>
-                                                    <div className="col-md-2">
-                                                        <label className="topic-product">Pumper</label>
-                                                    </div>
-                                                </div>
-                                            </Card>
-                                        </div>
-
-                                    </div>
                                 </Tab>
 
 

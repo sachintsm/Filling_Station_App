@@ -2,6 +2,10 @@
     height: 40px;
     width: 100%;
 }
+.first-div{
+    margin-left: 0px;
+    margin-right: 20px;
+}
 
 .first-topic{
     font-size: 18px;
@@ -10,5 +14,8 @@
 .topic-product{
     font-size: 16px;
     font-weight: 400;
-
+}
+.product{
+    font-size: 14px;
+    font-weight: 300;
 }

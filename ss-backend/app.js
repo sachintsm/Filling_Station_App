@@ -13,6 +13,7 @@ const config = require('./config/database')
 const users = require('./routes/users')
 const pumpsRegistration = require('./routes/pumpsRegistration')
 const fuelLubricantPrice = require('./routes/fuelLubricantPrice')
+const dailySales = require('./routes/dailySales')
 
 const connection = mongoose.connect(config.database, { useUnifiedTopology: true, useNewUrlParser: true })
 if (connection) {
@@ -23,7 +24,6 @@ else {
 }
 
 
-// app.use(passport.initialize());
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use(cors())
@@ -36,6 +36,7 @@ app.use(passport.session());
 app.use('/users', users);
 app.use('/pumpsRegistration', pumpsRegistration)
 app.use('/fuelLubricantPrice', fuelLubricantPrice)
+app.use('/dailySales', dailySales)
 
 app.get("/", function (req, res) {
     res.send("Hello world");

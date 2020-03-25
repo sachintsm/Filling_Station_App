@@ -7,8 +7,7 @@ var dailySalesSchema = mongoose.Schema({
     size: {type: String},
     price: {type: String},
     qty: {type: String}, 
-    pumper: {type: String},   
-    pState: {type: String},
+    date: {type: String},
 });
 
 const dailySales = module.exports = mongoose.model("dailySales", dailySalesSchema);

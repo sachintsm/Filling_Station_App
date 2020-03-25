@@ -73,7 +73,7 @@ router.post('/register', function (req, res) {
                 }
                 else {
                     newUser.save()
-                        .then(req => {
+                        .then(result => {
                             res.json({ state: true, msg: " User Registered Successfully..!" })
                         })
                         .catch(err => {
