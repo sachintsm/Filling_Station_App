@@ -1,0 +1,52 @@
+.main-div{
+    height: 1000px;
+}
+.reg-card{
+    padding-top: 50px;
+    
+}
+
+.list-card{
+    margin-top: 30px;
+    margin-bottom: 20px;
+}
+.fuel-selector{
+    margin-top: 24px;
+}
+
+.reg-btn{
+    width: 100%;
+    height: 38px;
+}
+/**************************************/
+
+.sub-topic{
+    font-size: 20px;
+    font-weight: 500;
+    margin-bottom: -20px;
+    margin-top: 20px;
+}
+.card-content{
+    margin-top: 30px;
+    margin-bottom: 10px;
+}
+
+.topic-product{
+    font-size: 18px;
+    font-weight: 500;
+    color: rgb(85, 85, 85);
+}
+.des-product{
+    font-size: 16px;
+    font-weight: 400;
+    color: rgb(85, 85, 85);
+}
+
+.delete-btn{
+    height: 40px;
+    width: 100%;
+}
+
+.inputValue{
+    text-align: right;
+}

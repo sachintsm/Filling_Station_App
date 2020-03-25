@@ -1,31 +1,69 @@
 import React, { Component } from 'react'
 import '../../Css/Auth/sidebar.css'
+import { Link } from 'react-router-dom';
+
+import LocalGasStationIcon from '@material-ui/icons/LocalGasStation';
+import PersonAddIcon from '@material-ui/icons/PersonAdd';
+import EvStationIcon from '@material-ui/icons/EvStation';
+import AttachMoneyIcon from '@material-ui/icons/AttachMoney';
 
 export default class sidebar extends Component {
     render() {
         return (
             <div className="container-fluid">
-                <div className="row side-row-div">
+                <div className="side-row-div">
+                    <Link to={'/pumpsRegistration'}>
 
-                    <div className="col-md-2 side-icn">
-                        Icon
-                    </div>
-                    <div className="col-md-10 side-txt">
-                        <p>Pumps Registration</p>
-                    </div>
-
+                        <div className="row ">
+                            <div className="col-md-2 side-icn">
+                                <LocalGasStationIcon />
+                            </div>
+                            <div className="col-md-10 side-txt">
+                                <p>Pumps Registration</p>
+                            </div>
+                        </div>
+                    </Link>
                 </div>
-                <div className="row side-row-div">
+                <div className="side-row-div">
+                    <Link to={'/registration'}>
+                        <div className="row">
 
-                    <div className="col-md-2 side-icn">
-                        Icon
-                    </div>
-                    <div className="col-md-10 side-txt">
-                        <p>Pumps Registration</p>
-                    </div>
-
+                            <div className="col-md-2 side-icn">
+                                <PersonAddIcon />
+                            </div>
+                            <div className="col-md-10 side-txt">
+                                <p>User Registration</p>
+                            </div>
+                        </div>
+                    </Link>
                 </div>
-                
+
+                <div className="side-row-div">
+                    <Link to={'/daily$pumpers$calculations'}>
+
+                        <div className="row">
+                            <div className="col-md-2 side-icn">
+                                <EvStationIcon />
+                            </div>
+                            <div className="col-md-10 side-txt">
+                                <p>Pumpers Calculations</p>
+                            </div>
+                        </div>
+                    </Link>
+                </div>
+                <div className="side-row-div">
+                    <Link to={'/fuel$lubricant$price'}>
+
+                        <div className="row">
+                            <div className="col-md-2 side-icn">
+                                <AttachMoneyIcon />
+                            </div>
+                            <div className="col-md-10 side-txt">
+                                <p>Fuel / Lumbricant Price</p>
+                            </div>
+                        </div>
+                    </Link>
+                </div>
             </div>
         )
     }
