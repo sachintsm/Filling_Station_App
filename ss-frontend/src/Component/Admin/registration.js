@@ -1,11 +1,13 @@
-import React, { Component } from 'react'
+import React, { Component } from 'react';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { Row, Col } from 'reactstrap';
 import '../../Css/Admin/registration.css';
 import axios from 'axios';
-import Sidebar from '../Auth/sidebar'
+import Sidebar from '../Auth/sidebar';
 import { verifyAuth } from '../../utils/authentication';
+
+
 
 export default class registration extends Component {
 
@@ -42,8 +44,9 @@ export default class registration extends Component {
         const formData = new FormData();
         formData.append("profileImage", this.state.form.file);
         formData.append('fullName', this.state.form.fullName);
-        formData.append('password',this.state.form.password);
+        formData.append('password', this.state.form.password);
         formData.append('userId', this.state.form.userId);
+        formData.append('userId', this.state.form.email);
         formData.append('userType', this.state.form.userType);
         formData.append('birthday', this.state.form.birthday);
         formData.append('nic', this.state.form.nic);
@@ -54,15 +57,16 @@ export default class registration extends Component {
         formData.append('address', this.state.form.address);
         formData.append('other', this.state.form.other);
 
+            axios.post("http://localhost:4000/users/register", formData, { // receive two parameter endpoint url ,form data 
+            })
+                .then(res => { // then print response status
+                    console.log(res)
+                })
+                .catch(err => {
+                    console.log(err);
+                })
 
-        axios.post("http://localhost:4000/users/register", formData, { // receive two parameter endpoint url ,form data 
-        })
-            .then(res => { // then print response status
-                console.log(res)
-            })
-            .catch(err =>{
-                console.log(err);
-            })
+        
     }
 
     async componentDidMount() {

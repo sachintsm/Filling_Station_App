@@ -86,6 +86,14 @@ router.post('/register', function (req, res) {
     })
 })
 
+router.route('/:id').get(function (req, res) {
+
+    let id = req.params.id;
+    User.findById(id, function (err, user) {
+      res.json(user);
+    });
+  });
+
 //User Login
 router.post('/account/login', async function (req, res) {
     const password = req.body.password
