@@ -1,17 +1,17 @@
-import React, { Component } from 'react'
-import Sidebar from '../Auth/sidebar'
-import { verifyAuth } from '../../utils/authentication'
-import { getFromStorage } from '../../utils/storage';
-import axios from 'axios'
-import '../../Css/Basic/dailySales.css'
-import { MDBInput } from "mdbreact";
-import { Button } from 'reactstrap';
 import Card from '@material-ui/core/Card';
+import IconButton from '@material-ui/core/IconButton';
+import Snackbar from '@material-ui/core/Snackbar';
+import axios from 'axios';
+import { MDBInput } from "mdbreact";
+import React, { Component } from 'react';
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
-import Snackbar from '@material-ui/core/Snackbar'
-import IconButton from '@material-ui/core/IconButton'
-
+import { Button } from 'reactstrap';
+import '../../Css/Basic/dailySales.css';
+import { verifyAuth } from '../../utils/authentication';
+import { getFromStorage } from '../../utils/storage';
+import Sidebar from '../Auth/sidebar';
+import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 export default class dailyPumperCalculations extends Component {
 
     constructor(props) {
@@ -28,14 +28,16 @@ export default class dailyPumperCalculations extends Component {
             sales: [],
             salesTotal: 0,
             lockerAmount: '',
-            lockerTotal : 0.00,
-            
+            locker: [],
+            lockerTotal: 0.00,
+
         }
 
         this.onLocalChange = this.onLocalChange.bind(this)
         this.onLocalSubmit = this.onLocalSubmit.bind(this)
         this.onLockerSubmit = this.onLockerSubmit.bind(this)
         this.onLockerChange = this.onLocalChange.bind(this)
+        this.lockerDelete = this.lockerDelete.bind(this)
     }
     snackbarClose = (event) => {
         this.setState({ snackbaropen: false })
@@ -46,7 +48,7 @@ export default class dailyPumperCalculations extends Component {
         this.setState({ authState: authState })
         if (!authState) this.props.history.push('/login');
 
-        axios.get('http://localhost:4000/dailySales/get')
+        await axios.get('http://localhost:4000/dailySales/get')
             .then(res => {
                 this.setState({
                     sales: res.data.data
@@ -56,6 +58,18 @@ export default class dailyPumperCalculations extends Component {
                 }
                 this.setState({
                     salesTotal: this.state.salesTotal.toFixed(2)
+                })
+            })
+        await axios.get('http://localhost:4000/lockerState/get')
+            .then(res => {
+                this.setState({
+                    locker: res.data.data
+                })
+                for (var i = 0; i < this.state.sales.length; i++) {
+                    // this.state.lockerTotal = this.state.lockerTotal + parseFloat(this.state.locker[i].lockerAmount)
+                }
+                this.setState({
+                    lockerTotal: this.state.lockerTotal.toFixed(2)
                 })
             })
     }
@@ -71,6 +85,25 @@ export default class dailyPumperCalculations extends Component {
         this.setState({
             lockerAmount: e.target.value
         })
+    }
+
+    lockerDelete(data) {
+        // axios.delete('http://localhost:4000/lockerState/delete/' + data)
+        //     .then(res => {
+        //         console.log(res);
+        //         this.setState({
+        //             snackbaropen: true,
+        //             snackbarmsg: res.data.message
+        //         })
+        //         window.location.reload();
+        //     })
+        //     .catch(err => {
+        //         console.log(err);
+        //         this.setState({
+        //             snackbaropen: true,
+        //             snackbarmsg: err
+        //         })
+        //     })
     }
 
     async onLockerSubmit() {
@@ -283,6 +316,34 @@ export default class dailyPumperCalculations extends Component {
                                                                 <Button className="sub-btn" color="primary" onClick={this.onLockerSubmit}>Submit</Button>
                                                             </div>
                                                         </div>
+
+                                                        <div className="row" >
+                                                            <div className="col-md-5">
+                                                                <p className="topic-product">Time</p>
+                                                            </div>
+                                                            <div className="col-md-5">
+                                                                <p className="topic-product">Amount</p>
+                                                            </div>
+                                                            <div className="col-md-2">
+                                                                <p className="topic-product">Action</p>
+                                                            </div>
+                                                        </div>
+
+                                                        {this.state.locker.map((data) => {
+                                                            return (
+                                                                <div className="row" key={data._id}>
+                                                                    <div className="col-md-5">
+                                                                        <p className="product">{data.time}</p>
+                                                                    </div>
+                                                                    <div className="col-md-5" style={{textAlign:"right"}}>
+                                                                        <p className="product">{data.lockerAmount}.00</p>
+                                                                    </div>
+                                                                    <div className="col-md-2" style={{ textAlign: "center" }}>
+                                                                        <DeleteForeverIcon className="del-btn" onClick={this.lockerDelete(data._id)} />
+                                                                    </div>
+                                                                </div>
+                                                            )
+                                                        })}
                                                     </Card>
                                                 </div>
                                             </div>

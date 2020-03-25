@@ -207,7 +207,6 @@ export default class fuelLubricantPrice extends Component {
     }
 
     deleteProduct(data) {
-        console.log(data)
         axios.delete('http://localhost:4000/fuelLubricantPrice/deleteProduct/' + data)
             .then(res => {
                 console.log(res);

@@ -4,7 +4,7 @@ const config = require('../config/database');
 const DailySales = require('../models/dailySales');
 const verify = require('../authentication');
 
-router.post('/add', async function (req, res) {
+router.post('/add', verify, async function (req, res) {
 
     var today = new Date();
     var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();

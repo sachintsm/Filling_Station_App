@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.schema;
 
 var lockerStateSchema = mongoose.Schema({
-    amount: { type: String },
+    lockerAmount: { type: String },
     date: { type: String },
     time: { type: String },
 });

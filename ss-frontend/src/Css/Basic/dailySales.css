@@ -9,13 +9,23 @@
 
 .first-topic{
     font-size: 18px;
-    font-weight: 400;
+    font-weight: 500;
 }
 .topic-product{
     font-size: 16px;
-    font-weight: 400;
+    font-weight: 500;
 }
 .product{
     font-size: 14px;
-    font-weight: 300;
+    font-weight: 400;
+    color: rgb(88, 88, 88);
+}
+
+.del-btn{
+    color: rgb(88, 88, 88);
+}
+
+.del-btn:hover{
+    color: rgb(187, 0, 0);
+    cursor: pointer;
 }
