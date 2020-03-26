@@ -7,8 +7,6 @@ import axios from 'axios';
 import Sidebar from '../Auth/sidebar';
 import { verifyAuth } from '../../utils/authentication';
 
-
-
 export default class registration extends Component {
 
     constructor(props) {

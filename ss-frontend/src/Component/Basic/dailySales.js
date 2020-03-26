@@ -6,12 +6,14 @@ import { MDBInput } from "mdbreact";
 import React, { Component } from 'react';
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
-import { Button } from 'reactstrap';
 import '../../Css/Basic/dailySales.css';
 import { verifyAuth } from '../../utils/authentication';
 import { getFromStorage } from '../../utils/storage';
 import Sidebar from '../Auth/sidebar';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
+import { Button, Form, Col, Row } from 'react-bootstrap';
+
+
 export default class dailyPumperCalculations extends Component {
 
     constructor(props) {
@@ -449,7 +451,99 @@ export default class dailyPumperCalculations extends Component {
                                     </Tab>
 
                                     <Tab eventKey="debit" title="Debit Management">
-                                        <div ></div>
+                                        <div className="container" style={{ marginTop: "20px" }} >
+                                            <Card className="container">
+                                                <div className="row">
+                                                    <div className="col-md-6">
+                                                        <Row>
+                                                            <Col xs="3">
+                                                                <p className="debitor-Input">Debitor ID</p>
+                                                            </Col>
+                                                            <Col xs="9">
+                                                                <MDBInput outline label="Product ID" type="text" name="salesPId" onChange={this.onLocalChange} />
+                                                            </Col>
+                                                        </Row>
+                                                        <Row style={{ marginTop: "-30px" }}>
+                                                            <Col xs="3">
+                                                                <p className="debitor-Input">Bill No.</p>
+                                                            </Col>
+                                                            <Col xs="9">
+                                                                <MDBInput outline label="Product ID" type="text" name="salesPId" onChange={this.onLocalChange} />
+                                                            </Col>
+                                                        </Row>
+                                                        <Row style={{ marginTop: "-30px" }}>
+                                                            <Col xs="3">
+                                                                <p className="debitor-Input">Invoice No.</p>
+                                                            </Col>
+                                                            <Col xs="9">
+                                                                <MDBInput outline label="Product ID" type="text" name="salesPId" onChange={this.onLocalChange} />
+                                                            </Col>
+                                                        </Row>
+                                                        <Row style={{ marginTop: "-30px" }}>
+                                                            <Col xs="3">
+                                                                <p className="debitor-Input">Venicle No.</p>
+                                                            </Col>
+                                                            <Col xs="9">
+                                                                <MDBInput outline label="Product ID" type="text" name="salesPId" onChange={this.onLocalChange} />
+                                                            </Col>
+                                                        </Row>
+                                                    </div>
+                                                    <div className="col-md-6">
+                                                        <Row>
+                                                            <Col xs="3">
+                                                                <p className="debitor-Input">Product ID</p>
+                                                            </Col>
+                                                            <Col xs="9">
+                                                                <MDBInput outline label="Product ID" type="text" name="salesPId" onChange={this.onLocalChange} />
+                                                            </Col>
+                                                        </Row>
+                                                        <Row style={{ marginTop: "-30px" }}>
+                                                            <Col xs="3">
+                                                                <p className="debitor-Input">Quentity</p>
+                                                            </Col>
+                                                            <Col xs="9">
+                                                                <MDBInput outline label="Product ID" type="text" name="salesPId" onChange={this.onLocalChange} />
+                                                            </Col>
+                                                        </Row>
+                                                        <Row style={{ marginTop: "-30px" }}>
+                                                            <Col xs="3">
+                                                                <p className="debitor-Input">Debit Type</p>
+                                                            </Col>
+                                                            <Col xs="9">
+                                                                <MDBInput outline label="Product ID" type="text" name="salesPId" onChange={this.onLocalChange} />
+                                                            </Col>
+                                                        </Row>
+                                                        <Row style={{ marginTop: "-30px" }}>
+                                                            <Col xs="3">
+                                                                <p className="debitor-Input">Pump ID</p>
+                                                            </Col>
+                                                            <Col xs="9">
+                                                                <MDBInput outline label="Product ID" type="text" name="salesPId" onChange={this.onLocalChange} />
+                                                            </Col>
+                                                        </Row>
+                                                    </div>
+                                                    <Button className="sub-btn" color="primary" onClick={this.onLocalSubmit}>Submit</Button>
+
+                                                </div>
+                                            </Card>
+                                        </div>
+
+                                        <div className="container" style={{ marginTop: "20px" }} >
+                                            <Card className="container">
+                                                <Row>
+                                                    <Col xs="1"></Col>
+                                                    <Col xs="1"></Col>
+                                                    <Col xs="1"></Col>
+                                                    <Col xs="1"></Col>
+                                                    <Col xs="1"></Col>
+                                                    <Col xs="1"></Col>
+                                                    <Col xs="1"></Col>
+                                                    <Col xs="1"></Col>
+                                                    <Col xs="1"></Col>
+
+                                                </Row>
+                                            </Card>
+                                        </div>
                                     </Tab>
 
                                     <Tab eventKey="pumps" title="Pumps Management">
