@@ -32,7 +32,7 @@ router.post('/register', function (req, res) {
 
         //check password empty
         if (req.body.password == '') return res.json({ state: false, msg: "Password Empty..!" })
-        console.log(req.body);
+        console.log(req.body.userId);
 
         //checking if the userId is already in the database
         const userIdExist = await User.findOne({ userId: req.body.userId })

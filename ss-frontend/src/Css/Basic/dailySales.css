@@ -29,3 +29,8 @@
     color: rgb(187, 0, 0);
     cursor: pointer;
 }
+
+.meterReadingInput{
+    margin-top: -35px;
+    margin-bottom: -10px;
+}

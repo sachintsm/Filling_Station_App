@@ -46,7 +46,7 @@ export default class registration extends Component {
         formData.append('fullName', this.state.form.fullName);
         formData.append('password', this.state.form.password);
         formData.append('userId', this.state.form.userId);
-        formData.append('userId', this.state.form.email);
+        formData.append('email', this.state.form.email);
         formData.append('userType', this.state.form.userType);
         formData.append('birthday', this.state.form.birthday);
         formData.append('nic', this.state.form.nic);
