@@ -4,15 +4,12 @@ import { Button, Card, Form, Col, Row } from 'react-bootstrap';
 import Sidebar from '../Auth/sidebar';
 import "react-datepicker/dist/react-datepicker.css";
 import '../../Css/Basic/profile.css';
-import DatePicker from "react-datepicker";
 import normal from '../../Assets/images/normal.png';
 import { getFromStorage } from '../../utils/storage';
 
 
-// import Upper from "../../Components/Upper.component";
-// import { connect } from 'react-redux';
+
 // import AddImage from "../../Components/AddServiceImage.component";
-// import normal from '../../Images/Profile/normal.png';
 // import Delete from "../../Components/Delete.component";
 
 export default class profile extends Component {
@@ -62,23 +59,24 @@ export default class profile extends Component {
                 console.log(response);
 
                 this.setState({
-                    userData: response.data.data
-                    //     fullName: response.data.data.fullName,
-                    //     email: response.data.data.email,
-                    //     password: response.data.data.password,
-                    //     mobileOne: response.data.data.mobileOne,
-                    //     mobileTwo: response.data.data.mobileTwo,
-                    //     address: response.data.data.address,
-                    //     nic: response.data.data.nic,
-                    //     epf: response.data.data.epf,
-                    //     etf: response.data.data.etf,
-                    //     other: response.data.data.other,
-                    //     file: response.data.data.file,
-                    //     userId: response.data.data.userId,
-                    //     userType: response.data.data.userType,
-                    //     signup_completed: response.data.data.signup_completed
+                    userData: response.data.data,
+
+                        fullName: userData.fullName,
+                        email: userData.email,
+                        password: userData.password,
+                        mobileOne: userData.mobileOne,
+                        mobileTwo: userData.mobileTwo,
+                        address: userData.address,
+                        nic: userData.nic,
+                        epf: userData.epf,
+                        etf: userData.etf,
+                        other: userData.other,
+                        file: userData.file,
+                        userId: userData.userId,
+                        userType: userData.userType,
+                        signup_completed: userData.signup_completed
                 })
-                console.log();
+                console.log(this.state.userId);
             })
             .catch(error => {
                 console.log(error)
@@ -158,6 +156,10 @@ export default class profile extends Component {
         });
     }
     onSubmit(e) {
+
+        const userData = getFromStorage('auth-user')
+        console.log(userData.userId)
+
         e.preventDefault();
         const obj = {
             signup_firstName: this.state.signup_firstName,
@@ -176,7 +178,7 @@ export default class profile extends Component {
             signup_completed: this.state.signup_completed
         };
 
-        axios.post('http://localhost:4000/mazzevents/updatecustomer/' + this.props.id, obj)
+        axios.post('http://localhost:4000/users/updateuser/' + userData.userId, obj)
             .then(res => console.log(res.data));
 
         // const obj2 = {
@@ -233,14 +235,14 @@ export default class profile extends Component {
                                         </div>
 
                                         <div className="col-md-8">
-                                            {this.state.userData.map((data) => {
-                                                return (
-                                                    <form onSubmit={this.onSubmit} key={data._id}>
+                                            {/* {this.state.userData.map((data) => { */}
+                                                {/* return ( */}
+                                                    <form onSubmit={this.onSubmit}>
                                                         <div className="row" >
                                                             <div className="col-md-4">
                                                                 <div className="form-group" style={{ marginTop: "50px" }}>
                                                                     <label>User ID : </label>
-                                                                    <input type="text" className="form-control" name="userId" defaultValue={data.userId} onChange={this.onChange} />
+                                                                    <input type="text" className="form-control" name="userId" defaultValue={this.state.userId} onChange={this.onChange} />
                                                                 </div>
                                                             </div>
 
@@ -309,8 +311,8 @@ export default class profile extends Component {
                                                         </div>
 
                                                     </form>
-                                                )
-                                            })}
+                                                {/* )
+                                             })} */}
                                         </div>
                                     </div>
                                 </div>

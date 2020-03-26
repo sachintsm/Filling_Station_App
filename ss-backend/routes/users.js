@@ -115,6 +115,44 @@ router.get('/get/:id', function (req, res) {
         })
 });
 
+//update notification 
+  router.post('/updateuser', async function (req, res) {
+    console.log(req.body);
+    const userId = req.body.userId;
+    const userType = req.body.userType;
+    const birthday = req.body.birthday;
+    const email = req.body.email;
+    const epf = req.body.epf;
+    const etf = req.body.etf;
+    const address = req.body.address;
+    const other = req.body.other;
+
+
+    await User
+        .update({ userId: userId },
+            {
+                $set: {
+                    userType: userType,
+                    birthday: birthday,
+                    email: email,
+                    epf: epf,
+                    etf: etf,
+                    address: address,
+                    other: other
+
+                }
+            })    //update user data with correspond to userid
+        .exec()
+        .then(data => {
+            console.log("Data Update Success..!")
+            res.json({ state: true, msg: "Data Update Success..!" });
+
+        })
+        .catch(error => {
+            console.log("Data Updating Unsuccessfull..!")
+            res.json({ state: false, msg: "Data Updating Unsuccessfull..!" });
+        })
+})
 
 //User Login
 router.post('/account/login', async function (req, res) {
