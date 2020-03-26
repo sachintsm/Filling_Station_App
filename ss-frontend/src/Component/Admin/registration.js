@@ -160,22 +160,24 @@ export default class registration extends Component {
                                                     <input type="text" className="form-control" name="userId" value={form.userId} onChange={this.onChange}></input>
                                                 </div>
                                             </Col>
-                                            <Col>
-
-                                                <label>Usertype : </label>
+                                            
+                                                <Col>
+                                                <label>User Type : </label>
                                                 <div className="form-group">
-                                                    <select id="dropdown" value={form.userType} onChange={this.handleDropdownChange}>
+                                                    <select  className="form-control" id="dropdown" value={form.userType} onChange={this.handleDropdownChange}>
                                                         <option value="Administrator">Administrator</option>
                                                         <option value="Manager">Manager</option>
                                                         <option value="Pumper">Pumper</option>
 
                                                     </select>
                                                 </div>
-                                            </Col>
+                                                </Col>
+                                           
                                             <Col>
                                                 <label>Birthday : </label>
                                                 <div className="form-group">
                                                     <DatePicker
+                                                        className="form-control"
                                                         selected={form.birthday}
                                                         onChange={this.handleChangeBirthday}
                                                     />
@@ -234,9 +236,9 @@ export default class registration extends Component {
                                             <label>Others : </label>
                                             <textarea type="text" className="form-control" name="other" value={form.other} onChange={this.onChange}></textarea>
                                         </div>
-                                        <div>
-                                            <h1>File Upload</h1>
-                                            <input type="file" name="myImage" onChange={this.handleImageChange} />
+                                        <div className="form-group">
+                                        <label>Upload Your Profile Image : </label>
+                                            <input type="file"  className="form-control" name="myImage" onChange={this.handleImageChange} />
                                         </div>
                                         <div className="form-group">
                                             <button className="btn btn-info my-4 btn-block " type="submit">Register Now</button>

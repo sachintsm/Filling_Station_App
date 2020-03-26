@@ -1,17 +1,20 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import { Button, Card, Form, Col } from 'react-bootstrap';
+import { Button, Card, Form, Col, Row } from 'react-bootstrap';
 import Sidebar from '../Auth/sidebar';
 import "react-datepicker/dist/react-datepicker.css";
-import { Row, Col } from 'reactstrap';
-import '../../Css/Admin/registration.css';
+import '../../Css/Basic/profile.css';
+import DatePicker from "react-datepicker";
+import normal from '../../Assets/images/normal.png';
+
+
 // import Upper from "../../Components/Upper.component";
-import { connect } from 'react-redux';
+// import { connect } from 'react-redux';
 // import AddImage from "../../Components/AddServiceImage.component";
 // import normal from '../../Images/Profile/normal.png';
 // import Delete from "../../Components/Delete.component";
 
-class profile extends Component {
+export default class profile extends Component {
     constructor(props) {
         super(props);
         this.onChangeFulName = this.onChangeFulName.bind(this);
@@ -179,78 +182,139 @@ class profile extends Component {
 
     render() {
         return (
+
+
             <div>
-                <Sidebar />
-                <div className="right">
-                    {/* <Upper /> */}
-                    {/* <div className="left">
-                        <Card style={{ width: '18rem' }}>
-                            <div className="overflow">
-                                <Card.Img variant="top" src={!this.state.profilePic ? normal : this.state.profilePic} />
-                            </div>
-                            <Card.Body>
-                                <Card.Title><center>{this.state.signup_firstName} {this.state.signup_lastName}</center></Card.Title>
-                                <Card.Text>
-                                    Email Address: {this.state.signup_email}<br />
-                                    Contact Number: {this.state.signup_number}<br />
-
-                                </Card.Text>
-                                <br />
-                                <center>
-                                    <AddImage />
-                                </center>
-                            </Card.Body>
-                        </Card>
-                    </div> */}
-
-                    <div className="rightAccount">
-
-                        <h3>Update My details</h3>
-                        <Form onSubmit={this.onSubmit}>
-                            <Form.Row>
-                                <Form.Group as={Col} controlId="formGridFirstName">
-                                    <Form.Label>full Name</Form.Label>
-                                    <Form.Control type="text" className="form-control" value={this.state.fullName} onChange={this.onChangeFulName} />
-                                </Form.Group>
-                                <Form.Group as={Col} controlId="formGridLastName">
-                                    <Form.Label>Address</Form.Label>
-                                    <Form.Control type="text" className="form-control" value={this.state.address} onChange={this.onChangeAddress} />
-                                </Form.Group>
-                            </Form.Row>
-                            <Form.Row>
-                                <Form.Group as={Col} controlId="formGridEmail">
-                                    <Form.Label>Email</Form.Label>
-                                    <Form.Control type="text" className="form-control" value={this.state.email} onChange={this.onChangeEmail} />
-                                </Form.Group>
-                                <Form.Group controlId="ContactNumber">
-                                    <Form.Label>Contact Number</Form.Label>
-                                    <Form.Control type="text" className="form-control" value={this.state.mobileOne} onChange={this.onChangeMobileOne} />
-                                </Form.Group>
-                            </Form.Row>
-                            <div className="row">
-                                <div className="col-md-6">
-                                    <Button variant="dark" type="submit" value="Update">
-                                        Update
-                                    </Button>
-                                </div>
-                                <div className="col-md-6">
-                                    <Delete />
-                                </div>
-                            </div>
-                        </Form>
+                <Col className="row">
+                    <div className="col-md-2" style={{ backgroundColor: "#1c2431" }}>
+                        <Sidebar />
                     </div>
-                </div>
-            </div>
+                    <div className="col-md-10">
+
+                        <React.Fragment>
+                            <h3 style={{ textAlign: "center", marginTop: "50px" }}>My Profile</h3>
+
+
+
+
+                            <div className="card">
+
+                                <div style={{ width: "90%", margin: 'auto' }}>
+                                    <div className="row">
+                                        <div className="col-md-4">
+
+                                            <Card style={{ width: '18rem' }}>
+                                                <div className="overflow">
+                                                    <Card.Img variant="top" src={!this.state.file ? normal : this.state.file} />
+                                                </div>
+                                                <Card.Body>
+                                                    <Card.Title><center>{this.state.fullName} {this.state.fullName}</center></Card.Title>
+                                                    <Card.Text>
+                                                        Contact Number 1: {this.state.mobileOne}<br />
+                                                        Contact Number 2: {this.state.mobileTwo}<br />
+
+                                                    </Card.Text>
+                                                    <br />
+                                                    {/* <center>
+                                    <AddImage />
+                                </center> */}
+                                                </Card.Body>
+                                            </Card>
+                                        </div>
+
+                                        <div className="col-md-8">
+                                            <form onSubmit={this.onSubmit}>
+
+
+                                                <Row>
+                                                    <Col>
+                                                        <div className="form-group" style={{ marginTop: "50px" }}>
+                                                            <label>User ID : </label>
+                                                            <input type="text" className="form-control" name="userId" value={this.state.userId} onChange={this.onChange}></input>
+                                                        </div>
+                                                    </Col>
+
+
+
+                                                    <Col>
+                                                        <div className="form-group" style={{ marginTop: "50px" }}>
+                                                            <label>User Type : </label>
+                                                            <input type="text" className="form-control" name="userType" value={this.state.userType} onChange={this.onChange}></input>
+                                                        </div>
+                                                    </Col>
+
+
+                                                    <Col>
+                                                        <div className="form-group" style={{ marginTop: "50px" }}>
+                                                            <label>Birthday : </label>
+                                                            <input type="text" className="form-control" name="userType" value={this.state.birthday} onChange={this.onChange}></input>
+                                                        </div>
+                                                    </Col>
+                                                </Row>
+                                                <Row>
+                                                    <Col>
+                                                        <div className="form-group">
+                                                            <label>E-mail : </label>
+                                                            <input type="text" className="form-control" name="email" value={this.state.email} onChange={this.onChange}></input>
+                                                        </div>
+                                                    </Col>
+                                                    <Col>
+                                                        <div className="form-group">
+                                                            <label>NIC Number : </label>
+                                                            <input type="text" className="form-control" name="nic" value={this.state.nic} onChange={this.onChange}></input>
+                                                        </div>
+                                                    </Col>
+                                                </Row>
+
+                                                <Row>
+                                                    <Col>
+                                                        <div className="form-group">
+                                                            <label>EPF Number : </label>
+                                                            <input type="text" className="form-control" name="epf" value={this.state.epf} onChange={this.onChange}></input>
+                                                        </div>
+                                                    </Col>
+                                                    <Col>
+                                                        <div className="form-group">
+                                                            <label>ETF Number : </label>
+                                                            <input type="text" className="form-control" name="etf" value={this.state.etf} onChange={this.onChange}></input>
+                                                        </div>
+                                                    </Col>
+                                                </Row>
+                                                <div className="form-group">
+                                                    <label>Address : </label>
+                                                    <textarea type="text" className="form-control" name="address" value={this.state.address} onChange={this.onChange}></textarea>
+                                                </div>
+                                                <div className="form-group">
+                                                    <label>Others : </label>
+                                                    <textarea type="text" className="form-control" name="other" value={this.state.other} onChange={this.onChange}></textarea>
+                                                </div>
+
+                                                <div className="form-group">
+                                                    <button className="btn btn-info my-4 btn-block " type="submit">UPDATE</button>
+                                                </div>
+
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </React.Fragment>
+
+                    </div>
+
+                </Col>
+            </div >
+
         )
     }
 }
 
-const mapStateToProps = state => ({
-    id: state.auth.id,
-    fName: state.auth.fName,
-    lName: state.auth.lName,
-    email: state.auth.email,
-    number: state.auth.number
-});
+// const mapStateToProps = state => ({
+//     id: state.auth.id,
+//     fName: state.auth.fName,
+//     lName: state.auth.lName,
+//     email: state.auth.email,
+//     number: state.auth.number
+// });
 
-export default connect(mapStateToProps, null)(profile);
+// export default connect(mapStateToProps, null)(profile);

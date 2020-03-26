@@ -9,6 +9,7 @@ const fs = require('fs');
 var jwt = require('jsonwebtoken');
 const verify = require('../authentication');
 
+
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, 'local_storage/profile_Images/')    //user profile pictures saving destination folder
@@ -86,13 +87,34 @@ router.post('/register', function (req, res) {
     })
 })
 
-router.route('/:id').get(function (req, res) {
+//get data from backend
+
+router.get('/get', function (req, res) {
+
+    User.find()
+        .exec()
+        .then(result => {
+            res.json({ state: true, msg: "Data Transfer Successfully..!", data: result });
+        })
+        .catch(error => {
+            res.json({ state: false, msg: "Data Transfering Unsuccessfull..!" });
+        })
+})
+
+//get data for a particular id
+router.get('/get/:id', function (req, res) {
 
     let id = req.params.id;
-    User.findById(id, function (err, user) {
-      res.json(user);
-    });
-  });
+    User.find({ userId: id })
+        .exec()
+        .then(result => {
+            res.json({ state: true, msg: "Data Transfer Successfully..!", data: result });
+        })
+        .catch(error => {
+            res.json({ state: false, msg: "Data Transfering Unsuccessfull..!" });
+        })
+});
+
 
 //User Login
 router.post('/account/login', async function (req, res) {
