@@ -15,6 +15,7 @@ const pumpsRegistration = require('./routes/pumpsRegistration')
 const fuelLubricantPrice = require('./routes/fuelLubricantPrice')
 const dailySales = require('./routes/dailySales')
 const lockerState = require('./routes/lockerState')
+const machinesData = require('./routes/machinesData')
 
 const connection = mongoose.connect(config.database, { useUnifiedTopology: true, useNewUrlParser: true })
 if (connection) {
@@ -36,6 +37,7 @@ app.use('/pumpsRegistration', pumpsRegistration)
 app.use('/fuelLubricantPrice', fuelLubricantPrice)
 app.use('/dailySales', dailySales)
 app.use('/lockerState', lockerState)
+app.use('/machinesData', machinesData)
 
 app.get("/", function (req, res) {
     res.send("Hello world");
