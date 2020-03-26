@@ -104,7 +104,7 @@ router.post('/account/login', async function (req, res) {
             }
             else {
                 const token = jwt.sign({ _id: user._id }, config.secret)
-                res.header('auth-token', token).send({ state: true, msg: " Sign in Successfully..!", token: token })
+                res.header('auth-token', token).send({ state: true, msg: " Sign in Successfully..!", token: token,data :user })
             }
         }
         else {
