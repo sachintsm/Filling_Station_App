@@ -1,11 +1,13 @@
-import React, { Component } from 'react'
+import React, { Component } from 'react';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { Row, Col } from 'reactstrap';
 import '../../Css/Admin/registration.css';
 import axios from 'axios';
-import Sidebar from '../Auth/sidebar'
+import Sidebar from '../Auth/sidebar';
 import { verifyAuth } from '../../utils/authentication';
+
+
 
 export default class registration extends Component {
 
@@ -42,8 +44,9 @@ export default class registration extends Component {
         const formData = new FormData();
         formData.append("profileImage", this.state.form.file);
         formData.append('fullName', this.state.form.fullName);
-        formData.append('password',this.state.form.password);
+        formData.append('password', this.state.form.password);
         formData.append('userId', this.state.form.userId);
+        formData.append('userId', this.state.form.email);
         formData.append('userType', this.state.form.userType);
         formData.append('birthday', this.state.form.birthday);
         formData.append('nic', this.state.form.nic);
@@ -54,15 +57,16 @@ export default class registration extends Component {
         formData.append('address', this.state.form.address);
         formData.append('other', this.state.form.other);
 
+            axios.post("http://localhost:4000/users/register", formData, { // receive two parameter endpoint url ,form data 
+            })
+                .then(res => { // then print response status
+                    console.log(res)
+                })
+                .catch(err => {
+                    console.log(err);
+                })
 
-        axios.post("http://localhost:4000/users/register", formData, { // receive two parameter endpoint url ,form data 
-        })
-            .then(res => { // then print response status
-                console.log(res)
-            })
-            .catch(err =>{
-                console.log(err);
-            })
+        
     }
 
     async componentDidMount() {
@@ -156,22 +160,24 @@ export default class registration extends Component {
                                                     <input type="text" className="form-control" name="userId" value={form.userId} onChange={this.onChange}></input>
                                                 </div>
                                             </Col>
-                                            <Col>
-
-                                                <label>Usertype : </label>
+                                            
+                                                <Col>
+                                                <label>User Type : </label>
                                                 <div className="form-group">
-                                                    <select id="dropdown" value={form.userType} onChange={this.handleDropdownChange}>
+                                                    <select  className="form-control" id="dropdown" value={form.userType} onChange={this.handleDropdownChange}>
                                                         <option value="Administrator">Administrator</option>
                                                         <option value="Manager">Manager</option>
                                                         <option value="Pumper">Pumper</option>
 
                                                     </select>
                                                 </div>
-                                            </Col>
+                                                </Col>
+                                           
                                             <Col>
                                                 <label>Birthday : </label>
                                                 <div className="form-group">
                                                     <DatePicker
+                                                        className="form-control"
                                                         selected={form.birthday}
                                                         onChange={this.handleChangeBirthday}
                                                     />
@@ -230,9 +236,9 @@ export default class registration extends Component {
                                             <label>Others : </label>
                                             <textarea type="text" className="form-control" name="other" value={form.other} onChange={this.onChange}></textarea>
                                         </div>
-                                        <div>
-                                            <h1>File Upload</h1>
-                                            <input type="file" name="myImage" onChange={this.handleImageChange} />
+                                        <div className="form-group">
+                                        <label>Upload Your Profile Image : </label>
+                                            <input type="file"  className="form-control" name="myImage" onChange={this.handleImageChange} />
                                         </div>
                                         <div className="form-group">
                                             <button className="btn btn-info my-4 btn-block " type="submit">Register Now</button>
