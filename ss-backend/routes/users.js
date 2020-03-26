@@ -74,7 +74,7 @@ router.post('/register', function (req, res) {
                 }
                 else {
                     newUser.save()
-                        .then(req => {
+                        .then(result => {
                             res.json({ state: true, msg: " User Registered Successfully..!" })
                         })
                         .catch(err => {
@@ -134,7 +134,7 @@ router.post('/account/login', async function (req, res) {
             }
             else {
                 const token = jwt.sign({ _id: user._id }, config.secret)
-                res.header('auth-token', token).send({ state: true, msg: " Sign in Successfully..!", token: token })
+                res.header('auth-token', token).send({ state: true, msg: " Sign in Successfully..!", token: token,data :user })
             }
         }
         else {

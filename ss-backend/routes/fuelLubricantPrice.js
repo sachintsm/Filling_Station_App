@@ -19,7 +19,7 @@ router.post('/add', verify, async function (req, res, next) {
         pType: req.body.pType
     });
     data.save()
-        .then(req => {
+        .then(result => {
             res.json({ state: true, msg: " Data Added Successfully..!" })
         })
         .catch(err => {

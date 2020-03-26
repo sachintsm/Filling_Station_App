@@ -6,6 +6,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import '../../Css/Basic/profile.css';
 import DatePicker from "react-datepicker";
 import normal from '../../Assets/images/normal.png';
+import { getFromStorage } from '../../utils/storage';
 
 
 // import Upper from "../../Components/Upper.component";
@@ -47,33 +48,42 @@ export default class profile extends Component {
             address: '',
             other: '',
             file: '',
-            signup_completed: false
+            signup_completed: false,
+            userData: []
         }
     }
 
     componentDidMount() {
-        axios.get('http://localhost:4000/users/' + this.props.id)
+        const userData = getFromStorage('auth-user')
+        console.log(userData.userId)
+
+        axios.get('http://localhost:4000/users/get/' + userData.userId)
             .then(response => {
+                console.log(response);
+
                 this.setState({
-                    fullName: response.data.fullName,
-                    email: response.data.email,
-                    password: response.data.password,
-                    mobileOne: response.data.mobileOne,
-                    mobileTwo: response.data.mobileTwo,
-                    address: response.data.address,
-                    nic: response.data.nic,
-                    epf: response.data.epf,
-                    etf: response.data.etf,
-                    other: response.data.other,
-                    file: response.data.file,
-                    userId: response.data.userId,
-                    userType: response.data.userType,
-                    signup_completed: response.data.signup_completed
+                    userData: response.data.data
+                    //     fullName: response.data.data.fullName,
+                    //     email: response.data.data.email,
+                    //     password: response.data.data.password,
+                    //     mobileOne: response.data.data.mobileOne,
+                    //     mobileTwo: response.data.data.mobileTwo,
+                    //     address: response.data.data.address,
+                    //     nic: response.data.data.nic,
+                    //     epf: response.data.data.epf,
+                    //     etf: response.data.data.etf,
+                    //     other: response.data.data.other,
+                    //     file: response.data.data.file,
+                    //     userId: response.data.data.userId,
+                    //     userType: response.data.data.userType,
+                    //     signup_completed: response.data.data.signup_completed
                 })
+                console.log();
             })
-            .catch(function (error) {
+            .catch(error => {
                 console.log(error)
             })
+
     }
 
     onChangeFulName(e) {
@@ -223,77 +233,84 @@ export default class profile extends Component {
                                         </div>
 
                                         <div className="col-md-8">
-                                            <form onSubmit={this.onSubmit}>
+                                            {this.state.userData.map((data) => {
+                                                return (
+                                                    <form onSubmit={this.onSubmit} key={data._id}>
+                                                        <div className="row" >
+                                                            <div className="col-md-4">
+                                                                <div className="form-group" style={{ marginTop: "50px" }}>
+                                                                    <label>User ID : </label>
+                                                                    <input type="text" className="form-control" name="userId" defaultValue={data.userId} onChange={this.onChange} />
+                                                                </div>
+                                                            </div>
 
 
-                                                <Row>
-                                                    <Col>
-                                                        <div className="form-group" style={{ marginTop: "50px" }}>
-                                                            <label>User ID : </label>
-                                                            <input type="text" className="form-control" name="userId" value={this.state.userId} onChange={this.onChange}></input>
+                                                            <div className="col-md-4">
+                                                                <div className="form-group" style={{ marginTop: "50px" }}>
+                                                                    <label>User Type : </label>
+                                                                    <input type="text" className="form-control" name="userType" defaultValue={this.state.userType} onChange={this.onChange}></input>
+                                                                </div>
+                                                            </div>
+
+
+                                                            <div className="col-md-4">
+                                                                <div className="form-group" style={{ marginTop: "50px" }}>
+                                                                    <label>Birthday : </label>
+                                                                    <input type="text" className="form-control" name="userType" defaultValue={this.state.birthday} onChange={this.onChange}></input>
+                                                                </div>
+                                                            </div>
                                                         </div>
-                                                    </Col>
 
 
 
-                                                    <Col>
-                                                        <div className="form-group" style={{ marginTop: "50px" }}>
-                                                            <label>User Type : </label>
-                                                            <input type="text" className="form-control" name="userType" value={this.state.userType} onChange={this.onChange}></input>
+
+
+
+                                                        <div className="row">
+                                                            <div className="col-md-6">
+                                                                <div className="form-group">
+                                                                    <label>E-mail : </label>
+                                                                    <input type="text" className="form-control" name="email" defaultValue={this.state.email} onChange={this.onChange}></input>
+                                                                </div>
+                                                            </div>
+                                                            <div className="col-md-6">
+                                                                <div className="form-group">
+                                                                    <label>NIC Number : </label>
+                                                                    <input type="text" className="form-control" name="nic" defaultValue={this.state.nic} onChange={this.onChange}></input>
+                                                                </div>
+                                                            </div>
                                                         </div>
-                                                    </Col>
 
-
-                                                    <Col>
-                                                        <div className="form-group" style={{ marginTop: "50px" }}>
-                                                            <label>Birthday : </label>
-                                                            <input type="text" className="form-control" name="userType" value={this.state.birthday} onChange={this.onChange}></input>
-                                                        </div>
-                                                    </Col>
-                                                </Row>
-                                                <Row>
-                                                    <Col>
+                                                        <Row>
+                                                            <Col>
+                                                                <div className="form-group">
+                                                                    <label>EPF Number : </label>
+                                                                    <input type="text" className="form-control" name="epf" defaultValue={this.state.epf} onChange={this.onChange}></input>
+                                                                </div>
+                                                            </Col>
+                                                            <Col>
+                                                                <div className="form-group">
+                                                                    <label>ETF Number : </label>
+                                                                    <input type="text" className="form-control" name="etf" defaultValue={this.state.etf} onChange={this.onChange}></input>
+                                                                </div>
+                                                            </Col>
+                                                        </Row>
                                                         <div className="form-group">
-                                                            <label>E-mail : </label>
-                                                            <input type="text" className="form-control" name="email" value={this.state.email} onChange={this.onChange}></input>
+                                                            <label>Address : </label>
+                                                            <textarea type="text" className="form-control" name="address" defaultValue={this.state.address} onChange={this.onChange}></textarea>
                                                         </div>
-                                                    </Col>
-                                                    <Col>
                                                         <div className="form-group">
-                                                            <label>NIC Number : </label>
-                                                            <input type="text" className="form-control" name="nic" value={this.state.nic} onChange={this.onChange}></input>
+                                                            <label>Others : </label>
+                                                            <textarea type="text" className="form-control" name="other" defaultValue={this.state.other} onChange={this.onChange}></textarea>
                                                         </div>
-                                                    </Col>
-                                                </Row>
 
-                                                <Row>
-                                                    <Col>
                                                         <div className="form-group">
-                                                            <label>EPF Number : </label>
-                                                            <input type="text" className="form-control" name="epf" value={this.state.epf} onChange={this.onChange}></input>
+                                                            <button className="btn btn-info my-4 btn-block " type="submit">UPDATE</button>
                                                         </div>
-                                                    </Col>
-                                                    <Col>
-                                                        <div className="form-group">
-                                                            <label>ETF Number : </label>
-                                                            <input type="text" className="form-control" name="etf" value={this.state.etf} onChange={this.onChange}></input>
-                                                        </div>
-                                                    </Col>
-                                                </Row>
-                                                <div className="form-group">
-                                                    <label>Address : </label>
-                                                    <textarea type="text" className="form-control" name="address" value={this.state.address} onChange={this.onChange}></textarea>
-                                                </div>
-                                                <div className="form-group">
-                                                    <label>Others : </label>
-                                                    <textarea type="text" className="form-control" name="other" value={this.state.other} onChange={this.onChange}></textarea>
-                                                </div>
 
-                                                <div className="form-group">
-                                                    <button className="btn btn-info my-4 btn-block " type="submit">UPDATE</button>
-                                                </div>
-
-                                            </form>
+                                                    </form>
+                                                )
+                                            })}
                                         </div>
                                     </div>
                                 </div>

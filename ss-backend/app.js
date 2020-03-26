@@ -13,6 +13,8 @@ const config = require('./config/database')
 const users = require('./routes/users')
 const pumpsRegistration = require('./routes/pumpsRegistration')
 const fuelLubricantPrice = require('./routes/fuelLubricantPrice')
+const dailySales = require('./routes/dailySales')
+const lockerState = require('./routes/lockerState')
 
 const connection = mongoose.connect(config.database, { useUnifiedTopology: true, useNewUrlParser: true })
 if (connection) {
@@ -22,12 +24,8 @@ else {
     console.log("Database not Connected");
 }
 
-
-// app.use(passport.initialize());
 app.use(express.static(path.join(__dirname, "public")));
-
 app.use(cors())
-
 app.use(bodyParser.urlencoded({ extended: true, limit: '50mb', parameterLimit: 1000000 }));
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(passport.initialize());
@@ -36,6 +34,8 @@ app.use(passport.session());
 app.use('/users', users);
 app.use('/pumpsRegistration', pumpsRegistration)
 app.use('/fuelLubricantPrice', fuelLubricantPrice)
+app.use('/dailySales', dailySales)
+app.use('/lockerState', lockerState)
 
 app.get("/", function (req, res) {
     res.send("Hello world");

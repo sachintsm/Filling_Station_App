@@ -60,6 +60,10 @@ export default class login extends Component {
             .then(json => {
                 if (json.state) {
                     setInStorage('auth-token', { token: json.token })
+                    setInStorage('auth-user', {
+                        userId : json.data.userId,
+                        userType : json.data.userType
+                    })
                     this.setState({
                         signInError: json.msg,
                         password: '',
