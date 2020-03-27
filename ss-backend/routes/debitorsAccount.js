@@ -4,10 +4,7 @@ const config = require('../config/database');
 const DebitorAccount = require('../models/debitorsAccount');
 const verify = require('../authentication');
 
-router.post('/add', verify, function (req, res) {
-    console.log(req.body);
-    console.log("heool");
-    
+router.post('/add', verify, function (req, res) { 
 
     var today = new Date();
     var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
@@ -97,7 +94,7 @@ router.get('/getOther', function (req, res) {
 //delete product
 router.delete('/delete/:id', function (req, res) {
     const _id = req.params.id
-
+    
     DebitorAccount.remove({ _id: _id })
         .exec()
         .then(result => {

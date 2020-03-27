@@ -60,7 +60,7 @@ export default class dailyPumperCalculations extends Component {
         this.onChangeDebitType = this.onChangeDebitType.bind(this)
         this.onDebitChange = this.onDebitChange.bind(this)
         this.onNewDebitSubmit = this.onNewDebitSubmit.bind(this)
-
+        this.deleteDebit = this.deleteDebit.bind(this)
     }
     snackbarClose = (event) => {
         this.setState({ snackbaropen: false })
@@ -125,7 +125,6 @@ export default class dailyPumperCalculations extends Component {
         //get today petroleum debit data
         await axios.get('http://localhost:4000/debitorsAccount/get')
             .then(res => {
-                console.log(res);
                 this.setState({
                     todayPetroleumDebit: res.data.data
                 })
@@ -133,7 +132,6 @@ export default class dailyPumperCalculations extends Component {
         //get today other debits
         await axios.get('http://localhost:4000/debitorsAccount/getOther')
             .then(res => {
-                console.log(res);
                 this.setState({
                     todayOtherDebit: res.data.data
                 })
@@ -157,7 +155,24 @@ export default class dailyPumperCalculations extends Component {
             newDType: e.target.value
         })
     }
-
+    deleteDebit(data) {
+        axios.delete('http://localhost:4000/debitorsAccount/delete/' + data)
+            .then(res => {
+                console.log(res);
+                this.setState({
+                    snackbaropen: true,
+                    snackbarmsg: res.data.message
+                })
+                window.location.reload();
+            })
+            .catch(err => {
+                console.log(err);
+                this.setState({
+                    snackbaropen: true,
+                    snackbarmsg: err
+                })
+            })
+    }
     async onNewDebitSubmit() {
         const obj = getFromStorage('auth-token');
         if (this.state.newDDebitorId === '' || this.state.newDProductId === '' || this.state.newDQty === '') {
@@ -178,11 +193,9 @@ export default class dailyPumperCalculations extends Component {
                     if (this.state.products[i].pId === this.state.newDProductId) {
                         amount = this.state.products[i].sellPrice * this.state.newDQty
 
-                        console.log(this.state.products[i].sellPrice);
-
                         const data = {
                             debitorId: this.state.newDDebitorId,
-                            billNo: this.state.products[i].pName,
+                            billNo: this.state.newDBillNo,
                             invoiceNo: this.state.newDInvoiceNo,
                             vehicleNo: this.state.newDVehicleNo,
                             productId: this.state.newDProductId,
@@ -571,7 +584,7 @@ export default class dailyPumperCalculations extends Component {
                                         <div className="container" style={{ marginTop: "20px" }} >
                                             <Row>
                                                 <Col xs="8">
-                                                    <p className="first-topic">Add Debit</p>
+                                                    <p className="first-topic">Add Main Debit</p>
                                                     <Card className="container">
                                                         <div className="row">
                                                             <div className="col-md-6" style={{ marginLeft: "5px" }}>
@@ -619,6 +632,29 @@ export default class dailyPumperCalculations extends Component {
                                                         </div>
                                                     </Card>
 
+                                                    <p className="first-topic" style={{marginTop:"20px"}}>Add Other Debit</p>
+
+                                                    <Card className="container">
+                                                        <div className="row">
+                                                            <div className="col-md-6" style={{ marginLeft: "5px" }}>
+                                                                <Row>
+                                                                    <Col xs="12">
+                                                                        <MDBInput outline label="Debitor Name / Reason" type="text" name="newDDebitorId" onChange={this.onDebitChange} />
+                                                                    </Col>
+                                                                </Row>
+                                    
+                                                            </div>
+                                                            <div className="col-md-6" style={{ marginLeft: "-10px" }}>
+                                                                <Row>
+                                                                    <Col xs="12">
+                                                                        <MDBInput outline label="Amount" type="text" name="newDPumpId" onChange={this.onDebitChange} />
+                                                                    </Col>
+                                                                </Row>
+                                                            </div>
+                                                            <Button style={{ marginLeft: "21px", marginTop: "-10px ", marginBottom: "20px" }} className="debit-btn" color="primary" onClick={this.onNewDebitSubmit}>Submit</Button>
+                                                        </div>
+                                                    </Card>
+
                                                 </Col>
                                                 <Col xs="4">
                                                     <p className="first-topic">Debitors</p>
@@ -635,20 +671,20 @@ export default class dailyPumperCalculations extends Component {
                                         <div className="container" style={{ marginTop: "20px" }} >
                                             <Card className="container">
                                                 <Row style={{ marginTop: "20px" }}>
-                                                    <Col xs="1">
+                                                    <Col xs="2">
                                                         <p className="debitor-tbl-head">Date</p>
                                                     </Col>
 
-                                                    <Col xs="3">
+                                                    <Col xs="1">
 
-                                                        <p className="debitor-tbl-head">Debitor Name</p>
+                                                        <p className="debitor-tbl-head">Debitor ID</p>
                                                     </Col>
                                                     <Col xs="1">
 
                                                         <p className="debitor-tbl-head">Bill No.</p>
                                                     </Col>
 
-                                                    <Col xs="3">
+                                                    <Col xs="2">
                                                         <p className="debitor-tbl-head">Product Name</p>
 
                                                     </Col>
@@ -660,7 +696,7 @@ export default class dailyPumperCalculations extends Component {
                                                         <p className="debitor-tbl-head">Quentity</p>
 
                                                     </Col>
-                                                    <Col xs="1">
+                                                    <Col xs="2">
                                                         <p className="debitor-tbl-head">Amount</p>
 
                                                     </Col>
@@ -668,45 +704,54 @@ export default class dailyPumperCalculations extends Component {
                                                         <p className="debitor-tbl-head">Pump ID</p>
 
                                                     </Col>
-
-                                                </Row>
-
-                                                <Row style={{ marginTop: "20px" }}>
                                                     <Col xs="1">
-                                                        <p className="debitor-tbl-body">Date</p>
-                                                    </Col>
-
-                                                    <Col xs="3">
-
-                                                        <p className="debitor-tbl-body">Debitor Name</p>
-                                                    </Col>
-                                                    <Col xs="1">
-
-                                                        <p className="debitor-tbl-body">Bill No.</p>
-                                                    </Col>
-
-                                                    <Col xs="3">
-                                                        <p className="debitor-tbl-body">Product Name</p>
-
-                                                    </Col>
-                                                    <Col xs="1">
-                                                        <p className="debitor-tbl-body">Size</p>
-
-                                                    </Col>
-                                                    <Col xs="1">
-                                                        <p className="debitor-tbl-body">Quentity</p>
-
-                                                    </Col>
-                                                    <Col xs="1">
-                                                        <p className="debitor-tbl-body">Amount</p>
-
-                                                    </Col>
-                                                    <Col xs="1">
-                                                        <p className="debitor-tbl-body">Pump ID</p>
-
+                                                        <p className="debitor-tbl-head">Action</p>
                                                     </Col>
 
                                                 </Row>
+                                                {this.state.todayPetroleumDebit.map((data) => {
+                                                    return (
+                                                        <Row key={data._id}>
+                                                            <Col xs="2">
+                                                                <p className="debitor-tbl-body">{data.date}</p>
+                                                            </Col>
+
+                                                            <Col xs="1">
+
+                                                                <p className="debitor-tbl-body">{data.debitorId}</p>
+                                                            </Col>
+                                                            <Col xs="1">
+
+                                                                <p className="debitor-tbl-body">{data.billNo}</p>
+                                                            </Col>
+
+                                                            <Col xs="2">
+                                                                <p className="debitor-tbl-body">{data.productName}</p>
+
+                                                            </Col>
+                                                            <Col xs="1">
+                                                                <p className="debitor-tbl-body">{data.size}</p>
+
+                                                            </Col>
+                                                            <Col xs="1">
+                                                                <p className="debitor-tbl-body">{data.qty}</p>
+
+                                                            </Col>
+                                                            <Col xs="2">
+                                                                <p className="debitor-tbl-body">{data.amount}</p>
+
+                                                            </Col>
+                                                            <Col xs="1">
+                                                                <p className="debitor-tbl-body">{data.pumpId}</p>
+
+                                                            </Col>
+                                                            <Col xs="1">
+                                                                <DeleteForeverIcon className="del-btn" onClick={() => this.deleteDebit(data._id)} />
+                                                            </Col>
+
+                                                        </Row>
+                                                    )
+                                                })}
                                             </Card>
                                         </div>
                                     </Tab>
