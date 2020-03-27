@@ -8,7 +8,6 @@ var cors = require('cors')
 const passport = require('passport');
 const { createServer } = require('http');
 
-
 const config = require('./config/database')
 const users = require('./routes/users')
 const pumpsRegistration = require('./routes/pumpsRegistration')
@@ -16,6 +15,7 @@ const fuelLubricantPrice = require('./routes/fuelLubricantPrice')
 const dailySales = require('./routes/dailySales')
 const lockerState = require('./routes/lockerState')
 const machinesData = require('./routes/machinesData')
+const debitorsAccount = require('./routes/debitorsAccount')
 
 const connection = mongoose.connect(config.database, { useUnifiedTopology: true, useNewUrlParser: true })
 if (connection) {
@@ -38,6 +38,7 @@ app.use('/fuelLubricantPrice', fuelLubricantPrice)
 app.use('/dailySales', dailySales)
 app.use('/lockerState', lockerState)
 app.use('/machinesData', machinesData)
+app.use('/debitorsAccount', debitorsAccount)
 
 app.get("/", function (req, res) {
     res.send("Hello world");

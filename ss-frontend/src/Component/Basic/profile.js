@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import { Button, Card, Form, Col, Row } from 'react-bootstrap';
+import { Card, Col, Row } from 'react-bootstrap';
 import Sidebar from '../Auth/sidebar';
 import "react-datepicker/dist/react-datepicker.css";
 import '../../Css/Basic/profile.css';
-import DatePicker from "react-datepicker";
+// import DatePicker from "react-datepicker";
 import normal from '../../Assets/images/normal.png';
 import { getFromStorage } from '../../utils/storage';
 
