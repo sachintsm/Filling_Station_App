@@ -10,28 +10,14 @@ import { getFromStorage } from '../../utils/storage';
 import Snackbar from '@material-ui/core/Snackbar'
 import IconButton from '@material-ui/core/IconButton'
 
-// import Upper from "../../Components/Upper.component";
-// import { connect } from 'react-redux';
+
 // import AddImage from "../../Components/AddServiceImage.component";
-// import normal from '../../Images/Profile/normal.png';
 // import Delete from "../../Components/Delete.component";
 
 export default class profile extends Component {
     constructor(props) {
         super(props);
-        this.onChangeFulName = this.onChangeFulName.bind(this);
-        this.onChangeEmail = this.onChangeEmail.bind(this);
-        this.onChangeBirthday = this.onChangeBirthday.bind(this);
-        this.onChangeMobileOne = this.onChangeMobileOne.bind(this);
-        this.onChangeMobileTwo = this.onChangeMobileTwo.bind(this);
-        this.onChangePassword = this.onChangePassword.bind(this);
-        this.onChangeAddress = this.onChangeAddress.bind(this);
-        this.onChangeNic = this.onChangeNic.bind(this);
-        this.onChangeEpf = this.onChangeEpf.bind(this);
-        this.onChangeEtf = this.onChangeEtf.bind(this);
-        this.onChangeOther = this.onChangeOther.bind(this);
-        this.onChangeUserId = this.onChangeUserId.bind(this);
-        this.onChangeUserType = this.onChangeUserType.bind(this);
+        this.onChange = this.onChange.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
 
         this.state = {
@@ -52,7 +38,8 @@ export default class profile extends Component {
             other: '',
             file: '',
             signup_completed: false,
-            userData: []
+            userData: [],
+            users:[]
         }
     }
     snackbarClose = (event) => {
@@ -67,23 +54,8 @@ export default class profile extends Component {
                 console.log(response);
 
                 this.setState({
-                    userData: response.data.data
-                    //     fullName: response.data.data.fullName,
-                    //     email: response.data.data.email,
-                    //     password: response.data.data.password,
-                    //     mobileOne: response.data.data.mobileOne,
-                    //     mobileTwo: response.data.data.mobileTwo,
-                    //     address: response.data.data.address,
-                    //     nic: response.data.data.nic,
-                    //     epf: response.data.data.epf,
-                    //     etf: response.data.data.etf,
-                    //     other: response.data.data.other,
-                    //     file: response.data.data.file,
-                    //     userId: response.data.data.userId,
-                    //     userType: response.data.data.userType,
-                    //     signup_completed: response.data.data.signup_completed
+                    users: response.data.data,
                 })
-                console.log();
             })
             .catch(error => {
                 console.log(error)
@@ -91,81 +63,21 @@ export default class profile extends Component {
 
     }
 
-    onChangeFulName(e) {
-        this.setState({
-            fullName: e.target.value
-        });
-    }
-    onChangeEmail(e) {
-        this.setState({
-            email: e.target.value
-        });
-    }
-    onChangeMobileOne(e) {
-        this.setState({
-            mobileOne: e.target.value
-        });
-    }
-    onChangeMobileTwo(e) {
-        this.setState({
-            mobileTwo: e.target.value
-        });
-    }
-    onChangeBirthday(e) {
-        this.setState({
-            birthday: e.target.value
-        });
-    }
-    onChangePassword(e) {
-        this.setState({
-            password: e.target.value
-        });
-    }
-    // onChangeSignupAPassword(e) {
-    //     this.setState({
-    //         signup_aPassword: e.target.value
-    //     });
-    // }
-    onChangeAddress(e) {
-        this.setState({
-            address: e.target.value
-        });
-    }
-    onChangeNic(e) {
-        this.setState({
-            nic: e.target.value
-        });
+    onChange = (e) => {
+        e.persist = () => { };
+        let store = this.state;
+        store[e.target.name] = e.target.value
+        this.setState(store);
     }
 
-    onChangeEpf(e) {
-        this.setState({
-            epf: e.target.value
-        });
-    }
-    onChangeEtf(e) {
-        this.setState({
-            etf: e.target.value
-        });
-    }
-    onChangeOther(e) {
-        this.setState({
-            other: e.target.value
-        });
-    }
-    onChangeUserId(e) {
-        this.setState({
-            userId: e.target.value
-        });
-    }
-    onChangeUserType(e) {
-        this.setState({
-            userType: e.target.value
-        });
-    }
+
     onSubmit(e) {
+
+        const userData = getFromStorage('auth-user')
+        console.log(this.state.epf)
+
         e.preventDefault();
         const obj = {
-            signup_firstName: this.state.signup_firstName,
             fullName: this.state.fullName,
             email: this.state.email,
             birthday: this.state.birthday,
@@ -178,10 +90,11 @@ export default class profile extends Component {
             etf: this.state.etf,
             userId: this.state.userId,
             userType: this.state.userType,
+            other: this.state.other,
             signup_completed: this.state.signup_completed
         };
 
-        axios.post('http://localhost:4000/mazzevents/updatecustomer/' + this.props.id, obj)
+        axios.post('http://localhost:4000/users/updateuser/' + userData.userId, obj)
             .then(res => console.log(res.data));
 
         // const obj2 = {
@@ -226,16 +139,21 @@ export default class profile extends Component {
                                 <div style={{ width: "90%", margin: 'auto' }}>
                                     <div className="row">
                                         <div className="col-md-4">
+                                        {this.state.users.map((data) => {
+                                                console.log(data.path);
+                                                
 
-                                            <Card style={{ width: '18rem' }}>
+                                            return (
+
+                                            <Card style={{ width: '18rem' }} key={data.userId}>
                                                 <div className="overflow">
-                                                    <Card.Img variant="top" src={!this.state.file ? normal : this.state.file} />
+                                                    <Card.Img variant="top" src={!('http://localhost:4000/users/profileImage/' + data.path) ? normal : ('http://localhost:4000/users/profileImage/' + data.path)} />
                                                 </div>
                                                 <Card.Body>
-                                                    <Card.Title><center>{this.state.fullName} {this.state.fullName}</center></Card.Title>
+                                                    <Card.Title><center>{data.fullName} </center></Card.Title>
                                                     <Card.Text>
-                                                        Contact Number 1: {this.state.mobileOne}<br />
-                        Contact Number 2: {this.state.mobileTwo}<br />
+                                                        Contact Number 1: {data.mobileOne}<br />
+                                                        Contact Number 2: {data.mobileTwo}<br />
 
                                                     </Card.Text>
                                                     <br />
@@ -244,17 +162,22 @@ export default class profile extends Component {
 </center> */}
                                                 </Card.Body>
                                             </Card>
+                                                 )
+                                                })} 
                                         </div>
 
                                         <div className="col-md-8">
-                                            {this.state.userData.map((data) => {
-                                                return (
-                                                    <form onSubmit={this.onSubmit} key={data._id}>
+                                            {this.state.users.map((data) => {
+                                                console.log(data.epf);
+                                                
+
+                                            return (
+                                                    <form onSubmit={this.onSubmit} key={data.userId}>
                                                         <div className="row" >
                                                             <div className="col-md-4">
                                                                 <div className="form-group" style={{ marginTop: "50px" }}>
                                                                     <label>User ID : </label>
-                                                                    <input type="text" className="form-control" name="userId" defaultValue={data.userId} onChange={this.onChange} />
+                                                                    <input readOnly type="text" className="form-control" name="userId" defaultValue={data.userId} onChange={this.onChange} />
                                                                 </div>
                                                             </div>
 
@@ -262,7 +185,7 @@ export default class profile extends Component {
                                                             <div className="col-md-4">
                                                                 <div className="form-group" style={{ marginTop: "50px" }}>
                                                                     <label>User Type : </label>
-                                                                    <input type="text" className="form-control" name="userType" defaultValue={this.state.userType} onChange={this.onChange}></input>
+                                                                    <input type="text" className="form-control" name="userType" defaultValue={data.userType} onChange={this.onChange}></input>
                                                                 </div>
                                                             </div>
 
@@ -270,7 +193,7 @@ export default class profile extends Component {
                                                             <div className="col-md-4">
                                                                 <div className="form-group" style={{ marginTop: "50px" }}>
                                                                     <label>Birthday : </label>
-                                                                    <input type="text" className="form-control" name="userType" defaultValue={this.state.birthday} onChange={this.onChange}></input>
+                                                                    <input type="date" className="form-control" name="userType" defaultValue={data.birthday} onChange={this.onChange}></input>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -284,13 +207,13 @@ export default class profile extends Component {
                                                             <div className="col-md-6">
                                                                 <div className="form-group">
                                                                     <label>E-mail : </label>
-                                                                    <input type="text" className="form-control" name="email" defaultValue={this.state.email} onChange={this.onChange}></input>
+                                                                    <input type="text" className="form-control" name="email" defaultValue={data.email} onChange={this.onChange}></input>
                                                                 </div>
                                                             </div>
                                                             <div className="col-md-6">
                                                                 <div className="form-group">
                                                                     <label>NIC Number : </label>
-                                                                    <input type="text" className="form-control" name="nic" defaultValue={this.state.nic} onChange={this.onChange}></input>
+                                                                    <input type="text" className="form-control" name="nic" defaultValue={data.nic} onChange={this.onChange}></input>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -299,23 +222,23 @@ export default class profile extends Component {
                                                             <Col>
                                                                 <div className="form-group">
                                                                     <label>EPF Number : </label>
-                                                                    <input type="text" className="form-control" name="epf" defaultValue={this.state.epf} onChange={this.onChange}></input>
+                                                                    <input type="text" className="form-control" name="epf" defaultValue={data.epf} onChange={this.onChange}></input>
                                                                 </div>
                                                             </Col>
                                                             <Col>
                                                                 <div className="form-group">
                                                                     <label>ETF Number : </label>
-                                                                    <input type="text" className="form-control" name="etf" defaultValue={this.state.etf} onChange={this.onChange}></input>
+                                                                    <input type="text" className="form-control" name="etf" defaultValue={data.etf} onChange={this.onChange}></input>
                                                                 </div>
                                                             </Col>
                                                         </Row>
                                                         <div className="form-group">
                                                             <label>Address : </label>
-                                                            <textarea type="text" className="form-control" name="address" defaultValue={this.state.address} onChange={this.onChange}></textarea>
+                                                            <textarea type="text" className="form-control" name="address" defaultValue={data.address} onChange={this.onChange}></textarea>
                                                         </div>
                                                         <div className="form-group">
                                                             <label>Others : </label>
-                                                            <textarea type="text" className="form-control" name="other" defaultValue={this.state.other} onChange={this.onChange}></textarea>
+                                                            <textarea type="text" className="form-control" name="other" defaultValue={data.other} onChange={this.onChange}></textarea>
                                                         </div>
 
                                                         <div className="form-group">
@@ -323,8 +246,8 @@ export default class profile extends Component {
                                                         </div>
 
                                                     </form>
-                                                )
-                                            })}
+                                              )
+                                          })} 
                                         </div>
                                     </div>
                                 </div>
@@ -338,12 +261,3 @@ export default class profile extends Component {
     }
 }
 
-// const mapStateToProps = state => ({
-//     id: state.auth.id,
-//     fName: state.auth.fName,
-//     lName: state.auth.lName,
-//     email: state.auth.email,
-//     number: state.auth.number
-// });
-
-// export default connect(mapStateToProps, null)(profile);
