@@ -46,7 +46,8 @@ export default class profile extends Component {
             other: '',
             file: '',
             signup_completed: false,
-            userData: []
+            userData: [],
+            users:[]
         }
     }
 
@@ -59,24 +60,24 @@ export default class profile extends Component {
                 console.log(response);
 
                 this.setState({
-                    userData: response.data.data,
+                    users: response.data.data,
 
-                        fullName: userData.fullName,
-                        email: userData.email,
-                        password: userData.password,
-                        mobileOne: userData.mobileOne,
-                        mobileTwo: userData.mobileTwo,
-                        address: userData.address,
-                        nic: userData.nic,
-                        epf: userData.epf,
-                        etf: userData.etf,
-                        other: userData.other,
-                        file: userData.file,
-                        userId: userData.userId,
-                        userType: userData.userType,
-                        signup_completed: userData.signup_completed
+                        // fullName: this.state.users.fullName,
+                        // email: userData.email,
+                        // birthday: userData.birthday,
+                        // mobileOne: userData.mobileOne,
+                        // mobileTwo: userData.mobileTwo,
+                        // address: userData.address,
+                        // nic: response.data.data.nic,
+                        // epf: userData.epf,
+                        // etf: userData.etf,
+                        // other: userData.other,
+                        // file: userData.file,
+                        // userId: userData.userId,
+                        // userType: userData.userType,
+                        // signup_completed: userData.signup_completed
                 })
-                console.log(this.state.userId);
+                // console.log(this.state.nic);
             })
             .catch(error => {
                 console.log(error)
@@ -162,7 +163,7 @@ export default class profile extends Component {
 
         e.preventDefault();
         const obj = {
-            signup_firstName: this.state.signup_firstName,
+            // signup_firstName: this.state.signup_firstName,
             fullName: this.state.fullName,
             email: this.state.email,
             birthday: this.state.birthday,
@@ -214,16 +215,21 @@ export default class profile extends Component {
                                 <div style={{ width: "90%", margin: 'auto' }}>
                                     <div className="row">
                                         <div className="col-md-4">
+                                        {this.state.users.map((data) => {
+                                                console.log(data.path);
+                                                
 
-                                            <Card style={{ width: '18rem' }}>
+                                            return (
+
+                                            <Card style={{ width: '18rem' }} key={data.userId}>
                                                 <div className="overflow">
-                                                    <Card.Img variant="top" src={!this.state.file ? normal : this.state.file} />
+                                                    <Card.Img variant="top" src={!('http://localhost:4000/users/profileImage/' + data.path) ? normal : ('http://localhost:4000/users/profileImage/' + data.path)} />
                                                 </div>
                                                 <Card.Body>
-                                                    <Card.Title><center>{this.state.fullName} {this.state.fullName}</center></Card.Title>
+                                                    <Card.Title><center>{data.fullName} </center></Card.Title>
                                                     <Card.Text>
-                                                        Contact Number 1: {this.state.mobileOne}<br />
-                                                        Contact Number 2: {this.state.mobileTwo}<br />
+                                                        Contact Number 1: {data.mobileOne}<br />
+                                                        Contact Number 2: {data.mobileTwo}<br />
 
                                                     </Card.Text>
                                                     <br />
@@ -232,17 +238,22 @@ export default class profile extends Component {
                                 </center> */}
                                                 </Card.Body>
                                             </Card>
+                                                 )
+                                                })} 
                                         </div>
 
                                         <div className="col-md-8">
-                                            {/* {this.state.userData.map((data) => { */}
-                                                {/* return ( */}
-                                                    <form onSubmit={this.onSubmit}>
+                                            {this.state.users.map((data) => {
+                                                console.log(data.epf);
+                                                
+
+                                            return (
+                                                    <form onSubmit={this.onSubmit} key={data.userId}>
                                                         <div className="row" >
                                                             <div className="col-md-4">
                                                                 <div className="form-group" style={{ marginTop: "50px" }}>
                                                                     <label>User ID : </label>
-                                                                    <input type="text" className="form-control" name="userId" defaultValue={this.state.userId} onChange={this.onChange} />
+                                                                    <input type="text" className="form-control" name="userId" defaultValue={data.userId} onChange={this.onChange} />
                                                                 </div>
                                                             </div>
 
@@ -250,7 +261,7 @@ export default class profile extends Component {
                                                             <div className="col-md-4">
                                                                 <div className="form-group" style={{ marginTop: "50px" }}>
                                                                     <label>User Type : </label>
-                                                                    <input type="text" className="form-control" name="userType" defaultValue={this.state.userType} onChange={this.onChange}></input>
+                                                                    <input type="text" className="form-control" name="userType" defaultValue={data.userType} onChange={this.onChange}></input>
                                                                 </div>
                                                             </div>
 
@@ -258,7 +269,7 @@ export default class profile extends Component {
                                                             <div className="col-md-4">
                                                                 <div className="form-group" style={{ marginTop: "50px" }}>
                                                                     <label>Birthday : </label>
-                                                                    <input type="text" className="form-control" name="userType" defaultValue={this.state.birthday} onChange={this.onChange}></input>
+                                                                    <input type="text" className="form-control" name="userType" defaultValue={data.birthday} onChange={this.onChange}></input>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -272,13 +283,13 @@ export default class profile extends Component {
                                                             <div className="col-md-6">
                                                                 <div className="form-group">
                                                                     <label>E-mail : </label>
-                                                                    <input type="text" className="form-control" name="email" defaultValue={this.state.email} onChange={this.onChange}></input>
+                                                                    <input type="text" className="form-control" name="email" defaultValue={data.email} onChange={this.onChange}></input>
                                                                 </div>
                                                             </div>
                                                             <div className="col-md-6">
                                                                 <div className="form-group">
                                                                     <label>NIC Number : </label>
-                                                                    <input type="text" className="form-control" name="nic" defaultValue={this.state.nic} onChange={this.onChange}></input>
+                                                                    <input type="text" className="form-control" name="nic" defaultValue={data.nic} onChange={this.onChange}></input>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -287,23 +298,23 @@ export default class profile extends Component {
                                                             <Col>
                                                                 <div className="form-group">
                                                                     <label>EPF Number : </label>
-                                                                    <input type="text" className="form-control" name="epf" defaultValue={this.state.epf} onChange={this.onChange}></input>
+                                                                    <input type="text" className="form-control" name="epf" defaultValue={data.epf} onChange={this.onChange}></input>
                                                                 </div>
                                                             </Col>
                                                             <Col>
                                                                 <div className="form-group">
                                                                     <label>ETF Number : </label>
-                                                                    <input type="text" className="form-control" name="etf" defaultValue={this.state.etf} onChange={this.onChange}></input>
+                                                                    <input type="text" className="form-control" name="etf" defaultValue={data.etf} onChange={this.onChange}></input>
                                                                 </div>
                                                             </Col>
                                                         </Row>
                                                         <div className="form-group">
                                                             <label>Address : </label>
-                                                            <textarea type="text" className="form-control" name="address" defaultValue={this.state.address} onChange={this.onChange}></textarea>
+                                                            <textarea type="text" className="form-control" name="address" defaultValue={data.address} onChange={this.onChange}></textarea>
                                                         </div>
                                                         <div className="form-group">
                                                             <label>Others : </label>
-                                                            <textarea type="text" className="form-control" name="other" defaultValue={this.state.other} onChange={this.onChange}></textarea>
+                                                            <textarea type="text" className="form-control" name="other" defaultValue={data.other} onChange={this.onChange}></textarea>
                                                         </div>
 
                                                         <div className="form-group">
@@ -311,8 +322,8 @@ export default class profile extends Component {
                                                         </div>
 
                                                     </form>
-                                                {/* )
-                                             })} */}
+                                              )
+                                          })} 
                                         </div>
                                     </div>
                                 </div>
