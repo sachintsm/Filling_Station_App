@@ -6,14 +6,17 @@ var DebitorAccountSchema = mongoose.Schema({
     debitorId: { type: String },
     billNo: { type: String },
     invoiceNo: { type: String },
+    chequeNo: {type:String},
     vehicleNo: { type: String },
     productId: { type: String },
     productName : {type : String},
     qty: { type: String },
     size : {type: String},
-    amount : {type : String},
+    debitAmount : {type : String},
+    creditAmount : {type:String},
     debitType: { type: String },
     pumpId: { type: String },
+    state : {type  :String}
 });
 
 const DebitorAccount = module.exports = mongoose.model("DebitorAccount", DebitorAccountSchema);

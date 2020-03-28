@@ -7,7 +7,8 @@ import '../../Css/Basic/profile.css';
 // import DatePicker from "react-datepicker";
 import normal from '../../Assets/images/normal.png';
 import { getFromStorage } from '../../utils/storage';
-
+import Snackbar from '@material-ui/core/Snackbar'
+import IconButton from '@material-ui/core/IconButton'
 
 // import Upper from "../../Components/Upper.component";
 // import { connect } from 'react-redux';
@@ -34,6 +35,8 @@ export default class profile extends Component {
         this.onSubmit = this.onSubmit.bind(this);
 
         this.state = {
+            snackbaropen: false,
+            snackbarmsg: '',
             fullName: '',
             password: '',
             userId: '',
@@ -52,7 +55,9 @@ export default class profile extends Component {
             userData: []
         }
     }
-
+    snackbarClose = (event) => {
+        this.setState({ snackbaropen: false })
+    }
     componentDidMount() {
         const userData = getFromStorage('auth-user')
         console.log(userData.userId)
@@ -192,21 +197,30 @@ export default class profile extends Component {
 
     render() {
         return (
+            <React.Fragment>
 
+                <div className="container-fluid">
+                    <Snackbar
+                        open={this.state.snackbaropen}
+                        autoHideDuration={2000}
+                        onClose={this.snackbarClose}
+                        message={<span id="message-id">{this.state.snackbarmsg}</span>}
+                        action={[
+                            <IconButton
+                                key="close"
+                                aria-label="Close"
+                                color="secondary"
+                                onClick={this.snackbarClose}
+                            > x </IconButton>
+                        ]}
+                    />
 
-            <div>
-                <Col className="row">
-                    <div className="col-md-2" style={{ backgroundColor: "#1c2431" }}>
-                        <Sidebar />
-                    </div>
-                    <div className="col-md-10">
-
-                        <React.Fragment>
+                    <div className="row">
+                        <div className="col-md-2" style={{ backgroundColor: "#1c2431" }}>
+                            <Sidebar />
+                        </div>
+                        <div className="col-md-10" style={{ backgroundColor: "#f8f9fd" }}>
                             <h3 style={{ textAlign: "center", marginTop: "50px" }}>My Profile</h3>
-
-
-
-
                             <div className="card">
 
                                 <div style={{ width: "90%", margin: 'auto' }}>
@@ -221,13 +235,13 @@ export default class profile extends Component {
                                                     <Card.Title><center>{this.state.fullName} {this.state.fullName}</center></Card.Title>
                                                     <Card.Text>
                                                         Contact Number 1: {this.state.mobileOne}<br />
-                                                        Contact Number 2: {this.state.mobileTwo}<br />
+                        Contact Number 2: {this.state.mobileTwo}<br />
 
                                                     </Card.Text>
                                                     <br />
                                                     {/* <center>
-                                    <AddImage />
-                                </center> */}
+    <AddImage />
+</center> */}
                                                 </Card.Body>
                                             </Card>
                                         </div>
@@ -315,13 +329,11 @@ export default class profile extends Component {
                                     </div>
                                 </div>
                             </div>
-                        </React.Fragment>
 
+                        </div>
                     </div>
-
-                </Col>
-            </div >
-
+                </div>
+            </React.Fragment>
         )
     }
 }

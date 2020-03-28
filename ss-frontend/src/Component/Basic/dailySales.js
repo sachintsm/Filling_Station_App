@@ -47,6 +47,15 @@ export default class dailyPumperCalculations extends Component {
             newDPumpId: '',
             newDQty: '',
             newDVehicleNo: '',
+            newDOname: '',
+            newDOamount: '',
+            newCDebitorId: '',
+            newCInvoiceNo: '',
+            newCChequeNo: '',
+            newCAmount: '',
+            newCOname: '',
+            newCOamount: '',
+
         }
 
         this.onLocalChange = this.onLocalChange.bind(this)
@@ -61,9 +70,124 @@ export default class dailyPumperCalculations extends Component {
         this.onDebitChange = this.onDebitChange.bind(this)
         this.onNewDebitSubmit = this.onNewDebitSubmit.bind(this)
         this.deleteDebit = this.deleteDebit.bind(this)
+        this.onNewOtherDebitSubmit = this.onNewOtherDebitSubmit.bind(this)
+        this.onNewCreditSubmit = this.onNewCreditSubmit.bind(this)
+        this.onNewOtherCeditSubmit = this.onNewOtherCeditSubmit.bind(this)
     }
     snackbarClose = (event) => {
         this.setState({ snackbaropen: false })
+    }
+
+    onNewCreditSubmit() {
+        const obj = getFromStorage('auth-token');
+        if (this.state.newCDebitorId === '' || this.state.newCAmount === '') {
+            this.setState({
+                snackbaropen: true,
+                snackbarmsg: "Please Fill the Missing Fields ..!"
+            })
+        }
+
+        const data = {
+            debitorId: this.state.newCDebitorId,
+            chequeNo: this.state.newCChequeNo,
+            creditAmount: parseFloat(this.state.newCAmount).toFixed(2),
+        }
+        fetch('http://localhost:4000/debitorsAccount/addCredit', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'auth-token': obj.token
+            },
+            body: JSON.stringify(data),
+        })
+            .then(res => res.json())
+            .then(json => {
+                this.setState({
+                    snackbaropen: true,
+                    snackbarmsg: json.msg
+                })
+            })
+            .catch(err => {
+                console.log(err)
+                this.setState({
+                    snackbaropen: true,
+                    snackbarmsg: err
+                })
+            })
+
+    }
+    onNewOtherCeditSubmit() {
+        const obj = getFromStorage('auth-token');
+        if (this.state.newCOname === '' || this.state.newCOamount === '') {
+            this.setState({
+                snackbaropen: true,
+                snackbarmsg: "Please Fill the Missing Fields ..!"
+            })
+        }
+
+        const data = {
+            newCOname: this.state.newCOname,
+            newCOamount: parseFloat(this.state.newCOamount).toFixed(2),
+        }
+        fetch('http://localhost:4000/debitorsAccount/addOtherCredit', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'auth-token': obj.token
+            },
+            body: JSON.stringify(data),
+        })
+            .then(res => res.json())
+            .then(json => {
+                this.setState({
+                    snackbaropen: true,
+                    snackbarmsg: json.msg
+                })
+            })
+            .catch(err => {
+                console.log(err)
+                this.setState({
+                    snackbaropen: true,
+                    snackbarmsg: err
+                })
+            })
+    }
+
+    onNewOtherDebitSubmit() {
+        const obj = getFromStorage('auth-token');
+        if (this.state.newDOname === '' || this.state.newDOamount === '') {
+            this.setState({
+                snackbaropen: true,
+                snackbarmsg: "Please Fill the Missing Fields ..!"
+            })
+        }
+
+        const data = {
+            newDOname: this.state.newDOname,
+            newDOamount: parseFloat(this.state.newDOamount).toFixed(2),
+        }
+        fetch('http://localhost:4000/debitorsAccount/addOther', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'auth-token': obj.token
+            },
+            body: JSON.stringify(data),
+        })
+            .then(res => res.json())
+            .then(json => {
+                this.setState({
+                    snackbaropen: true,
+                    snackbarmsg: json.msg
+                })
+            })
+            .catch(err => {
+                console.log(err)
+                this.setState({
+                    snackbaropen: true,
+                    snackbarmsg: err
+                })
+            })
     }
 
     componentDidMount = async () => {
@@ -114,7 +238,7 @@ export default class dailyPumperCalculations extends Component {
                 })
             })
 
-        //load debidtor id and names
+        // // load debidtor id and names
         // await axios.get('http://localhost:4000/')
         //     .then(res => {
         //         console.log(res);
@@ -432,6 +556,7 @@ export default class dailyPumperCalculations extends Component {
                             > x </IconButton>
                         ]}
                     />
+                    {/* ************************************************************************************************************************************************************************** */}
 
                     <div className="row">
                         <div className="col-md-2" style={{ backgroundColor: "#1c2431" }}>
@@ -581,94 +706,172 @@ export default class dailyPumperCalculations extends Component {
                                     </Tab>
 
                                     <Tab eventKey="debit" title="Debit Management">
-                                        <div className="container" style={{ marginTop: "20px" }} >
+                                        <div className="container" style={{ marginTop: "0px" }} >
                                             <Row>
-                                                <Col xs="8">
-                                                    <p className="first-topic">Add Main Debit</p>
-                                                    <Card className="container">
-                                                        <div className="row">
-                                                            <div className="col-md-6" style={{ marginLeft: "5px" }}>
-                                                                <Row>
-                                                                    <Col xs="12">
-                                                                        <MDBInput outline label="Debitor ID" type="text" name="newDDebitorId" onChange={this.onDebitChange} />
-                                                                    </Col>
-                                                                </Row>
-                                                                <Row style={{ marginTop: "-40px" }}>
-                                                                    <Col xs="12">
-                                                                        <MDBInput outline label="Bill No." type="text" name="newDBillNo" onChange={this.onDebitChange} />
-                                                                    </Col>
-                                                                </Row>
-                                                                <Row style={{ marginTop: "-40px" }}>
-                                                                    <Col xs="12">
-                                                                        <MDBInput outline label="Invoice No." type="text" name="newDInvoiceNo" onChange={this.onDebitChange} />
-                                                                    </Col>
-                                                                </Row>
-                                                                <Row style={{ marginTop: "-40px" }}>
-                                                                    <Col xs="12">
-                                                                        <MDBInput outline label="Vehicle No." type="text" name="newDVehicleNo" onChange={this.onDebitChange} />
-                                                                    </Col>
-                                                                </Row>
-                                                            </div>
-                                                            <div className="col-md-6" style={{ marginLeft: "-10px" }}>
-                                                                <Row>
-                                                                    <Col xs="12">
-                                                                        <MDBInput outline label="Product ID" type="text" name="newDProductId" onChange={this.onDebitChange} />
-                                                                    </Col>
-                                                                </Row>
-                                                                <Row style={{ marginTop: "-40px" }}>
-                                                                    <Col xs="12">
+                                                <Col xs="8" >
+                                                    <Tabs defaultActiveKey="credit" id="uncontrolled-tab-example" style={{ marginTop: "20px" }}>
+                                                        <Tab eventKey="debit" title="Debit ">
+                                                            {/* ************************************************************************************************************************************************************************** */}
+                                                            <p className="first-topic" style={{ marginTop: "20px" }}>Add Main Debit</p>
+                                                            <Card className="container">
+                                                                <div className="row">
+                                                                    <div className="col-md-6" style={{ marginLeft: "5px" }}>
+                                                                        <Row>
+                                                                            <Col xs="12">
+                                                                                <MDBInput outline label="Debitor ID" type="text" name="newDDebitorId" onChange={this.onDebitChange} />
+                                                                            </Col>
+                                                                        </Row>
+                                                                        <Row style={{ marginTop: "-40px" }}>
+                                                                            <Col xs="12">
+                                                                                <MDBInput outline label="Bill No." type="text" name="newDBillNo" onChange={this.onDebitChange} />
+                                                                            </Col>
+                                                                        </Row>
+                                                                        <Row style={{ marginTop: "-40px" }}>
+                                                                            <Col xs="12">
+                                                                                <MDBInput outline label="Invoice No." type="text" name="newDInvoiceNo" onChange={this.onDebitChange} />
+                                                                            </Col>
+                                                                        </Row>
+                                                                        <Row style={{ marginTop: "-40px" }}>
+                                                                            <Col xs="12">
+                                                                                <MDBInput outline label="Vehicle No." type="text" name="newDVehicleNo" onChange={this.onDebitChange} />
+                                                                            </Col>
+                                                                        </Row>
+                                                                    </div>
+                                                                    <div className="col-md-6" style={{ marginLeft: "-10px" }}>
+                                                                        <Row>
+                                                                            <Col xs="12">
+                                                                                <MDBInput outline label="Product ID" type="text" name="newDProductId" onChange={this.onDebitChange} />
+                                                                            </Col>
+                                                                        </Row>
+                                                                        <Row style={{ marginTop: "-40px" }}>
+                                                                            <Col xs="12">
 
-                                                                        <MDBInput outline label="Quentity" type="text" name="newDQty" onChange={this.onDebitChange} />
-                                                                    </Col>
-                                                                </Row>
+                                                                                <MDBInput outline label="Quentity" type="text" name="newDQty" onChange={this.onDebitChange} />
+                                                                            </Col>
+                                                                        </Row>
 
-                                                                <Row style={{ marginTop: "-40px" }}>
-                                                                    <Col xs="12">
-                                                                        <MDBInput outline label="Pump ID" type="text" name="newDPumpId" onChange={this.onDebitChange} />
-                                                                    </Col>
-                                                                </Row>
-                                                            </div>
-                                                            <Button style={{ marginLeft: "21px", marginTop: "-10px ", marginBottom: "20px" }} className="debit-btn" color="primary" onClick={this.onNewDebitSubmit}>Submit</Button>
-                                                        </div>
-                                                    </Card>
+                                                                        <Row style={{ marginTop: "-40px" }}>
+                                                                            <Col xs="12">
+                                                                                <MDBInput outline label="Pump ID" type="text" name="newDPumpId" onChange={this.onDebitChange} />
+                                                                            </Col>
+                                                                        </Row>
+                                                                    </div>
+                                                                    <Button style={{ marginLeft: "21px", marginTop: "-10px ", marginBottom: "20px" }} className="debit-btn" color="primary" onClick={this.onNewDebitSubmit}>Submit</Button>
+                                                                </div>
+                                                            </Card>
+                                                            {/* ***************************************************************************************************************************************** */}
+                                                            <p className="first-topic" style={{ marginTop: "20px" }}>Add Other Debit</p>
+                                                            <Card className="container">
+                                                                <div className="row">
+                                                                    <div className="col-md-6" style={{ marginLeft: "5px" }}>
+                                                                        <Row>
+                                                                            <Col xs="12">
+                                                                                <MDBInput outline label="Debitor Name / Reason" type="text" name="newDOname" onChange={this.onDebitChange} />
+                                                                            </Col>
+                                                                        </Row>
 
-                                                    <p className="first-topic" style={{marginTop:"20px"}}>Add Other Debit</p>
+                                                                    </div>
+                                                                    <div className="col-md-6" style={{ marginLeft: "-10px" }}>
+                                                                        <Row>
+                                                                            <Col xs="12">
+                                                                                <MDBInput outline label="Amount" type="text" name="newDOamount" onChange={this.onDebitChange} />
+                                                                            </Col>
+                                                                        </Row>
+                                                                    </div>
+                                                                    <Button style={{ marginLeft: "21px", marginTop: "-10px ", marginBottom: "20px" }} className="debit-btn" color="primary" onClick={this.onNewOtherDebitSubmit}>Submit</Button>
+                                                                </div>
+                                                            </Card>
+                                                        </Tab>
+                                                        {/* ***************************************************************************************************************************************** */}
 
-                                                    <Card className="container">
-                                                        <div className="row">
-                                                            <div className="col-md-6" style={{ marginLeft: "5px" }}>
-                                                                <Row>
-                                                                    <Col xs="12">
-                                                                        <MDBInput outline label="Debitor Name / Reason" type="text" name="newDDebitorId" onChange={this.onDebitChange} />
-                                                                    </Col>
-                                                                </Row>
-                                    
-                                                            </div>
-                                                            <div className="col-md-6" style={{ marginLeft: "-10px" }}>
-                                                                <Row>
-                                                                    <Col xs="12">
-                                                                        <MDBInput outline label="Amount" type="text" name="newDPumpId" onChange={this.onDebitChange} />
-                                                                    </Col>
-                                                                </Row>
-                                                            </div>
-                                                            <Button style={{ marginLeft: "21px", marginTop: "-10px ", marginBottom: "20px" }} className="debit-btn" color="primary" onClick={this.onNewDebitSubmit}>Submit</Button>
-                                                        </div>
-                                                    </Card>
+                                                        <Tab eventKey="credit" title="Credit">
+                                                            <p className="first-topic" style={{marginTop:"20px"}}>Add Main Credit</p>
+                                                            <Card className="container">
+                                                                <div className="row">
+                                                                    <div className="col-md-6" style={{ marginLeft: "5px" }}>
+                                                                        <Row>
+                                                                            <Col xs="12">
+                                                                                <MDBInput outline label="Debitor ID" type="text" name="newCDebitorId" onChange={this.onDebitChange} />
+                                                                            </Col>
+                                                                        </Row>
+
+                                                                        <Row style={{ marginTop: "-40px" }}>
+                                                                            <Col xs="12">
+                                                                                <MDBInput outline label="Amount" type="text" name="newCAmount" onChange={this.onDebitChange} />
+                                                                            </Col>
+                                                                        </Row>
+
+                                                                    </div>
+                                                                    <div className="col-md-6" style={{ marginLeft: "-10px" }}>
+                                                                        <Row>
+                                                                            <Col xs="12">
+                                                                                <MDBInput outline label="Cheque No" type="text" name="newCChequeNo" onChange={this.onDebitChange} />
+                                                                            </Col>
+                                                                        </Row>
+                                                                    </div>
+                                                                    <Button style={{ marginLeft: "21px", marginTop: "-10px ", marginBottom: "20px" }} className="debit-btn" color="primary" onClick={this.onNewCreditSubmit}>Submit</Button>
+                                                                </div>
+                                                            </Card>
+                                                            {/* ************************************************************************************************************************************************************************** */}
+
+                                                            <p className="first-topic" style={{ marginTop: "20px" }}>Add Other Credit</p>
+
+                                                            <Card className="container">
+                                                                <div className="row">
+                                                                    <div className="col-md-6" style={{ marginLeft: "5px" }}>
+                                                                        <Row>
+                                                                            <Col xs="12">
+                                                                                <MDBInput outline label="Debitor Name / Reason" type="text" name="newCOname" onChange={this.onDebitChange} />
+                                                                            </Col>
+                                                                        </Row>
+
+                                                                    </div>
+                                                                    <div className="col-md-6" style={{ marginLeft: "-10px" }}>
+                                                                        <Row>
+                                                                            <Col xs="12">
+                                                                                <MDBInput outline label="Amount" type="text" name="newCOamount" onChange={this.onDebitChange} />
+                                                                            </Col>
+                                                                        </Row>
+                                                                    </div>
+                                                                    <Button style={{ marginLeft: "21px", marginTop: "-10px ", marginBottom: "20px" }} className="debit-btn" color="primary" onClick={this.onNewOtherCeditSubmit}>Submit</Button>
+                                                                </div>
+                                                            </Card>
+                                                        </Tab>
+                                                    </Tabs>
+
 
                                                 </Col>
+                                                {/* ************************************************************************************************************************************************************************** */}
+
                                                 <Col xs="4">
-                                                    <p className="first-topic">Debitors</p>
+                                                    <p className="first-topic" style={{ marginTop: "20px" }}>Debitors</p>
 
-                                                    <Card style={{ height: "280px" }}>
-
+                                                    <Card style={{ height: "543px" }}>
+                                                        <Row className="container" style={{ marginTop: "20px" }}>
+                                                            <Col xs="3">
+                                                                <p className="debitor-tbl-head">Debitor ID</p>
+                                                            </Col>
+                                                            <Col xs="9">
+                                                                <p className="debitor-tbl-head">Debitor Name</p>
+                                                            </Col>
+                                                        </Row>
+                                                        <Row className="container" style={{ marginTop: "20px" }}>
+                                                            <Col xs="3">
+                                                                <p className="debitor-tbl-head">Debitor ID</p>
+                                                            </Col>
+                                                            <Col xs="9">
+                                                                <p className="debitor-tbl-head">Debitor Name</p>
+                                                            </Col>
+                                                        </Row>
                                                     </Card>
                                                 </Col>
                                             </Row>
 
 
                                         </div>
+                                        {/* ************************************************************************************************************************************************************************** */}
 
-                                        <div className="container" style={{ marginTop: "20px" }} >
+                                        <div className="container" style={{ marginTop: "20px", marginBottom: "20px" }} >
                                             <Card className="container">
                                                 <Row style={{ marginTop: "20px" }}>
                                                     <Col xs="2">
@@ -696,9 +899,11 @@ export default class dailyPumperCalculations extends Component {
                                                         <p className="debitor-tbl-head">Quentity</p>
 
                                                     </Col>
-                                                    <Col xs="2">
-                                                        <p className="debitor-tbl-head">Amount</p>
-
+                                                    <Col xs="1">
+                                                        <p className="debitor-tbl-head">Debit</p>
+                                                    </Col>
+                                                    <Col xs="1">
+                                                        <p className="debitor-tbl-head">Credit</p>
                                                     </Col>
                                                     <Col xs="1">
                                                         <p className="debitor-tbl-head">Pump ID</p>
@@ -737,14 +942,74 @@ export default class dailyPumperCalculations extends Component {
                                                                 <p className="debitor-tbl-body">{data.qty}</p>
 
                                                             </Col>
-                                                            <Col xs="2">
-                                                                <p className="debitor-tbl-body">{data.amount}</p>
+                                                            <Col xs="1">
+                                                                <p className="debitor-tbl-body">{data.debitAmount}</p>
+
+                                                            </Col>
+                                                            <Col xs="1">
+                                                                <p className="debitor-tbl-body">{data.creditAmount}</p>
 
                                                             </Col>
                                                             <Col xs="1">
                                                                 <p className="debitor-tbl-body">{data.pumpId}</p>
 
                                                             </Col>
+                                                            <Col xs="1">
+                                                                <DeleteForeverIcon className="del-btn" onClick={() => this.deleteDebit(data._id)} />
+                                                            </Col>
+                                                        </Row>
+                                                    )
+                                                })}
+                                            </Card>
+                                        </div>
+                                        {/* ************************************************************************************************************************************************************************** */}
+
+                                        <div className="container" style={{ marginTop: "20px" , marginBottom:"20px"}} >
+                                            <Card className="container">
+                                                <Row style={{ marginTop: "20px" }}>
+                                                    <Col xs="2">
+                                                        <p className="debitor-tbl-head">Date</p>
+                                                    </Col>
+
+                                                    <Col xs="5">
+
+                                                        <p className="debitor-tbl-head">Name/ Reason</p>
+                                                    </Col>
+                                                    <Col xs="2">
+                                                        <p className="debitor-tbl-head">Debit</p>
+
+                                                    </Col>
+                                                    <Col xs="2">
+                                                        <p className="debitor-tbl-head">Credit</p>
+
+                                                    </Col>
+
+                                                    <Col xs="1">
+                                                        <p className="debitor-tbl-head">Action</p>
+                                                    </Col>
+
+                                                </Row>
+                                                {this.state.todayOtherDebit.map((data) => {
+                                                    return (
+                                                        <Row key={data._id}>
+                                                            <Col xs="2">
+                                                                <p className="debitor-tbl-body">{data.date}</p>
+                                                            </Col>
+
+                                                            <Col xs="5">
+
+                                                                <p className="debitor-tbl-body">{data.debitorId}</p>
+                                                            </Col>
+
+                                                            <Col xs="2">
+                                                                <p className="debitor-tbl-body">{data.debitAmount}</p>
+
+                                                            </Col>
+                                                            <Col xs="2">
+                                                                <p className="debitor-tbl-body">{data.creditAmount}</p>
+
+                                                            </Col>
+
                                                             <Col xs="1">
                                                                 <DeleteForeverIcon className="del-btn" onClick={() => this.deleteDebit(data._id)} />
                                                             </Col>
@@ -755,6 +1020,7 @@ export default class dailyPumperCalculations extends Component {
                                             </Card>
                                         </div>
                                     </Tab>
+                                    {/* ************************************************************************************************************************************************************************** */}
 
                                     <Tab eventKey="pumps" title="Pumps Management">
                                         <div className="row" style={{ marginTop: "20px" }}>

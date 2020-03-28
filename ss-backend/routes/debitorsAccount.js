@@ -4,7 +4,7 @@ const config = require('../config/database');
 const DebitorAccount = require('../models/debitorsAccount');
 const verify = require('../authentication');
 
-router.post('/add', verify, function (req, res) { 
+router.post('/add', verify, function (req, res) {
 
     var today = new Date();
     var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
@@ -17,11 +17,12 @@ router.post('/add', verify, function (req, res) {
         vehicleNo: req.body.vehicleNo,
         productId: req.body.productId,
         productName: req.body.productName,
-        size : req.body.size,
+        size: req.body.size,
         qty: req.body.qty,
-        amount: req.body.amount,
+        debitAmount: req.body.amount,
         debitType: 'products',
         pumpId: req.body.pumpId,
+        state: 'Pending'
     })
 
     data.save()
@@ -35,25 +36,16 @@ router.post('/add', verify, function (req, res) {
 
 router.post('/addOther', verify, function (req, res) {
     console.log(req.body);
-    console.log("heool"); 
-    
 
     var today = new Date();
     var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
 
     const data = new DebitorAccount({
         date: date,
-        debitorId: req.body.debitorId,
-        billNo: req.body.billNo,
-        invoiceNo: req.body.invoiceNo,
-        vehicleNo: req.body.vehicleNo,
-        productId: req.body.productId,
-        productName: req.body.productName,
-        size : req.body.size,
-        qty: req.body.qty,
-        amount: req.body.amount,
-        debitType: 'products',
-        pumpId: req.body.pumpId,
+        debitorId: req.body.newDOname,
+        debitAmount: req.body.newDOamount,
+        debitType: 'other',
+        state: 'Pending'
     })
 
     data.save()
@@ -68,7 +60,7 @@ router.get('/get', function (req, res) {
     var today = new Date();
     var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
 
-    DebitorAccount.find({ date: date, debitType : 'products' })
+    DebitorAccount.find({ date: date, debitType: 'products' })
         .then(data => {
             res.send({ state: true, msg: "Data Transefer Done..!", data: data })
         })
@@ -80,7 +72,7 @@ router.get('/getOther', function (req, res) {
     var today = new Date();
     var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
 
-    DebitorAccount.find({ date: date, debitType : 'products' })
+    DebitorAccount.find({ date: date, debitType: 'other' })
         .then(data => {
             res.send({ state: true, msg: "Data Transefer Done..!", data: data })
         })
@@ -94,7 +86,7 @@ router.get('/getOther', function (req, res) {
 //delete product
 router.delete('/delete/:id', function (req, res) {
     const _id = req.params.id
-    
+
     DebitorAccount.remove({ _id: _id })
         .exec()
         .then(result => {
@@ -110,4 +102,48 @@ router.delete('/delete/:id', function (req, res) {
         });
 })
 
+router.post('/addOtherCredit', verify, function (req, res) {
+    console.log(req.body);
+
+    var today = new Date();
+    var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+
+    const data = new DebitorAccount({
+        date: date,
+        debitorId: req.body.newCOname,
+        creditAmount: req.body.newCOamount,
+        debitType: 'other',
+    })
+
+    data.save()
+        .then(result => {
+            res.send({ state: true, msg: "Data Successfully Added ..!" })
+        })
+        .catch(err => {
+            res.send({ state: false, msg: "Data Adding Not Successfull..!" })
+        })
+})
+
+router.post('/addCredit', verify, function (req, res) {
+    console.log(req.body);
+
+    var today = new Date();
+    var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+
+    const data = new DebitorAccount({
+        date: date,
+        debitorId: req.body.debitorId,
+        creditAmount: req.body.creditAmount,
+        chequeNo : req.body.chequeNo,
+        debitType: 'products',
+    })
+
+    data.save()
+        .then(result => {
+            res.send({ state: true, msg: "Data Successfully Added ..!" })
+        })
+        .catch(err => {
+            res.send({ state: false, msg: "Data Adding Not Successfull..!" })
+        })
+})
 module.exports = router

@@ -6,6 +6,8 @@ import '../../Css/Admin/registration.css';
 import axios from 'axios';
 import Sidebar from '../Auth/sidebar';
 import { verifyAuth } from '../../utils/authentication';
+import Snackbar from '@material-ui/core/Snackbar'
+import IconButton from '@material-ui/core/IconButton'
 
 export default class registration extends Component {
 
@@ -32,11 +34,15 @@ export default class registration extends Component {
                 address: '',
                 other: '',
                 file: null,
+                snackbaropen: false,
+                snackbarmsg: '',
             },
 
         }
     }
-
+    snackbarClose = (event) => {
+        this.setState({ snackbaropen: false })
+    }
     onSubmit(e) {
         e.preventDefault();
         const formData = new FormData();
@@ -55,16 +61,16 @@ export default class registration extends Component {
         formData.append('address', this.state.form.address);
         formData.append('other', this.state.form.other);
 
-            axios.post("http://localhost:4000/users/register", formData, { // receive two parameter endpoint url ,form data 
+        axios.post("http://localhost:4000/users/register", formData, { // receive two parameter endpoint url ,form data 
+        })
+            .then(res => { // then print response status
+                console.log(res)
             })
-                .then(res => { // then print response status
-                    console.log(res)
-                })
-                .catch(err => {
-                    console.log(err);
-                })
+            .catch(err => {
+                console.log(err);
+            })
 
-        
+
     }
 
     async componentDidMount() {
@@ -127,20 +133,32 @@ export default class registration extends Component {
         const { form } = this.state;
 
         return (
-            <div>
-                <Col className="row">
-                    <div className="col-md-2" style={{ backgroundColor: "#1c2431" }}>
-                        <Sidebar />
-                    </div>
-                    <div className="col-md-10">
+            <React.Fragment>
 
-                        <React.Fragment>
+                <div className="container-fluid">
+                    <Snackbar
+                        open={this.state.snackbaropen}
+                        autoHideDuration={2000}
+                        onClose={this.snackbarClose}
+                        message={<span id="message-id">{this.state.snackbarmsg}</span>}
+                        action={[
+                            <IconButton
+                                key="close"
+                                aria-label="Close"
+                                color="secondary"
+                                onClick={this.snackbarClose}
+                            > x </IconButton>
+                        ]}
+                    />
+
+                    <div className="row">
+                        <div className="col-md-2" style={{ backgroundColor: "#1c2431" }}>
+                            <Sidebar />
+                        </div>
+                        <div className="col-md-10" style={{ backgroundColor: "#f8f9fd" }}>
                             <h3 style={{ textAlign: "center", marginTop: "50px" }}>User Registration</h3>
-
                             <div className="card">
-
                                 <div style={{ width: "90%", margin: 'auto' }}>
-
                                     <form onSubmit={this.onSubmit}>
                                         <div className="form-group" style={{ marginTop: "50px" }}>
                                             <label>Full Name : </label>
@@ -158,19 +176,19 @@ export default class registration extends Component {
                                                     <input type="text" className="form-control" name="userId" value={form.userId} onChange={this.onChange}></input>
                                                 </div>
                                             </Col>
-                                            
-                                                <Col>
+
+                                            <Col>
                                                 <label>User Type : </label>
                                                 <div className="form-group">
-                                                    <select  className="form-control" id="dropdown" value={form.userType} onChange={this.handleDropdownChange}>
+                                                    <select className="form-control" id="dropdown" value={form.userType} onChange={this.handleDropdownChange}>
                                                         <option value="Administrator">Administrator</option>
                                                         <option value="Manager">Manager</option>
                                                         <option value="Pumper">Pumper</option>
 
                                                     </select>
                                                 </div>
-                                                </Col>
-                                           
+                                            </Col>
+
                                             <Col>
                                                 <label>Birthday : </label>
                                                 <div className="form-group">
@@ -235,8 +253,8 @@ export default class registration extends Component {
                                             <textarea type="text" className="form-control" name="other" value={form.other} onChange={this.onChange}></textarea>
                                         </div>
                                         <div className="form-group">
-                                        <label>Upload Your Profile Image : </label>
-                                            <input type="file"  className="form-control" name="myImage" onChange={this.handleImageChange} />
+                                            <label>Upload Your Profile Image : </label>
+                                            <input type="file" className="form-control" name="myImage" onChange={this.handleImageChange} />
                                         </div>
                                         <div className="form-group">
                                             <button className="btn btn-info my-4 btn-block " type="submit">Register Now</button>
@@ -245,15 +263,12 @@ export default class registration extends Component {
                                     </form>
                                 </div>
                             </div>
-                        </React.Fragment>
-
+                        </div>
                     </div>
-
-                </Col>
-            </div>
-
-
+                </div>
+            </React.Fragment>
         )
 
     }
 }
+
