@@ -116,9 +116,10 @@ router.get('/get/:id', function (req, res) {
 });
 
 //update notification 
-  router.post('/updateuser', async function (req, res) {
+  router.post('/updateuser/:userId', async function (req, res) {
     console.log(req.body);
-    const userId = req.body.userId;
+    const userId = req.params.userId;
+
     const userType = req.body.userType;
     const birthday = req.body.birthday;
     const email = req.body.email;

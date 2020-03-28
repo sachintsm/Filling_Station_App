@@ -16,19 +16,7 @@ import { getFromStorage } from '../../utils/storage';
 export default class profile extends Component {
     constructor(props) {
         super(props);
-        this.onChangeFulName = this.onChangeFulName.bind(this);
-        this.onChangeEmail = this.onChangeEmail.bind(this);
-        this.onChangeBirthday = this.onChangeBirthday.bind(this);
-        this.onChangeMobileOne = this.onChangeMobileOne.bind(this);
-        this.onChangeMobileTwo = this.onChangeMobileTwo.bind(this);
-        this.onChangePassword = this.onChangePassword.bind(this);
-        this.onChangeAddress = this.onChangeAddress.bind(this);
-        this.onChangeNic = this.onChangeNic.bind(this);
-        this.onChangeEpf = this.onChangeEpf.bind(this);
-        this.onChangeEtf = this.onChangeEtf.bind(this);
-        this.onChangeOther = this.onChangeOther.bind(this);
-        this.onChangeUserId = this.onChangeUserId.bind(this);
-        this.onChangeUserType = this.onChangeUserType.bind(this);
+        this.onChange = this.onChange.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
 
         this.state = {
@@ -62,23 +50,7 @@ export default class profile extends Component {
 
                 this.setState({
                     users: response.data.data,
-
-                        // fullName: this.state.users.fullName,
-                        // email: userData.email,
-                        // birthday: userData.birthday,
-                        // mobileOne: userData.mobileOne,
-                        // mobileTwo: userData.mobileTwo,
-                        // address: userData.address,
-                        // nic: response.data.data.nic,
-                        // epf: userData.epf,
-                        // etf: userData.etf,
-                        // other: userData.other,
-                        // file: userData.file,
-                        // userId: userData.userId,
-                        // userType: userData.userType,
-                        // signup_completed: userData.signup_completed
                 })
-                // console.log(this.state.nic);
             })
             .catch(error => {
                 console.log(error)
@@ -86,85 +58,21 @@ export default class profile extends Component {
 
     }
 
-    onChangeFulName(e) {
-        this.setState({
-            fullName: e.target.value
-        });
-    }
-    onChangeEmail(e) {
-        this.setState({
-            email: e.target.value
-        });
-    }
-    onChangeMobileOne(e) {
-        this.setState({
-            mobileOne: e.target.value
-        });
-    }
-    onChangeMobileTwo(e) {
-        this.setState({
-            mobileTwo: e.target.value
-        });
-    }
-    onChangeBirthday(e) {
-        this.setState({
-            birthday: e.target.value
-        });
-    }
-    onChangePassword(e) {
-        this.setState({
-            password: e.target.value
-        });
-    }
-    // onChangeSignupAPassword(e) {
-    //     this.setState({
-    //         signup_aPassword: e.target.value
-    //     });
-    // }
-    onChangeAddress(e) {
-        this.setState({
-            address: e.target.value
-        });
-    }
-    onChangeNic(e) {
-        this.setState({
-            nic: e.target.value
-        });
+    onChange = (e) => {
+        e.persist = () => { };
+        let store = this.state;
+        store[e.target.name] = e.target.value
+        this.setState(store);
     }
 
-    onChangeEpf(e) {
-        this.setState({
-            epf: e.target.value
-        });
-    }
-    onChangeEtf(e) {
-        this.setState({
-            etf: e.target.value
-        });
-    }
-    onChangeOther(e) {
-        this.setState({
-            other: e.target.value
-        });
-    }
-    onChangeUserId(e) {
-        this.setState({
-            userId: e.target.value
-        });
-    }
-    onChangeUserType(e) {
-        this.setState({
-            userType: e.target.value
-        });
-    }
+
     onSubmit(e) {
 
         const userData = getFromStorage('auth-user')
-        console.log(userData.userId)
+        console.log(this.state.epf)
 
         e.preventDefault();
         const obj = {
-            // signup_firstName: this.state.signup_firstName,
             fullName: this.state.fullName,
             email: this.state.email,
             birthday: this.state.birthday,
@@ -177,6 +85,7 @@ export default class profile extends Component {
             etf: this.state.etf,
             userId: this.state.userId,
             userType: this.state.userType,
+            other: this.state.other,
             signup_completed: this.state.signup_completed
         };
 
@@ -254,7 +163,7 @@ export default class profile extends Component {
                                                             <div className="col-md-4">
                                                                 <div className="form-group" style={{ marginTop: "50px" }}>
                                                                     <label>User ID : </label>
-                                                                    <input type="text" className="form-control" name="userId" defaultValue={data.userId} onChange={this.onChange} />
+                                                                    <input readOnly type="text" className="form-control" name="userId" defaultValue={data.userId} onChange={this.onChange} />
                                                                 </div>
                                                             </div>
 
@@ -270,7 +179,7 @@ export default class profile extends Component {
                                                             <div className="col-md-4">
                                                                 <div className="form-group" style={{ marginTop: "50px" }}>
                                                                     <label>Birthday : </label>
-                                                                    <input type="text" className="form-control" name="userType" defaultValue={data.birthday} onChange={this.onChange}></input>
+                                                                    <input type="date" className="form-control" name="userType" defaultValue={data.birthday} onChange={this.onChange}></input>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -340,12 +249,3 @@ export default class profile extends Component {
     }
 }
 
-// const mapStateToProps = state => ({
-//     id: state.auth.id,
-//     fName: state.auth.fName,
-//     lName: state.auth.lName,
-//     email: state.auth.email,
-//     number: state.auth.number
-// });
-
-// export default connect(mapStateToProps, null)(profile);
