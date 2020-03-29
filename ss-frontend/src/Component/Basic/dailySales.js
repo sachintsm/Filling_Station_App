@@ -55,7 +55,12 @@ export default class dailyPumperCalculations extends Component {
             newCAmount: '',
             newCOname: '',
             newCOamount: '',
-
+            totals: {
+                otherDebit: '',
+                otherCredit: '',
+                mainDebit: '',
+                mainCredit: '',
+            }
         }
 
         this.onLocalChange = this.onLocalChange.bind(this)
@@ -252,6 +257,22 @@ export default class dailyPumperCalculations extends Component {
                 this.setState({
                     todayPetroleumDebit: res.data.data
                 })
+                var tot1 = 0;
+                var tot2 = 0;
+                for (var i = 0; i < this.state.todayPetroleumDebit.length; i++) {
+                    if (this.state.todayPetroleumDebit[i].debitAmount != null) {
+                        tot1 = tot1 + parseFloat(this.state.todayPetroleumDebit[i].debitAmount)
+                    }
+                }
+                for (var j = 0; j < this.state.todayPetroleumDebit.length; j++) {
+                    if (this.state.todayPetroleumDebit[j].creditAmount != null) {
+                        tot2 = tot2 + parseFloat(this.state.todayPetroleumDebit[j].creditAmount)
+                    }
+                }
+                this.setState({
+                    mainDebit: tot1.toFixed(2),
+                    mainCredit: tot2.toFixed(2)
+                })
             })
         //get today other debits
         await axios.get('http://localhost:4000/debitorsAccount/getOther')
@@ -259,6 +280,23 @@ export default class dailyPumperCalculations extends Component {
                 this.setState({
                     todayOtherDebit: res.data.data
                 })
+                var tot1 = 0;
+                var tot2 = 0;
+                for (var i = 0; i < this.state.todayOtherDebit.length; i++) {
+                    if (this.state.todayOtherDebit[i].debitAmount != null) {
+                        tot1 = tot1 + parseFloat(this.state.todayOtherDebit[i].debitAmount)
+                    }
+                }
+                for (var j = 0; j < this.state.todayOtherDebit.length; j++) {
+                    if (this.state.todayOtherDebit[j].creditAmount != null) {
+                        tot2 = tot2 + parseFloat(this.state.todayOtherDebit[j].creditAmount)
+                    }
+                }
+                    this.setState({
+                    otherDebit: tot1.toFixed(2),
+                    otherCredit: tot2.toFixed(2)
+                })
+
             })
     }
 
@@ -785,7 +823,7 @@ export default class dailyPumperCalculations extends Component {
                                                         {/* ***************************************************************************************************************************************** */}
 
                                                         <Tab eventKey="credit" title="Credit">
-                                                            <p className="first-topic" style={{marginTop:"20px"}}>Add Main Credit</p>
+                                                            <p className="first-topic" style={{ marginTop: "20px" }}>Add Main Credit</p>
                                                             <Card className="container">
                                                                 <div className="row">
                                                                     <div className="col-md-6" style={{ marginLeft: "5px" }}>
@@ -961,10 +999,31 @@ export default class dailyPumperCalculations extends Component {
                                                     )
                                                 })}
                                             </Card>
+                                            <div className="container" style={{ marginTop: "10px" }}>
+                                                <Row>
+                                                    <Col xs="8">
+                                                    </Col>
+
+
+                                                    <Col xs="1">
+                                                        <p className="debitor-tbl-head">{this.state.mainDebit}</p>
+
+                                                    </Col>
+                                                    <Col xs="1">
+                                                        <p className="debitor-tbl-head">{this.state.mainCredit}</p>
+
+                                                    </Col>
+                                                    <Col xs="1">
+
+                                                    </Col>
+                                                    <Col xs="1">
+                                                    </Col>
+                                                </Row>
+                                            </div>
                                         </div>
                                         {/* ************************************************************************************************************************************************************************** */}
 
-                                        <div className="container" style={{ marginTop: "20px" , marginBottom:"20px"}} >
+                                        <div className="container" style={{ marginTop: "20px", marginBottom: "20px" }} >
                                             <Card className="container">
                                                 <Row style={{ marginTop: "20px" }}>
                                                     <Col xs="2">
@@ -1001,11 +1060,11 @@ export default class dailyPumperCalculations extends Component {
                                                                 <p className="debitor-tbl-body">{data.debitorId}</p>
                                                             </Col>
 
-                                                            <Col xs="2">
+                                                            <Col xs="2" style={{textAlign: "right"}}>
                                                                 <p className="debitor-tbl-body">{data.debitAmount}</p>
 
                                                             </Col>
-                                                            <Col xs="2">
+                                                            <Col xs="2" style={{textAlign: "right"}}>
                                                                 <p className="debitor-tbl-body">{data.creditAmount}</p>
 
                                                             </Col>
@@ -1018,6 +1077,27 @@ export default class dailyPumperCalculations extends Component {
                                                     )
                                                 })}
                                             </Card>
+                                            <div className="container">
+
+                                                <Row style={{ marginTop: "10px" }}>
+
+                                                    <Col xs="7">
+
+                                                    </Col>
+                                                    <Col xs="2" style={{textAlign: "right"}}>
+                                                        <p className="debitor-tbl-head">{this.state.otherDebit}</p>
+
+                                                    </Col>
+                                                    <Col xs="2" style={{textAlign: "right"}}>
+                                                        <p className="debitor-tbl-head">{this.state.otherCredit}</p>
+
+                                                    </Col>
+
+                                                    <Col xs="1">
+                                                    </Col>
+
+                                                </Row>
+                                            </div>
                                         </div>
                                     </Tab>
                                     {/* ************************************************************************************************************************************************************************** */}
