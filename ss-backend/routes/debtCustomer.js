@@ -60,7 +60,7 @@ router.post('/register', function (req, res) {
 
 router.get('/get', function (req, res) {
 
-    User.find()
+    Debtor.find()
         .exec()
         .then(result => {
             res.json({ state: true, msg: "Data Transfer Successfully..!", data: result });

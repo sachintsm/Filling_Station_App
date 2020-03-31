@@ -4,21 +4,33 @@ import { Card, Col, Row } from 'react-bootstrap';
 import Sidebar from '../Auth/sidebar';
 import "react-datepicker/dist/react-datepicker.css";
 import '../../Css/Basic/cusprofile.css';
-// import DatePicker from "react-datepicker";
-import normal from '../../Assets/images/normal.png';
 import { getFromStorage } from '../../utils/storage';
 import Snackbar from '@material-ui/core/Snackbar'
-import IconButton from '@material-ui/core/IconButton'
+import IconButton from '@material-ui/core/IconButton';
+import { Link } from 'react-router-dom';
 
-
-// import AddImage from "../../Components/AddServiceImage.component";
-// import Delete from "../../Components/Delete.component";
+const Debt = props => (
+    <tr>
+        <td>{props.debt.fullName}</td>
+        <td>{props.debt.debtorId}</td>
+        <td>{props.debt.damount}</td>
+        <td>{props.debt.mobile}</td>
+        <td>{props.debt.fax}</td>
+        <td>{props.debt.nic}</td>
+        <td>
+        <button className="btn btn-info  " type="delete">DELETE</button>
+            
+        </td>
+    </tr>
+)
 
 export default class profile extends Component {
     constructor(props) {
         super(props);
         this.onChange = this.onChange.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
+        this.handleSearch = this.handleSearch.bind(this);
+
 
         this.state = {
             snackbaropen: false,
@@ -32,7 +44,6 @@ export default class profile extends Component {
             fax: '',
             address: '',
             other: '',
-            // signup_completed: false,
             userData: [],
             users: []
         }
@@ -40,23 +51,20 @@ export default class profile extends Component {
     snackbarClose = (event) => {
         this.setState({ snackbaropen: false })
     }
-    // componentDidMount() {
-    //     const userData = getFromStorage('auth-user')
-    //     console.log(userData.userId)
+    componentDidMount() {
+        axios.get('http://localhost:4000/debtors/get')
+            .then(response => {
+                this.setState({ users: response.data.data });
+            })
+            .catch(function (error) {
+                console.log(error);
+            })
+    }
 
-    //     axios.get('http://localhost:4000/debtors/get' + userData.userId)
-    //         .then(response => {
-    //             console.log(response);
-
-    //             this.setState({
-    //                 users: response.data.data,
-    //             })
-    //         })
-    //         .catch(error => {
-    //             console.log(error)
-    //         })
-
-    // }
+    handleSearch = e => {
+        this.setState({ debtorId: e.target.value});
+        
+    };
 
     onChange = (e) => {
         e.persist = () => { };
@@ -65,11 +73,18 @@ export default class profile extends Component {
         this.setState(store);
     }
 
+    UserList() {
+        return this.state.users.map(function(currentDebt, i){
+            
+            return <Debt debt={currentDebt} key={i} />;
+            }
+    )
+    }
+
 
     onSubmit(e) {
 
-        // const userData = getFromStorage('auth-user')
-        // console.log(this.state.epf)
+
 
         e.preventDefault();
         const obj = {
@@ -80,22 +95,11 @@ export default class profile extends Component {
             mobile: this.state.mobile,
             fax: this.state.fax,
             other: this.state.other,
-            // signup_completed: this.state.signup_completed
         };
 
-        axios.post('http://localhost:4000/debtors/register' , obj)
+        axios.post('http://localhost:4000/debtors/register', obj)
             .then(res => console.log(res.data));
 
-
-        // const obj2 = {
-        //     signup_password: this.state.signup_password,
-        //     signup_completed: this.state.signup_completed
-        // };
-        // if (this.state.signup_password) {
-        //     axios.post('http://localhost:4000/mazzevents/updatepassword/' + this.props.id, obj2)
-        //         .then(res => console.log(res.data));
-        // }
-        //this.props.history.push('/customer/photo');
     }
 
     render() {
@@ -132,7 +136,7 @@ export default class profile extends Component {
                                     <div className="row">
                                         <div className="col-md-6">
                                             <div className="form-group" style={{ marginTop: "50px", marginLeft: "120px" }} >
-                                                <input className="form-control" type="debtorId" name="debtorId" id="debtorId" placeholder="Search ID here" onChange={this.onChange} />
+                                                <input className="form-control" type="debtorId" name="debtorId" id="debtorId" placeholder="Search ID here" onChange={this.handleSearch} />
                                             </div>
                                         </div>
                                         <div className="col-md-6">
@@ -165,7 +169,7 @@ export default class profile extends Component {
                                             </thead>
                                             <tbody>
 
-                                                {/* {this.UserList()} */}
+                                                {this.UserList()}
                                             </tbody>
                                         </table>
                                     </div>
@@ -177,75 +181,68 @@ export default class profile extends Component {
                                 <div style={{ width: "90%", margin: 'auto' }}>
                                     <div className="row">
 
+                                        <div className="card">
+                                            <div style={{ width: "90%", margin: 'auto' }}>
+                                                <form onSubmit={this.onSubmit} >
 
-
-                                        {/* {this.state.users.map((data) => {
-                                            console.log(data.epf);
-
-
-                                            return ( */}
-                                                <div className="card">
-                                                    <div style={{ width: "90%", margin: 'auto' }}>
-                                                        <form onSubmit={this.onSubmit} >
-
-                                                            <div className="form-group" style={{ marginTop: "50px" }}>
-                                                                <label>Name / Company Name : </label>
-                                                                <input type="text" className="form-control" name="fullName" defaultValue={this.state.fullName} onChange={this.onChange}></input>
-                                                            </div>
-                    
-                                                            <div className="row">
-                                                                <div className="col-md-4">
-                                                                    <div className="form-group">
-                                                                        <label>Debitor ID : </label>
-                                                                        <input type="text" className="form-control" name="debtorId" defaultValue={this.state.debtorId} onChange={this.onChange}></input>
-                                                                    </div>
-                                                                </div>
-                                                                <div className="col-md-4">
-                                                                    <div className="form-group">
-                                                                        <label>Debited Amount : </label>
-                                                                        <input type="text" className="form-control" name="damount" defaultValue={this.state.damount} onChange={this.onChange}></input>
-                                                                    </div>
-                                                                </div>
-                                                                <div className="col-md-4">
-                                                                    <div className="form-group">
-                                                                        <label>NIC : </label>
-                                                                        <input type="text" className="form-control" name="nic" defaultValue={this.state.nic} onChange={this.onChange}></input>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-
-                                                            <Row>
-                                                                <Col>
-                                                                    <div className="form-group">
-                                                                        <label>Mobile Number : </label>
-                                                                        <input type="text" className="form-control" name="mobile" defaultValue={this.state.mobile} onChange={this.onChange}></input>
-                                                                    </div>
-                                                                </Col>
-                                                                <Col>
-                                                                    <div className="form-group">
-                                                                        <label>Fax Mumber : </label>
-                                                                        <input type="text" className="form-control" name="fax" defaultValue={this.state.fax} onChange={this.onChange}></input>
-                                                                    </div>
-                                                                </Col>
-                                                            </Row>
-                                                            <div className="form-group">
-                                                                <label>Address : </label>
-                                                                <textarea type="text" className="form-control" name="address" defaultValue={this.state.address} onChange={this.onChange}></textarea>
-                                                            </div>
-                                                            <div className="form-group">
-                                                                <label>Others : </label>
-                                                                <textarea type="text" className="form-control" name="other" defaultValue={this.state.other} onChange={this.onChange}></textarea>
-                                                            </div>
-
-                                                            <div className="form-group">
-                                                                <button className="btn btn-info my-4 btn-block " type="submit">ADD</button>
-                                                            </div>
-
-                                                        </form>
+                                                    <div className="form-group" style={{ marginTop: "50px" }}>
+                                                        <label>Name / Company Name : </label>
+                                                        <input type="text" className="form-control" name="fullName" defaultValue={this.state.fullName} onChange={this.onChange}></input>
                                                     </div>
-                                                </div>
 
-                                            {/* )
+                                                    <div className="row">
+                                                        <div className="col-md-4">
+                                                            <div className="form-group">
+                                                                <label>Debitor ID : </label>
+                                                                <input type="text" className="form-control" name="debtorId" defaultValue={this.state.debtorId} onChange={this.onChange}></input>
+                                                            </div>
+                                                        </div>
+                                                        <div className="col-md-4">
+                                                            <div className="form-group">
+                                                                <label>Debited Amount : </label>
+                                                                <input type="text" className="form-control" name="damount" defaultValue={this.state.damount} onChange={this.onChange}></input>
+                                                            </div>
+                                                        </div>
+                                                        <div className="col-md-4">
+                                                            <div className="form-group">
+                                                                <label>NIC : </label>
+                                                                <input type="text" className="form-control" name="nic" defaultValue={this.state.nic} onChange={this.onChange}></input>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <Row>
+                                                        <Col>
+                                                            <div className="form-group">
+                                                                <label>Mobile Number : </label>
+                                                                <input type="text" className="form-control" name="mobile" defaultValue={this.state.mobile} onChange={this.onChange}></input>
+                                                            </div>
+                                                        </Col>
+                                                        <Col>
+                                                            <div className="form-group">
+                                                                <label>Fax Mumber : </label>
+                                                                <input type="text" className="form-control" name="fax" defaultValue={this.state.fax} onChange={this.onChange}></input>
+                                                            </div>
+                                                        </Col>
+                                                    </Row>
+                                                    <div className="form-group">
+                                                        <label>Address : </label>
+                                                        <textarea type="text" className="form-control" name="address" defaultValue={this.state.address} onChange={this.onChange}></textarea>
+                                                    </div>
+                                                    <div className="form-group">
+                                                        <label>Others : </label>
+                                                        <textarea type="text" className="form-control" name="other" defaultValue={this.state.other} onChange={this.onChange}></textarea>
+                                                    </div>
+
+                                                    <div className="form-group">
+                                                        <button className="btn btn-info my-4 btn-block " type="submit">ADD</button>
+                                                    </div>
+
+                                                </form>
+                                            </div>
+                                        </div>
+
+                                        {/* )
                                         })} */}
                                     </div>
 
