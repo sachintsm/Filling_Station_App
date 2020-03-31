@@ -18,8 +18,8 @@ const Debt = props => (
         <td>{props.debt.fax}</td>
         <td>{props.debt.nic}</td>
         <td>
-        <button className="btn btn-info  " type="delete">DELETE</button>
-            
+            <button className="btn btn-info  " type="delete">DELETE</button>
+
         </td>
     </tr>
 )
@@ -62,8 +62,8 @@ export default class profile extends Component {
     }
 
     handleSearch = e => {
-        this.setState({ debtorId: e.target.value});
-        
+        this.setState({ debtorId: e.target.value });
+
     };
 
     onChange = (e) => {
@@ -74,11 +74,11 @@ export default class profile extends Component {
     }
 
     UserList() {
-        return this.state.users.map(function(currentDebt, i){
-            
+        return this.state.users.map(function (currentDebt, i) {
+
             return <Debt debt={currentDebt} key={i} />;
-            }
-    )
+        }
+        )
     }
 
 
@@ -131,27 +131,28 @@ export default class profile extends Component {
 
                             <div>
 
-                                <form>
+                                
 
-                                    <div className="row">
-                                        <div className="col-md-6">
-                                            <div className="form-group" style={{ marginTop: "50px", marginLeft: "120px" }} >
-                                                <input className="form-control" type="debtorId" name="debtorId" id="debtorId" placeholder="Search ID here" onChange={this.handleSearch} />
-                                            </div>
-                                        </div>
-                                        <div className="col-md-6">
-                                            <div className="form-group" style={{ marginTop: "50px", marginRight: "120px" }}>
+                                   
+                                        
+                                        <div >
+                                            <div className="form-group" style={{ marginTop: "50px", marginRight: "175px", marginLeft:"60px" }}>
                                                 <button className="btn btn-info my-4 btn-block " type="submit">ADD A NEW DEBTOR</button>
                                             </div>
                                         </div>
-                                    </div>
-                                </form>
+                                 
+                           
 
                             </div>
                             <div className="card">
 
                                 <div>
                                     <h3 className="sp_head">List of Debtors</h3>
+                                    <form>
+                                    <div className="form-group" style={{ marginTop: "50px" , marginLeft:"40px", marginRight:"40px" }} >
+                                        <input className="form-control" type="debtorId" name="debtorId" id="debtorId" placeholder="Search ID here" onChange={this.handleSearch} />
+                                    </div>
+                                    </form>
                                     <div className="sp_table">
 
                                         <table className="table table-striped" style={{ marginTop: 20 }} >
