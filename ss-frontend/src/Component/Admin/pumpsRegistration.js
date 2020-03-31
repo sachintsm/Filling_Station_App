@@ -9,6 +9,7 @@ import { getFromStorage } from '../../utils/storage';
 import axios from 'axios'
 import Snackbar from '@material-ui/core/Snackbar'
 import IconButton from '@material-ui/core/IconButton'
+import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 
 export default class pumpsRegistration extends Component {
 
@@ -24,7 +25,10 @@ export default class pumpsRegistration extends Component {
             pumpSet: '',
             snackbaropen: false,
             snackbarmsg: '',
-            showMe: false
+            showMe: false,
+            setNumber: '',
+            pumpSetData: [],
+            selectedSet: ''
         }
         this.onChangeFuelType = this.onChangeFuelType.bind(this);
         this.onChangeMachineNumber = this.onChangeMachineNumber.bind(this)
@@ -34,6 +38,8 @@ export default class pumpsRegistration extends Component {
         this.onChangePumpSet = this.onChangePumpSet.bind(this)
         this.deletePump = this.deletePump.bind(this)
         this.onRefresh = this.onRefresh.bind(this)
+        this.onAddPumpSet = this.onAddPumpSet.bind(this)
+        this.onChangeSetNumber = this.onChangeSetNumber.bind(this)
     }
     snackbarClose = (event) => {
         this.setState({ snackbaropen: false })
@@ -61,6 +67,11 @@ export default class pumpsRegistration extends Component {
             meterReading: e.target.value
         })
     }
+    onChangeSetNumber(e) {
+        this.setState({
+            setNumber: e.target.value
+        })
+    }
 
     componentDidMount = async () => {
         const authState = await verifyAuth();
@@ -74,6 +85,58 @@ export default class pumpsRegistration extends Component {
             .catch(function (err) {
                 console.log(err);
             })
+        axios.get('http://localhost:4000/pumpSetRegistration/get')
+            .then(res => {
+
+                this.setState({
+                    pumpSetData: res.data.data
+                });
+            })
+
+            .catch(err => {
+                console.log(err);
+            })
+    }
+
+    onAddPumpSet() {
+        const obj = getFromStorage('auth-token');
+        if (this.state.setNumber === '') {
+            this.setState({
+                snackbaropen: true,
+                snackbarmsg: "Please Fill the Data ..!"
+            })
+        }
+        else {
+            const data = {
+                setNumber: this.state.setNumber,
+            }
+            fetch('http://localhost:4000/pumpSetRegistration/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'auth-token': obj.token
+                },
+                body: JSON.stringify(data),
+            })
+                .then(res => res.json())
+                .then(json => {
+                    // alert(json.msg)
+                    this.setState({
+                        snackbaropen: true,
+                        snackbarmsg: json.msg
+                    })
+                    window.location.reload();
+                })
+                .catch(err => {
+                    this.setState({
+                        snackbaropen: true,
+                        snackbarmsg: err
+                    })
+                    console.log(err)
+                })
+        }
+
+
     }
 
     onSubmit() {
@@ -164,9 +227,36 @@ export default class pumpsRegistration extends Component {
                 })
             })
     }
+    onDeleteSet(data) {
+        console.log(data)
+        axios.delete('http://localhost:4000/pumpSetRegistration/delete/' + data)
+            .then(res => {
+                console.log(res);
+                this.setState({
+                    snackbaropen: true,
+                    snackbarmsg: res.data.message
+                })
+                window.location.reload();
+            })
+            .catch(err => {
+                console.log(err);
+                this.setState({
+                    snackbaropen: true,
+                    snackbarmsg: err
+                })
+            })
+    }
 
     render() {
 
+        const { pumpSetData } = this.state;
+
+        let countriesList = pumpSetData.length > 0
+            && pumpSetData.map((item, i) => {
+                return (
+                    <option key={i} value={item.setNumber}>{item.setNumber}</option>
+                )
+            }, this);
         return (
             <React.Fragment>
 
@@ -186,106 +276,160 @@ export default class pumpsRegistration extends Component {
                         ]}
                     />
 
+
+
                     <div className="row">
                         <div className="col-md-2" style={{ backgroundColor: "#1c2431" }}>
                             <Sidebar />
                         </div>
                         <div className="col-md-10" style={{ backgroundColor: "#f8f9fd", height: "1000px" }}>
-                            <div className="main-div" >
-                                <div className="container reg-card">
-                                    <Card>
-                                        <form>
-                                            <div className="container">
+                            <div className="container" >
+                                <div className="row" style={{ marginTop: "20px" }}>
+                                    <div className="col-md-4">
+                                        <p className="tpic">Add Pump Set</p>
 
-                                                <div className="row">
-                                                    <div className="col-md-3">
-                                                        <MDBInput outline label="Machine Number" type="text" name="machineNumber" onChange={this.onChangeMachineNumber} />
-                                                    </div>
+                                        <Card>
+                                            <form>
+                                                <div className="container">
 
-                                                    <div className="col-md-3 fuel-selector">
-                                                        <select className="form-control" onChange={this.onChangeFuelType}>
-                                                            <option >Select the fuel</option>
-                                                            <option value="Lanka Auto Diesel">Lanka Auto Diesel</option>
-                                                            <option value="Lanka Super Diesel">Lanka Super Diesel</option>
-                                                            <option value="Lanka Karesine-oil">Lanka Karesine-oil</option>
-                                                            <option value="Petrol Octane 92">Petrol Octane 92</option>
-                                                            <option value="Petrol Octane 95">Petrol Octane 95</option>
-                                                        </select>
-
-                                                    </div>
-                                                    <div className="col-md-3">
-                                                        <MDBInput outline label="Merter Reading" type="text" name="meterReading" onChange={this.onChangeMeterReading} />
-                                                    </div>
-                                                    <div className="col-md-3" style={{ marginTop: "20px" }}>
-                                                        <Button className="reg-btn" color="primary" onClick={this.onSubmit}>Add Machine</Button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </form>
-                                    </Card>
-                                </div>
-                                <div className="container">
-                                    <Card className="list-card">
-                                        <div className="container card-content">
-                                            <div className="row" style={{ marginLeft: "5px", marginRight: "5px" }} >
-                                                <div className="col-md-2">
-                                                    <label className="topic-pump"> Machine No.</label>
-                                                </div>
-                                                <div className="col-md-3">
-                                                    <label className="topic-pump"> Fuel Type </label>
-                                                </div>
-                                                <div className="col-md-3">
-                                                    <label className="topic-pump" > Initial Merter Reading</label>
-                                                </div>
-                                                <div className="col-md-2">
-                                                    <label className="topic-pump"> Assumed Pumper</label>
-                                                </div>
-                                                <div className="col-md-2">
-                                                    <label className="topic-pump"> Actions</label>
-                                                </div>
-                                            </div>
-
-                                        </div>
-                                        <div className="container card-content">
-                                            {this.state.pumps.map((pump) => {
-                                                return (
-                                                    <div className="row div-pump" key={pump.machineNumber} style={{ marginLeft: "10px", marginRight: "10px" }} >
-                                                        <div className="col-md-2">
-                                                            <label className="des-pump"> {pump.machineNumber}</label>
+                                                    <div className="row">
+                                                        <div className="col-md-7">
+                                                            <MDBInput outline label="Set Number" type="text" name="setNumber" onChange={this.onChangeSetNumber} />
+                                                            <p style={{ color: "gray", fontWeight: "400", marginTop: "-22px", fontSize: "12px", marginLeft: "10px" }}>
+                                                                i.e : 1 , 2 , ....
+                                                            </p>
                                                         </div>
+                                                        <div className="col-md-5" style={{ marginTop: "20px" }}>
+                                                            <Button className="reg-btn" color="primary" onClick={this.onAddPumpSet}>+ SET</Button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </Card>
+                                    </div>
+                                    <div className="col-md-8">
+                                        <p className="tpic">Add New Machine</p>
+
+                                        <Card>
+                                            <form>
+                                                <div className="container">
+
+                                                    <div className="row">
                                                         <div className="col-md-3">
-                                                            <label className="des-pump" > {pump.fuelType} </label>
+                                                            <MDBInput outline label="Machine Number" type="text" name="machineNumber" onChange={this.onChangeMachineNumber} />
+                                                            <p style={{ color: "gray", fontWeight: "400", marginTop: "-22px", fontSize: "12px", marginLeft: "10px" }}>
+                                                                i.e : SD01
+                                                            </p>
                                                         </div>
-                                                        <div className="col-md-3">
-                                                            <label className="des-pump"> {pump.meterReading}</label>
-                                                        </div>
-                                                        <div className="col-md-2">
-                                                            <select className="form-control" onChange={this.onChangePumpSet} onBlur={() => this.onPumpsetBlur(pump)}>
-                                                                <option value={pump.pumpSet}>{pump.pumpSet}</option>
-                                                                <option value="set 1">Pump set 1</option>
-                                                                <option value="set 2">Pump set 2</option>
-                                                                <option value="set 3">Pump set 3</option>
+
+                                                        <div className="col-md-3 fuel-selector">
+                                                            <select className="form-control" onChange={this.onChangeFuelType}>
+                                                                <option >Select the fuel</option>
+                                                                <option value="Lanka Auto Diesel">Lanka Auto Diesel</option>
+                                                                <option value="Lanka Super Diesel">Lanka Super Diesel</option>
+                                                                <option value="Lanka Karesine-oil">Lanka Karesine-oil</option>
+                                                                <option value="Petrol Octane 92">Petrol Octane 92</option>
+                                                                <option value="Petrol Octane 95">Petrol Octane 95</option>
                                                             </select>
-                                                        </div>
-                                                        <div className="col-md-2" style={{ marginTop: "-7px" }}>
-                                                            <button className="btn btn-danger reg-btn" onClick={() => this.deletePump(pump._id)}>Delete</button>
-                                                        </div>
-                                                    </div>
-                                                )
-                                            }
-                                            )}
-                                            <div className="container">
-                                                <div className="row" style={{ float: "right", marginBottom: "20px" }}>
-                                                    <div className="col-md-2">
 
-                                                        <button style={{ width: "145px" }} className="btn btn-primary" onClick={this.onRefresh}>Submit Now</button>
+                                                        </div>
+                                                        <div className="col-md-3">
+                                                            <MDBInput outline label="Merter Reading" type="text" name="meterReading" onChange={this.onChangeMeterReading} />
+                                                        </div>
+                                                        <div className="col-md-3" style={{ marginTop: "20px" }}>
+                                                            <Button className="reg-btn" color="primary" onClick={this.onSubmit}>+ Machine</Button>
+                                                        </div>
                                                     </div>
                                                 </div>
+                                            </form>
+                                        </Card>
+                                    </div>
+                                </div>
+                                <p className="tpic" style={{ marginTop: "20px", marginBottom: "-10px" }}>Pumps</p>
+
+                                <Card className="list-card">
+                                    <div className="card-content">
+                                        <div className="row" style={{ marginLeft: "5px", marginRight: "5px" }} >
+                                            <div className="col-md-2">
+                                                <label className="topic-pump"> Machine No.</label>
+                                            </div>
+                                            <div className="col-md-3">
+                                                <label className="topic-pump"> Fuel Type </label>
+                                            </div>
+                                            <div className="col-md-3">
+                                                <label className="topic-pump" > Initial Merter Reading</label>
+                                            </div>
+                                            <div className="col-md-3">
+                                                <label className="topic-pump"> Assumed Pumper</label>
+                                            </div>
+                                            <div className="col-md-1" style={{textAlign:"left"}}>
+                                                <label className="topic-pump"> Actions</label>
                                             </div>
                                         </div>
 
-                                    </Card>
-                                </div>
+                                    </div>
+                                    <div className="container card-content">
+                                        {this.state.pumps.map((pump) => {
+                                            return (
+                                                <div className="row div-pump" key={pump.machineNumber} style={{ marginLeft: "10px", marginRight: "10px" }} >
+                                                    <div className="col-md-2">
+                                                        <label className="des-pump"> {pump.machineNumber}</label>
+                                                    </div>
+                                                    <div className="col-md-3">
+                                                        <label className="des-pump" > {pump.fuelType} </label>
+                                                    </div>
+                                                    <div className="col-md-3">
+                                                        <label className="des-pump"> {pump.meterReading}</label>
+                                                    </div>
+                                                    <div className="col-md-3">
+                                                        <select className="form-control" onChange={this.onChangePumpSet} onBlur={() => this.onPumpsetBlur(pump)}>
+                                                            <option value={pump.pumpSet}>{pump.pumpSet}</option>
+                                                            {countriesList}
+                                                        </select>
+                                                    </div>
+                                                    <div className="col-md-1" style={{ textAlign:"center"}}>
+                                                        <DeleteForeverIcon className="del-btn" onClick={() => this.deletePump(pump._id)} />
+                                                    </div>
+                                                </div>
+                                            )
+                                        }
+                                        )}
+                                        <div className="container">
+                                            <div className="row" style={{ float: "right", marginBottom: "20px" }}>
+                                                <div className="col-md-2">
+
+                                                    <button style={{ width: "145px" }} className="btn btn-primary" onClick={this.onRefresh}>Submit Now</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </Card>
+                                <p className="tpic">Pump Sets</p>
+
+                                <Card>
+                                    <form>
+                                        <div className="container">
+
+                                            <div className="row">
+                                                {this.state.pumpSetData.map((data) => {
+                                                    return (
+                                                        <div className="col-md-3" style={{ marginTop: "20px" }} key={data._id}>
+                                                            <div className="row" >
+                                                                <div className="col-md-3">
+                                                                    <p>{data.setNumber}</p>
+                                                                </div>
+                                                                <div className="col-md-6">
+                                                                    <DeleteForeverIcon className="del-btn" onClick={() => this.onDeleteSet(data._id)} />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    )
+                                                })}
+                                            </div>
+                                        </div>
+                                    </form>
+                                </Card>
                             </div>
                         </div>
                     </div>
