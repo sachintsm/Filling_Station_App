@@ -10,6 +10,8 @@ const { createServer } = require('http');
 
 const config = require('./config/database')
 const users = require('./routes/users')
+const debtors = require('./routes/debtCustomer')
+
 const pumpsRegistration = require('./routes/pumpsRegistration')
 const fuelLubricantPrice = require('./routes/fuelLubricantPrice')
 const dailySales = require('./routes/dailySales')
@@ -34,6 +36,8 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use('/users', users);
+app.use('/debtors', debtors);
+
 app.use('/pumpsRegistration', pumpsRegistration)
 app.use('/fuelLubricantPrice', fuelLubricantPrice)
 app.use('/dailySales', dailySales)
