@@ -87,7 +87,6 @@ export default class pumpsRegistration extends Component {
             })
         axios.get('http://localhost:4000/pumpSetRegistration/get')
             .then(res => {
-
                 this.setState({
                     pumpSetData: res.data.data
                 });

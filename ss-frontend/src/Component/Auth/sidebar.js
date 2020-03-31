@@ -7,7 +7,7 @@ import PersonAddIcon from '@material-ui/icons/PersonAdd';
 import EvStationIcon from '@material-ui/icons/EvStation';
 import AttachMoneyIcon from '@material-ui/icons/AttachMoney';
 import MonetizationOnIcon from '@material-ui/icons/MonetizationOn';
-import TransferWithinAStationIcon from '@material-ui/icons/TransferWithinAStation';
+// import TransferWithinAStationIcon from '@material-ui/icons/TransferWithinAStation';
 import FunctionsIcon from '@material-ui/icons/Functions';
 
 export default class sidebar extends Component {
