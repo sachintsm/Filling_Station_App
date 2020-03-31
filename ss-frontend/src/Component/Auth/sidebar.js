@@ -78,6 +78,19 @@ export default class sidebar extends Component {
                         </div>
                     </Link>
                 </div>
+                <div className="side-row-div">
+                    <Link to={'/cusprofile'}>
+
+                        <div className="row">
+                            <div className="col-md-2 side-icn">
+                                <MonetizationOnIcon />
+                            </div>
+                            <div className="col-md-10 side-txt">
+                                <p>Customer Profile</p>
+                            </div>
+                        </div>
+                    </Link>
+                </div>
             </div>
         )
     }
