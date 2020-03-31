@@ -2,12 +2,22 @@ import React, { Component } from 'react'
 import Sidebar from '../Auth/sidebar'
 import DatePicker from "react-datepicker";
 import { verifyAuth } from '../../utils/authentication'
+// import { getFromStorage } from '../../utils/storage';
 import '../../Css/Basic/dailyPumperCalculations.css'
 import axios from 'axios'
 import { MDBInput } from "mdbreact";
 import Snackbar from '@material-ui/core/Snackbar'
 import IconButton from '@material-ui/core/IconButton'
 
+class meterBlock {
+    constructor(pumpId, fuelType, yesterday, today,sale) {
+        this.pumpId = pumpId;
+        this.fuelType = fuelType;
+        this.yesterday = yesterday;
+        this.today = today;
+        this.sale = sale
+    }
+}
 export default class dailyPumperCalculations extends Component {
 
     constructor(props) {
@@ -18,23 +28,80 @@ export default class dailyPumperCalculations extends Component {
             pumpSetData: [],
             snackbaropen: false,
             snackbarmsg: '',
-
+            startDate: new Date(),
+            pumperId: '',
+            pumpSet: '',
+            pumpsNames: [],
+            yesReading: [],
+            todayReading: [],
+            meterBlock: [],
         }
         this.onChangePumpSet = this.onChangePumpSet.bind(this)
         this.onChangeDate = this.onChangeDate.bind(this)
         this.onChangepumperID = this.onChangepumperID.bind(this)
+        this.getData = this.getData.bind(this)
 
     }
-    onChangeDate(e){
+    onChangeDate = date => {
+        this.setState(prevState => ({
+            startDate: date
+        }))
+    }
+    onChangepumperID(e) {
+        this.setState({
+            pumperId: e.target.value
+        })
+    }
+    onChangePumpSet(e) {
+        this.setState({
+            pumpSet: e.target.value
+        })
+    }
+    async getData() {
+        if (this.state.pumperId === '') {
+            this.setState({
+                snackbaropen: true,
+                snackbarmsg: "Please Fill the Pumper ID ..!"
+            })
+        }
+        else {
+            await axios.get('http://localhost:4000/pumpsRegistration/getSet/' + this.state.pumpSet)
+                .then(res => {
+                    this.setState({
+                        pumpsNames: res.data.data
+                    })
+                })
+            await axios.get('http://localhost:4000/machinesData/getYes/' + this.state.startDate)
+                .then(res => {
+                    this.setState({
+                        yesReading: res.data.data
+                    })
+                })
+            await axios.get('http://localhost:4000/machinesData/getToday/' + this.state.startDate)
+                .then(res => {
+                    this.setState({
+                        todayReading: res.data.data
+                    })
+                })
+
+            for (var i = 0; i < this.state.pumpsNames.length; i++) {
+                for (var j = 0; j < this.state.yesReading.length; j++) {
+                    for (var k = 0; k < this.state.todayReading.length; k++) {
+                        if (this.state.pumpsNames[i].machineNumber === this.state.yesReading[j].machineNumber && this.state.pumpsNames[i].machineNumber === this.state.todayReading[k].machineNumber) {
+                            var sale = this.state.todayReading[k].meterReading - this.state.yesReading[j].meterReading ; 
+                            var block = new meterBlock(this.state.pumpsNames[i].machineNumber, this.state.pumpsNames[i].fuelType, this.state.yesReading[j].meterReading, this.state.todayReading[k].meterReading, sale)
+                            this.state.meterBlock.push(block)
+                        }
+                    }
+                }
+            }
+            for (var i = 0; i < this.state.meterBlock.length; i++) {
+                console.log(this.state.meterBlock[i]);
+            }
+
+        }
 
     }
-    onChangepumperID(e){
-
-    }
-    onChangePumpSet(e){
-
-    }
-    
     snackbarClose = (event) => {
         this.setState({ snackbaropen: false })
     }
@@ -55,10 +122,7 @@ export default class dailyPumperCalculations extends Component {
                 console.log(err);
             })
     }
-    state = {
-        selectedOption: null,
-        startDate: new Date()
-    };
+
 
     render() {
         const { pumpSetData } = this.state;
@@ -97,13 +161,13 @@ export default class dailyPumperCalculations extends Component {
                                 <div className="container">
 
                                     <div className="row first-div">
-                                        <div className="col-md-5">
+                                        <div className="col-md-4">
                                             <select className="form-control" onChange={this.onChangePumpSet}>
                                                 <option>Select Pump Set</option>
                                                 {countriesList}
                                             </select>
                                         </div>
-                                        <div className="col-md-5" style={{marginTop:"-24px"}}>
+                                        <div className="col-md-4" style={{ marginTop: "-24px" }}>
                                             <MDBInput outline label="Pumper ID" type="text" name="pumperId" onChange={this.onChangepumperID} />
                                         </div>
                                         <div className="col-md-2">
@@ -112,15 +176,18 @@ export default class dailyPumperCalculations extends Component {
                                                     className="form-control"
                                                     selected={this.state.startDate}
                                                     onChange={this.onChangeDate}
+                                                    dateFormat="yyyy-MM-dd"
                                                 />
                                             </div>
+                                        </div>
+                                        <div className="col-md-2" style={{ marginTop: "-7px" }}>
+                                            <button className="btn btn-primary sub-btn" onClick={this.getData}>Get Data</button>
                                         </div>
 
                                     </div>
                                     <div className="container">
                                         <div className="row">
                                             <div className="form-group">
-                                                <button className="btn btn-primary" style={{ width: "100%" }}>Get Data</button>
                                             </div>
                                         </div>
                                     </div>

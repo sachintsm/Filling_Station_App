@@ -5,6 +5,8 @@ import '../../Css/Basic/dailyPumperManagement.css'
 import { MDBInput } from "mdbreact";
 import { Button } from 'reactstrap';
 import Card from '@material-ui/core/Card';
+import axios from 'axios'
+
 
 export default class dailyPumperCalculations extends Component {
 
@@ -13,6 +15,7 @@ export default class dailyPumperCalculations extends Component {
 
         this.state = {
             authState: '',
+            pumpSets: [],
         }
     }
 
@@ -20,6 +23,16 @@ export default class dailyPumperCalculations extends Component {
         const authState = await verifyAuth();
         this.setState({ authState: authState })
         if (!authState) this.props.history.push('/login');
+
+        axios.get('http://localhost:4000/pumpSetRegistration/get')
+            .then(res => {
+                this.setState({
+                    pumpSets: res.data.data
+                })
+                for (var i = 0; i < this.state.pumpSets.length; i++) {
+                    console.log(this.state.pumpSets[i]);
+                }
+            })
     }
 
     render() {
@@ -32,39 +45,29 @@ export default class dailyPumperCalculations extends Component {
                         </div>
                         <div className="col-md-10" style={{ backgroundColor: "#f5f5f5" }}>
                             <div className="container">
-                                <div className="container reg-card">
+                                <div className="reg-card">
                                     <Card>
                                         <form>
                                             <div className="container">
                                                 <div className="row">
-                                                    <div className="col-md-1">
-                                                        <MDBInput outline label="PID" type="text" name="pId" onChange={this.onChange} />
-                                                    </div>
-                                                    <div className="col-md-3">
-                                                        <MDBInput outline label="Product Name" type="text" name="pName" onChange={this.onChange} />
-                                                    </div>
-                                                    <div className="col-md-1">
-                                                        <MDBInput outline label="Size" type="text" name="size" onChange={this.onChange} />
-                                                    </div>
-                                                    <div className="col-md-7">
+                                                    <div className="col-md-4">
                                                         <div className="row">
-                                                            <div className="col-md-3">
-                                                                <MDBInput outline label="Buying Price" type="text" name="buyPrice" onChange={this.onChange} />
-                                                            </div>
-                                                            <div className="col-md-3">
-                                                                <MDBInput outline label="Selling Price" type="text" name="sellPrice" onChange={this.onChange} />
-                                                            </div>
-                                                            <div className="col-md-3 fuel-selector">
+                                                            <div className="col-md-12 fuel-selector">
                                                                 <select className="form-control" onChange={this.onChangeType}>
-                                                                    <option >Select Type</option>
+                                                                    <option >Pumper ID</option>
                                                                     <option value="Fuel">Fuel</option>
                                                                     <option value="Lubricant">Lubricant</option>
                                                                     <option value="Gas">Gas</option>
                                                                     <option value="Other">Other</option>
                                                                 </select>
                                                             </div>
-                                                            <div className="col-md-3" style={{ marginTop: "20px" }}>
-                                                                <Button className="reg-btn" color="primary" onClick={this.onSubmit}>Add NOw</Button>
+                                                        </div>
+                                                        <div className="row">
+                                                            <div className="col-md-7">
+                                                                <MDBInput outline label="PID" type="text" name="pId" onChange={this.onChange} />
+                                                            </div>
+                                                            <div className="col-md-5">
+                                                                <button className="btn btn-primary sub-btn" onClick={this.getData}>Submit</button>
                                                             </div>
 
                                                         </div>
@@ -80,7 +83,7 @@ export default class dailyPumperCalculations extends Component {
                     </div>
                 </div>
 
-            </React.Fragment>
+            </React.Fragment >
         )
     }
 }

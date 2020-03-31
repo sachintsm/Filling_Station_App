@@ -18,7 +18,7 @@ const Debt = props => (
         <td>{props.debt.fax}</td>
         <td>{props.debt.nic}</td>
         <td>
-            <button className="btn btn-info  " type="delete">DELETE</button>
+            <button className="btn btn-info" type="delete" >DELETE</button>
 
         </td>
     </tr>
