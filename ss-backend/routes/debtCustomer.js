@@ -19,7 +19,7 @@ router.post('/register', function (req, res) {
         if (req.body.debtorId == '') return res.json({ state: false, msg: "Debtor ID Empty..!" })
         console.log(req.body.debtorId);
         if (req.body.damount == '') return res.json({ state: false, msg: "Amount Empty..!" })
-        if (req.body.nic == '') return res.json({ state: false, msg: "NIC Empty..!" })
+        // if (req.body.nic == '') return res.json({ state: false, msg: "NIC Empty..!" })
         if (req.body.mobile == '') return res.json({ state: false, msg: "Mobile Number Empty..!" })
         
 

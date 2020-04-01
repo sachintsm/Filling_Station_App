@@ -5,10 +5,18 @@ import Sidebar from '../Auth/sidebar';
 import "react-datepicker/dist/react-datepicker.css";
 import '../../Css/Basic/cusprofile.css';
 // import { getFromStorage } from '../../utils/storage';
-import Snackbar from '@material-ui/core/Snackbar'
+// import Snackbar from '@material-ui/core/Snackbar';
+
+import Snackbar from '@material-ui/core/Snackbar';
+
 import IconButton from '@material-ui/core/IconButton';
 
-const Debt = props => (
+
+{/* <Debt delete={this.deleteDebtor} debt={currentDebt} key={i} />; */}
+const Debt = React.memo(props => (
+
+
+
     <tr>
         <td>{props.debt.fullName}</td>
         <td>{props.debt.debtorId}</td>
@@ -16,10 +24,11 @@ const Debt = props => (
         <td>{props.debt.mobile}</td>
         <td>{props.debt.fax}</td>
         <td>
-            <button className="btn btn-danger btn-info  " type="delete" onClick={() => this.deleteDebtor()}>DELETE</button>
+            <button className="btn btn-danger btn-info  " type="delete" onClick={() => props.delete(props.debt._id)}>DELETE</button>
+
         </td>
     </tr>
-)
+));
 
 
 
@@ -96,18 +105,45 @@ export default class profile extends Component {
     UserList() {
         const local = this.state.debtorId;
         if (local == null || local === "") {
-            return this.state.users.map(function (currentDebt, i) {
-                return <Debt debt={currentDebt} key={i} />;
-            })
+
+            // console.log(this.state.users);
+            return this.state.users.map( (currentDebt, i)=> {
+
+                return <Debt delete={this.deleteDebtor} debt={currentDebt} key={i} />;
+            }
+            )
         }
         else {
-            return this.state.users.map(function (currentDebt, i) {
+            return this.state.users.map( (currentDebt, i)=> {
                 if (currentDebt.debtorId === local) {
-                    return <Debt debt={currentDebt} key={i} />;
+                    return <Debt delete={this.deleteDebtor} debt={currentDebt} key={i} />;
                 }
                 return null;
             })
         }
+
+
+    }
+
+    deleteDebtor(data) {
+        axios.delete('http://localhost:4000/debtors/deleteDebtor/' + data)
+            .then(res => {
+                console.log(res);
+                this.setState({
+                    // users: this.state.users.filter(u => u._id !== data),
+                    snackbaropen: true,
+                    snackbarmsg: res.data.message
+                })
+                window.location.reload();
+            })
+            .catch(err => {
+                console.log(err);
+                // this.setState({
+                //     snackbaropen: true,
+                //     snackbarmsg: err
+                // })
+            })
+
     }
 
     onSubmit(e) {
