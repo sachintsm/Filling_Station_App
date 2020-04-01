@@ -70,96 +70,25 @@ router.get('/get', function (req, res) {
         })
 })
 
-//get data for a particular id
-router.get('/get/debtor/:id', function (req, res) {
+//delete product
+router.delete('/deleteDebtor/:id', function (req, res) {
+    const _id = req.params.id
 
-    let id = req.params.id;
-    User.find({ userId: id })
+    Debtor.remove({ _id: _id })
         .exec()
         .then(result => {
-            res.json({ state: true, msg: "Data Transfer Successfully..!", data: result });
+            res.status(200).json({
+                message: 'Deleted Successfully'
+            });
         })
         .catch(error => {
-            res.json({ state: false, msg: "Data Transfering Unsuccessfull..!" });
-        })
-});
-
-//update notification 
-  router.post('/updateuser/:userId', async function (req, res) {
-    console.log(req.body);
-    const userId = req.params.userId;
-
-    const userType = req.body.userType;
-    const birthday = req.body.birthday;
-    const email = req.body.email;
-    const epf = req.body.epf;
-    const etf = req.body.etf;
-    const address = req.body.address;
-    const other = req.body.other;
-
-
-    await User
-        .update({ userId: userId },
-            {
-                $set: {
-                    userType: userType,
-                    birthday: birthday,
-                    email: email,
-                    epf: epf,
-                    etf: etf,
-                    address: address,
-                    other: other
-
-                }
-            })    //update user data with correspond to userid
-        .exec()
-        .then(data => {
-            console.log("Data Update Success..!")
-            res.json({ state: true, msg: "Data Update Success..!" });
-
-        })
-        .catch(error => {
-            console.log("Data Updating Unsuccessfull..!")
-            res.json({ state: false, msg: "Data Updating Unsuccessfull..!" });
-        })
+            console.log(error);
+            res.status(500).json({
+                error: error
+            });
+        });
 })
 
-//User Login
-router.post('/account/login', async function (req, res) {
-    const password = req.body.password
 
-    //checking if the userId is already in the database
-    const user = await User.findOne({ userId: req.body.userId })
-    if (!user) return res.status(400).send({ state: false, msg: "This is not valid userId!" })
-
-    bcrypt.compare(password, user.password, function (err, match) {
-        if (err) throw err;
-
-        if (match) {
-            if (err) {
-                console.log(err)
-                return res.send({ state: false, msg: "Error : Server error" })
-            }
-            else {
-                const token = jwt.sign({ _id: user._id }, config.secret)
-                res.header('auth-token', token).send({ state: true, msg: " Sign in Successfully..!", token: token,data :user })
-            }
-        }
-        else {
-            res.json({ state: false, msg: "Password Incorrect..!" })
-        }
-    })
-
-})
-
-router.get('/verify', verify, function (req, res, next) {
-    res.send({ loginState: true, msg: 'Login Successful..!' })
-})
-
-//Profile Image visible
-router.get("/profileImage/:filename", function (req, res) {
-    const filename = req.params.filename
-    res.sendFile(path.join(__dirname, '../local_storage/profile_Images/' + filename))
-})
 
 module.exports = router
