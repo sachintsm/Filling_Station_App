@@ -10,7 +10,7 @@ import Snackbar from '@material-ui/core/Snackbar'
 import IconButton from '@material-ui/core/IconButton'
 
 class meterBlock {
-    constructor(pumpId, fuelType, yesterday, today,sale) {
+    constructor(pumpId, fuelType, yesterday, today, sale) {
         this.pumpId = pumpId;
         this.fuelType = fuelType;
         this.yesterday = yesterday;
@@ -88,7 +88,7 @@ export default class dailyPumperCalculations extends Component {
                 for (var j = 0; j < this.state.yesReading.length; j++) {
                     for (var k = 0; k < this.state.todayReading.length; k++) {
                         if (this.state.pumpsNames[i].machineNumber === this.state.yesReading[j].machineNumber && this.state.pumpsNames[i].machineNumber === this.state.todayReading[k].machineNumber) {
-                            var sale = this.state.todayReading[k].meterReading - this.state.yesReading[j].meterReading ; 
+                            var sale = this.state.todayReading[k].meterReading - this.state.yesReading[j].meterReading;
                             var block = new meterBlock(this.state.pumpsNames[i].machineNumber, this.state.pumpsNames[i].fuelType, this.state.yesReading[j].meterReading, this.state.todayReading[k].meterReading, sale)
                             this.state.meterBlock.push(block)
                         }
@@ -127,7 +127,7 @@ export default class dailyPumperCalculations extends Component {
     render() {
         const { pumpSetData } = this.state;
 
-        let countriesList = pumpSetData.length > 0
+        let pumpSetList = pumpSetData.length > 0
             && pumpSetData.map((item, i) => {
                 return (
                     <option key={i} value={item.setNumber}>{item.setNumber}</option>
@@ -164,7 +164,7 @@ export default class dailyPumperCalculations extends Component {
                                         <div className="col-md-4">
                                             <select className="form-control" onChange={this.onChangePumpSet}>
                                                 <option>Select Pump Set</option>
-                                                {countriesList}
+                                                {pumpSetList}
                                             </select>
                                         </div>
                                         <div className="col-md-4" style={{ marginTop: "-24px" }}>

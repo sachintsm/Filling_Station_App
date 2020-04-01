@@ -116,7 +116,7 @@ router.get('/get/:id', function (req, res) {
 });
 
 //update notification 
-  router.post('/updateuser/:userId', async function (req, res) {
+router.post('/updateuser/:userId', async function (req, res) {
     console.log(req.body);
     const userId = req.params.userId;
 
@@ -173,7 +173,7 @@ router.post('/account/login', async function (req, res) {
             }
             else {
                 const token = jwt.sign({ _id: user._id }, config.secret)
-                res.header('auth-token', token).send({ state: true, msg: " Sign in Successfully..!", token: token,data :user })
+                res.header('auth-token', token).send({ state: true, msg: " Sign in Successfully..!", token: token, data: user })
             }
         }
         else {
@@ -191,6 +191,20 @@ router.get('/verify', verify, function (req, res, next) {
 router.get("/profileImage/:filename", function (req, res) {
     const filename = req.params.filename
     res.sendFile(path.join(__dirname, '../local_storage/profile_Images/' + filename))
+})
+
+//get pumpers data 
+router.get('/getPumpers', function (req, res) {
+    User
+        .find({ userType: 'Pumper' })
+        .select('userId fullName')
+        .exec()
+        .then(data => {
+            res.json({ state: true, msg: "Data Trnsfer Success..!", data: data });
+        })
+        .catch(err => {
+            res.json({ state: false, msg: 'Data retrive Unsuccess .. !' })
+        })
 })
 
 module.exports = router
