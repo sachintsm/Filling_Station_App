@@ -24,11 +24,27 @@ export default class dailyPumperCalculations extends Component {
             amount: '',
             pumperId: '',
             setNumber: '',
+            pumpersCash: [],
+            setId: '',
+
         }
         this.dataSetSubmit = this.dataSetSubmit.bind(this)
         this.onChangePumper = this.onChangePumper.bind(this)
         this.onChangeSet = this.onChangeSet.bind(this)
         this.onChange = this.onChange.bind(this)
+        this.onChangeSetId = this.onChangeSetId.bind(this)
+        this.onSetBlur = this.onSetBlur.bind(this)
+    }
+
+    onChangeSetId(e) {
+        this.setState({
+            setId: e.target.value
+        })
+    }
+
+    onSetBlur() {
+        console.log(this.state.setId);
+
     }
 
     snackbarClose = (event) => {
@@ -44,15 +60,19 @@ export default class dailyPumperCalculations extends Component {
                 this.setState({
                     pumpSets: res.data.data
                 })
-                for (var i = 0; i < this.state.pumpSets.length; i++) {
-                    console.log(this.state.pumpSets[i]);
-                }
             })
 
         axios.get('http://localhost:4000/users/getPumpers')
             .then(res => {
                 this.setState({
                     pumperIds: res.data.data
+                })
+            })
+
+        axios.get('http://localhost:4000/pumpersCash/get/' + this.state.setId)
+            .then(res => {
+                this.setState({
+                    pumpersCash: res.data.data
                 })
             })
     }
@@ -67,9 +87,9 @@ export default class dailyPumperCalculations extends Component {
             setNumber: e.target.value
         })
     }
-    onChange(e){
+    onChange(e) {
         this.setState({
-            amount : e.target.value
+            amount: e.target.value
         })
     }
     dataSetSubmit() {
@@ -85,10 +105,10 @@ export default class dailyPumperCalculations extends Component {
             const data = {
                 setNumber: this.state.setNumber,
                 pumperId: this.state.pumperId,
-                amount : this.state.amount
+                amount: this.state.amount
             }
 
-            fetch('http://localhost:4000/pumpersCach/add', {
+            fetch('http://localhost:4000/pumpersCash/add', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -154,18 +174,19 @@ export default class dailyPumperCalculations extends Component {
                             <Sidebar />
                         </div>
                         <div className="col-md-10" style={{ backgroundColor: "#f5f5f5" }}>
-                            <div className="container">
+                            <div className="container" style={{ marginTop: "20px" }}>
                                 <Card >
                                     <div className="container">
                                         <Row>
-                                            <Col xs="3">
+                                            <Col xs="3" style={{ marginTop: "24px" }}>
                                                 <select className="form-control" onChange={this.onChangeSet}>
                                                     <option >Pump Set</option>
                                                     {pumpSetList}
                                                 </select>
 
                                             </Col>
-                                            <Col xs="3">
+                                            <Col xs="3" style={{ marginTop: "24px" }}>
+
                                                 <select className="form-control" onChange={this.onChangePumper}>
                                                     <option >Pumper ID</option>
                                                     {pumpIdList}
@@ -176,12 +197,56 @@ export default class dailyPumperCalculations extends Component {
 
                                                 <MDBInput outline label="Amount" type="text" name="amount" onChange={this.onChange} />
                                             </Col>
-                                            <Col xs="3">
-
+                                            <Col xs="3" style={{ marginTop: "17px" }}>
                                                 <button className="btn btn-primary sub-btn" onClick={this.dataSetSubmit}>Submit</button>
                                             </Col>
                                         </Row>
 
+                                    </div>
+                                </Card>
+                            </div>
+
+                            <div className="container" style={{ marginTop: "20px", marginBottom:"20px" }}>
+                                <Card >
+                                    <div className="container" style={{ padding: "40px", }} >
+                                        <Row>
+                                            <select className="form-control" onChange={this.onChangeSetId} onClick={this.onSetBlur}>
+                                                <option >Pump Set</option>
+                                                {pumpSetList}
+                                            </select>
+                                        </Row>
+
+                                    </div>
+                                    <div className="container" style={{ padding: "30px" }}>
+                                        <Row>
+                                            <Col xs="6">
+                                                <p className="debitor-tbl-head">Name</p>
+                                                <p className="debitor-tbl-head">PumperID</p>
+                                                <p className="debitor-tbl-head">Set Number</p>
+                                                <p className="debitor-tbl-head">Date</p>
+                                            </Col>
+                                            <Col xs="6">
+                                                <Row>
+                                                    <Col xs="6">
+                                                        <p className="debitor-tbl-head">Time</p>
+                                                    </Col>
+                                                    <Col xs="6">
+                                                        <p className="debitor-tbl-head">Time</p>
+
+                                                    </Col>
+                                                </Row>
+                                                <Row>
+                                                    <Col xs="6">
+                                                        <p className="debitor-tbl-body">Time</p>
+
+                                                    </Col>
+                                                    <Col xs="6">
+                                                        <p className="debitor-tbl-body">Time</p>
+
+                                                    </Col>
+                                                </Row>
+                                            </Col>
+                                        </Row>
                                     </div>
                                 </Card>
                             </div>

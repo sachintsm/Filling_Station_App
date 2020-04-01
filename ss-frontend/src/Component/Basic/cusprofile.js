@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import {  Col, Row } from 'react-bootstrap';
+import { Col, Row } from 'react-bootstrap';
 import Sidebar from '../Auth/sidebar';
 import "react-datepicker/dist/react-datepicker.css";
 import '../../Css/Basic/cusprofile.css';
@@ -9,9 +9,6 @@ import Snackbar from '@material-ui/core/Snackbar'
 import IconButton from '@material-ui/core/IconButton';
 
 const Debt = props => (
-
-
-
     <tr>
         <td>{props.debt.fullName}</td>
         <td>{props.debt.debtorId}</td>
@@ -19,8 +16,7 @@ const Debt = props => (
         <td>{props.debt.mobile}</td>
         <td>{props.debt.fax}</td>
         <td>
-            <button className="btn btn-danger btn-info  " type="delete" onClick={() => this.deleteDebtor(props.debt._id)}>DELETE</button>
-
+            <button className="btn btn-danger btn-info  " type="delete" onClick={() => this.deleteDebtor()}>DELETE</button>
         </td>
     </tr>
 )
@@ -30,13 +26,6 @@ const Debt = props => (
 export default class profile extends Component {
     constructor(props) {
         super(props);
-        this.onChange = this.onChange.bind(this);
-        this.onSubmit = this.onSubmit.bind(this);
-        this.handleSearch = this.handleSearch.bind(this);
-        this.deleteDebtor = this.deleteDebtor.bind(props);
-
-
-
         this.state = {
             snackbaropen: false,
             snackbarmsg: '',
@@ -52,6 +41,32 @@ export default class profile extends Component {
             userData: [],
             users: []
         }
+        this.onChange = this.onChange.bind(this);
+        this.onSubmit = this.onSubmit.bind(this);
+        this.handleSearch = this.handleSearch.bind(this);
+        this.deleteDebtor = this.deleteDebtor.bind(this);
+    }
+    deleteDebtor() {
+        console.log("sachin");
+
+        // axios.delete('http://localhost:4000/debtors/deleteDebtor/' + data)
+        //     .then(res => {
+        //         console.log(res);
+        //         this.setState({
+        //             // users: this.state.users.filter(u => u._id !== data),
+        //             snackbaropen: true,
+        //             snackbarmsg: res.data.message
+        //         })
+        //         window.location.reload();
+        //     })
+        //     .catch(err => {
+        //         console.log(err);
+        //         this.setState({
+        //             snackbaropen: true,
+        //             snackbarmsg: err
+        //         })
+        //     })
+
     }
     snackbarClose = (event) => {
         this.setState({ snackbaropen: false })
@@ -78,18 +93,12 @@ export default class profile extends Component {
         this.setState(store);
     }
 
-
-
     UserList() {
         const local = this.state.debtorId;
         if (local == null || local === "") {
-
-            // console.log(this.state.users);
             return this.state.users.map(function (currentDebt, i) {
-
                 return <Debt debt={currentDebt} key={i} />;
-            }
-            )
+            })
         }
         else {
             return this.state.users.map(function (currentDebt, i) {
@@ -99,37 +108,9 @@ export default class profile extends Component {
                 return null;
             })
         }
-
-
     }
-
-    deleteDebtor(data) {
-        axios.delete('http://localhost:4000/debtors/deleteDebtor/' + data)
-            .then(res => {
-                console.log(res);
-                this.setState({
-                    // users: this.state.users.filter(u => u._id !== data),
-                    snackbaropen: true,
-                    snackbarmsg: res.data.message
-                })
-                window.location.reload();
-            })
-            .catch(err => {
-                console.log(err);
-                this.setState({
-                    snackbaropen: true,
-                    snackbarmsg: err
-                })
-            })
-
-    }
-
-
 
     onSubmit(e) {
-
-
-
         e.preventDefault();
         const obj = {
             fullName: this.state.fullName,
@@ -177,21 +158,12 @@ export default class profile extends Component {
                         </div>
                         <div className="col-md-10" style={{ backgroundColor: "#f8f9fd" }}>
                             <h3 style={{ textAlign: "center", marginTop: "50px" }}>DEBTORS</h3>
-
                             <div>
-
-
-
-
-
                                 <div >
                                     <div className="form-group" style={{ marginTop: "50px", marginRight: "175px", marginLeft: "60px" }}>
                                         <button className="btn btn-info my-4 btn-block " type="submit">ADD A NEW DEBTOR</button>
                                     </div>
                                 </div>
-
-
-
                             </div>
                             <div className="card">
 

@@ -13,9 +13,9 @@ router.post('/add', verify, async function (req, res, next) {
     const data = new PumpersCash({
         setNumber: req.body.setNumber,
         date: date,
-        time : time,
+        time: time,
         pumperId: req.body.pumperId,
-        amount: req.body.amount+'.00',
+        amount: req.body.amount + '.00',
     });
 
     data.save()
@@ -29,8 +29,12 @@ router.post('/add', verify, async function (req, res, next) {
 })
 
 //get pumps data
-router.get('/get', function (req, res) {
-    PumpSet.find()
+router.get('/get/:setId', function (req, res) {
+    var today = new Date();
+    var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+    const setId = req.params.setId
+
+    PumpersCash.find({ date: date, setNumber: setId })
         .exec()
         .then(result => {
             res.json({ state: true, msg: "Data Transfer Successfully..!", data: result });
