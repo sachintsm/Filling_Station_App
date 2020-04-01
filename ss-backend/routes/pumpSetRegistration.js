@@ -7,11 +7,11 @@ const verify = require('../authentication');
 //add new pump details
 router.post('/add', verify, async function (req, res, next) {
     //checking if the pId is already in the database
-    const pumpSetIdExist = await PumpSet.findOne({ setNumber: 'SET'+req.body.setNumber })
+    const pumpSetIdExist = await PumpSet.findOne({ setNumber: 'SET' + req.body.setNumber })
     if (pumpSetIdExist) return res.json({ state: false, msg: "This Set Number already in use..!" })
 
     const data = new PumpSet({
-        setNumber: 'SET'+req.body.setNumber,
+        setNumber: 'SET' + req.body.setNumber,
     });
     data.save()
         .then(req => {
@@ -53,4 +53,5 @@ router.delete('/delete/:id', function (req, res) {
             });
         });
 })
+
 module.exports = router;

@@ -61,6 +61,7 @@ router.get('/getToday', function (req, res) {
 })
 
 router.get('/getYesterday', function (req, res) {
+
     var today = new Date();
     var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + (today.getDate() - 1);
 
@@ -88,6 +89,48 @@ router.delete('/delete/:id', function (req, res) {
                 error: error
             });
         });
+})
+
+//this below function uses for dailyPumpers calculations
+function convertYesterDay(str) {
+    var date = new Date(str),
+        mnth = ("" + (date.getMonth() + 1)).slice(-2),
+        day = ("" + (date.getDate() - 1)).slice(-2);
+    return [date.getFullYear(), mnth, day].join("-");
+}
+
+router.get('/getYes/:date', function (req, res) {
+
+    const param = req.params.date
+    let date = convertYesterDay(param)
+    console.log(date)
+    MachineData.find({ date: date })
+        .then(data => {
+            res.send({ state: true, msg: "Data Transefer Done..!", data: data })
+        })
+        .catch(err => {
+            res.send({ state: false, msg: "data Tranfr Unsuccessful..!" })
+        })
+})
+
+function convertToday(str) {
+    var date = new Date(str),
+        mnth = ("" + (date.getMonth() + 1)).slice(-2),
+        day = ("" + date.getDate()).slice(-2);
+    return [date.getFullYear(), mnth, day].join("-");
+}
+router.get('/getToday/:date', function (req, res) {
+
+    const param = req.params.date
+    let date = convertToday(param)
+    console.log(date)
+    MachineData.find({ date: date })
+        .then(data => {
+            res.send({ state: true, msg: "Data Transefer Done..!", data: data })
+        })
+        .catch(err => {
+            res.send({ state: false, msg: "data Tranfr Unsuccessful..!" })
+        })
 })
 
 module.exports = router

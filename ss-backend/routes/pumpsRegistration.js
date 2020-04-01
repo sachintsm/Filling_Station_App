@@ -82,4 +82,25 @@ router.delete('/deletePump/:id', function (req, res) {
             });
         });
 })
+
+//get spesific pump set 
+router.get('/getSet/:id', function (req, res) {
+    const set = req.params.id
+
+    PumpRegistration
+        .find({ pumpSet: set })
+        .exec()
+        .then(result => {
+            res.status(200).json({
+                message: 'Data Transfer Successfully', data : result
+            });
+        })
+        .catch(error => {
+            console.log(error);
+            res.status(500).json({
+                error: error
+            });
+        });
+})
+
 module.exports = router;
