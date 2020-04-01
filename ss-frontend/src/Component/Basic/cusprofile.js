@@ -5,10 +5,15 @@ import Sidebar from '../Auth/sidebar';
 import "react-datepicker/dist/react-datepicker.css";
 import '../../Css/Basic/cusprofile.css';
 // import { getFromStorage } from '../../utils/storage';
-import Snackbar from '@material-ui/core/Snackbar'
+// import Snackbar from '@material-ui/core/Snackbar';
+
+import Snackbar from '@material-ui/core/Snackbar';
+
 import IconButton from '@material-ui/core/IconButton';
 
-const Debt = props => (
+
+{/* <Debt delete={this.deleteDebtor} debt={currentDebt} key={i} />; */}
+const Debt = React.memo(props => (
 
 
 
@@ -19,11 +24,11 @@ const Debt = props => (
         <td>{props.debt.mobile}</td>
         <td>{props.debt.fax}</td>
         <td>
-            <button className="btn btn-danger btn-info  " type="delete" onClick={() => this.deleteDebtor(props.debt._id)}>DELETE</button>
+            <button className="btn btn-danger btn-info  " type="delete" onClick={() => props.delete(props.debt._id)}>DELETE</button>
 
         </td>
     </tr>
-)
+));
 
 
 
@@ -85,16 +90,16 @@ export default class profile extends Component {
         if (local == null || local === "") {
 
             // console.log(this.state.users);
-            return this.state.users.map(function (currentDebt, i) {
+            return this.state.users.map( (currentDebt, i)=> {
 
-                return <Debt debt={currentDebt} key={i} />;
+                return <Debt delete={this.deleteDebtor} debt={currentDebt} key={i} />;
             }
             )
         }
         else {
-            return this.state.users.map(function (currentDebt, i) {
+            return this.state.users.map( (currentDebt, i)=> {
                 if (currentDebt.debtorId === local) {
-                    return <Debt debt={currentDebt} key={i} />;
+                    return <Debt delete={this.deleteDebtor} debt={currentDebt} key={i} />;
                 }
                 return null;
             })
@@ -116,10 +121,10 @@ export default class profile extends Component {
             })
             .catch(err => {
                 console.log(err);
-                this.setState({
-                    snackbaropen: true,
-                    snackbarmsg: err
-                })
+                // this.setState({
+                //     snackbaropen: true,
+                //     snackbarmsg: err
+                // })
             })
 
     }
