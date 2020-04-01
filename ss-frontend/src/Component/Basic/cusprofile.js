@@ -1,28 +1,31 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import { Card, Col, Row } from 'react-bootstrap';
+import {  Col, Row } from 'react-bootstrap';
 import Sidebar from '../Auth/sidebar';
 import "react-datepicker/dist/react-datepicker.css";
 import '../../Css/Basic/cusprofile.css';
-import { getFromStorage } from '../../utils/storage';
+// import { getFromStorage } from '../../utils/storage';
 import Snackbar from '@material-ui/core/Snackbar'
 import IconButton from '@material-ui/core/IconButton';
-import { Link } from 'react-router-dom';
 
 const Debt = props => (
+
+
+
     <tr>
         <td>{props.debt.fullName}</td>
         <td>{props.debt.debtorId}</td>
         <td>{props.debt.damount}</td>
         <td>{props.debt.mobile}</td>
         <td>{props.debt.fax}</td>
-        <td>{props.debt.nic}</td>
         <td>
-            <button className="btn btn-info" type="delete" >DELETE</button>
+            <button className="btn btn-danger btn-info  " type="delete" onClick={() => this.deleteDebtor(props.debt._id)}>DELETE</button>
 
         </td>
     </tr>
 )
+
+
 
 export default class profile extends Component {
     constructor(props) {
@@ -30,6 +33,8 @@ export default class profile extends Component {
         this.onChange = this.onChange.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
         this.handleSearch = this.handleSearch.bind(this);
+        this.deleteDebtor = this.deleteDebtor.bind(props);
+
 
 
         this.state = {
@@ -73,13 +78,52 @@ export default class profile extends Component {
         this.setState(store);
     }
 
-    UserList() {
-        return this.state.users.map(function (currentDebt, i) {
 
-            return <Debt debt={currentDebt} key={i} />;
+
+    UserList() {
+        const local = this.state.debtorId;
+        if (local == null || local === "") {
+
+            // console.log(this.state.users);
+            return this.state.users.map(function (currentDebt, i) {
+
+                return <Debt debt={currentDebt} key={i} />;
+            }
+            )
         }
-        )
+        else {
+            return this.state.users.map(function (currentDebt, i) {
+                if (currentDebt.debtorId === local) {
+                    return <Debt debt={currentDebt} key={i} />;
+                }
+                return null;
+            })
+        }
+
+
     }
+
+    deleteDebtor(data) {
+        axios.delete('http://localhost:4000/debtors/deleteDebtor/' + data)
+            .then(res => {
+                console.log(res);
+                this.setState({
+                    // users: this.state.users.filter(u => u._id !== data),
+                    snackbaropen: true,
+                    snackbarmsg: res.data.message
+                })
+                window.location.reload();
+            })
+            .catch(err => {
+                console.log(err);
+                this.setState({
+                    snackbaropen: true,
+                    snackbarmsg: err
+                })
+            })
+
+    }
+
 
 
     onSubmit(e) {
@@ -103,10 +147,15 @@ export default class profile extends Component {
     }
 
     render() {
+
+
         return (
+
+
             <React.Fragment>
 
                 <div className="container-fluid">
+
                     <Snackbar
                         open={this.state.snackbaropen}
                         autoHideDuration={2000}
@@ -131,17 +180,17 @@ export default class profile extends Component {
 
                             <div>
 
-                                
 
-                                   
-                                        
-                                        <div >
-                                            <div className="form-group" style={{ marginTop: "50px", marginRight: "175px", marginLeft:"60px" }}>
-                                                <button className="btn btn-info my-4 btn-block " type="submit">ADD A NEW DEBTOR</button>
-                                            </div>
-                                        </div>
-                                 
-                           
+
+
+
+                                <div >
+                                    <div className="form-group" style={{ marginTop: "50px", marginRight: "175px", marginLeft: "60px" }}>
+                                        <button className="btn btn-info my-4 btn-block " type="submit">ADD A NEW DEBTOR</button>
+                                    </div>
+                                </div>
+
+
 
                             </div>
                             <div className="card">
@@ -149,9 +198,9 @@ export default class profile extends Component {
                                 <div>
                                     <h3 className="sp_head">List of Debtors</h3>
                                     <form>
-                                    <div className="form-group" style={{ marginTop: "50px" , marginLeft:"40px", marginRight:"40px" }} >
-                                        <input className="form-control" type="debtorId" name="debtorId" id="debtorId" placeholder="Search ID here" onChange={this.handleSearch} />
-                                    </div>
+                                        <div className="form-group" style={{ marginTop: "50px", marginLeft: "40px", marginRight: "40px" }} >
+                                            <input className="form-control" type="debtorId" name="debtorId" id="debtorId" placeholder="Search ID here" onChange={this.handleSearch} />
+                                        </div>
                                     </form>
                                     <div className="sp_table">
 
@@ -163,7 +212,6 @@ export default class profile extends Component {
                                                     <th>Amount</th>
                                                     <th>Mobile Number</th>
                                                     <th>Fax Number</th>
-                                                    <th>NIC</th>
 
 
                                                 </tr>
@@ -192,24 +240,19 @@ export default class profile extends Component {
                                                     </div>
 
                                                     <div className="row">
-                                                        <div className="col-md-4">
+                                                        <div className="col-md-6">
                                                             <div className="form-group">
-                                                                <label>Debitor ID : </label>
+                                                                <label>Debtor ID : </label>
                                                                 <input type="text" className="form-control" name="debtorId" defaultValue={this.state.debtorId} onChange={this.onChange}></input>
                                                             </div>
                                                         </div>
-                                                        <div className="col-md-4">
+                                                        <div className="col-md-6">
                                                             <div className="form-group">
-                                                                <label>Debited Amount : </label>
+                                                                <label>Deposited Amount : </label>
                                                                 <input type="text" className="form-control" name="damount" defaultValue={this.state.damount} onChange={this.onChange}></input>
                                                             </div>
                                                         </div>
-                                                        <div className="col-md-4">
-                                                            <div className="form-group">
-                                                                <label>NIC : </label>
-                                                                <input type="text" className="form-control" name="nic" defaultValue={this.state.nic} onChange={this.onChange}></input>
-                                                            </div>
-                                                        </div>
+
                                                     </div>
 
                                                     <Row>
@@ -257,4 +300,5 @@ export default class profile extends Component {
         )
     }
 }
+
 
