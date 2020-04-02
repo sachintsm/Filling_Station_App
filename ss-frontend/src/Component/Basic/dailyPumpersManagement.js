@@ -3,7 +3,7 @@ import Sidebar from '../Auth/sidebar'
 import { verifyAuth } from '../../utils/authentication'
 import '../../Css/Basic/dailyPumperManagement.css'
 import { MDBInput } from "mdbreact";
-import { Button, Row, Col } from 'reactstrap';
+import { Row, Col } from 'reactstrap';
 import Card from '@material-ui/core/Card';
 import axios from 'axios'
 import { getFromStorage } from '../../utils/storage';
@@ -25,8 +25,15 @@ export default class dailyPumperCalculations extends Component {
             pumperId: '',
             setNumber: '',
             pumpersCash: [],
+            userData: [],
             setId: '',
-
+            pumperName: '',
+            pumperNameRes: '',
+            pumperIdRes: '',
+            pumperSetRes: '',
+            pumperDateRes: '',
+            totAmount: 0.00,
+            cashDiv: false,
         }
         this.dataSetSubmit = this.dataSetSubmit.bind(this)
         this.onChangePumper = this.onChangePumper.bind(this)
@@ -42,9 +49,40 @@ export default class dailyPumperCalculations extends Component {
         })
     }
 
-    onSetBlur() {
-        console.log(this.state.setId);
+    async onSetBlur() {
+        // const { cashDiv } = this.state;
 
+        console.log(this.state.setId);
+        this.state.pumpersCash = [];
+        this.state.totAmount = 0.00
+        await axios.get('http://localhost:4000/pumpersCash/get/' + this.state.setId)
+            .then(res => {
+                this.setState({
+                    pumpersCash: res.data.data
+                })
+                console.log(res);
+            })
+
+        var tot = 0;
+        for (var i = 0; i < this.state.pumpersCash.length; i++) {
+            tot = tot + parseFloat(this.state.pumpersCash[i].amount)
+        }
+        this.setState({ cashDiv: true });
+        if (this.state.pumpersCash[0] != null) {
+            await axios.get('http://localhost:4000/users/get/' + this.state.pumpersCash[0].pumperId)
+                .then(res => {
+                    this.setState({
+                        pumperNameRes: res.data.data[0].fullName
+                    })
+                })
+            this.setState({
+                pumperNameRes: this.state.pumperNameRes,
+                pumperIdRes: this.state.pumpersCash[0].pumperId,
+                pumperSetRes: this.state.pumpersCash[0].setNumber,
+                pumperDateRes: this.state.pumpersCash[0].date,
+                totAmount: tot
+            })
+        }
     }
 
     snackbarClose = (event) => {
@@ -66,13 +104,6 @@ export default class dailyPumperCalculations extends Component {
             .then(res => {
                 this.setState({
                     pumperIds: res.data.data
-                })
-            })
-
-        axios.get('http://localhost:4000/pumpersCash/get/' + this.state.setId)
-            .then(res => {
-                this.setState({
-                    pumpersCash: res.data.data
                 })
             })
     }
@@ -122,6 +153,8 @@ export default class dailyPumperCalculations extends Component {
                         snackbaropen: true,
                         snackbarmsg: json.msg
                     })
+
+                    window.location.reload();
                 })
                 .catch(err => {
                     console.log(err)
@@ -137,6 +170,7 @@ export default class dailyPumperCalculations extends Component {
     render() {
         const { pumperIds } = this.state;
         const { pumpSets } = this.state;
+        const { cashDiv } = this.state;
 
         let pumpIdList = pumperIds.length > 0
             && pumperIds.map((item, i) => {
@@ -206,7 +240,7 @@ export default class dailyPumperCalculations extends Component {
                                 </Card>
                             </div>
 
-                            <div className="container" style={{ marginTop: "20px", marginBottom:"20px" }}>
+                            <div className="container" style={{ marginTop: "20px", marginBottom: "20px" }}>
                                 <Card >
                                     <div className="container" style={{ padding: "40px", }} >
                                         <Row>
@@ -215,45 +249,57 @@ export default class dailyPumperCalculations extends Component {
                                                 {pumpSetList}
                                             </select>
                                         </Row>
-
                                     </div>
-                                    <div className="container" style={{ padding: "30px" }}>
-                                        <Row>
-                                            <Col xs="6">
-                                                <p className="debitor-tbl-head">Name</p>
-                                                <p className="debitor-tbl-head">PumperID</p>
-                                                <p className="debitor-tbl-head">Set Number</p>
-                                                <p className="debitor-tbl-head">Date</p>
-                                            </Col>
-                                            <Col xs="6">
-                                                <Row>
-                                                    <Col xs="6">
-                                                        <p className="debitor-tbl-head">Time</p>
-                                                    </Col>
-                                                    <Col xs="6">
-                                                        <p className="debitor-tbl-head">Time</p>
+                                    {cashDiv && (
 
-                                                    </Col>
-                                                </Row>
-                                                <Row>
-                                                    <Col xs="6">
-                                                        <p className="debitor-tbl-body">Time</p>
-
-                                                    </Col>
-                                                    <Col xs="6">
-                                                        <p className="debitor-tbl-body">Time</p>
-
-                                                    </Col>
-                                                </Row>
-                                            </Col>
-                                        </Row>
-                                    </div>
+                                        <div className="container" style={{ padding: "30px" }}>
+                                            <Row>
+                                                <Col xs="6">
+                                                    <p className="debitor-tbl-name">{this.state.pumperNameRes}</p>
+                                                    <p className="debitor-tbl-head">{this.state.pumperIdRes}</p>
+                                                    <p className="debitor-tbl-head">{this.state.pumperSetRes}</p>
+                                                    <p className="debitor-tbl-head">{this.state.pumperDateRes}</p>
+                                                </Col>
+                                                <Col xs="6">
+                                                    <Row style={{ marginTop: "-20px" }}>
+                                                        <Col xs="6" style={{ textAlign: "center", marginLeft: "-20px" }}>
+                                                            <p className="debitor-tbl-head">Time</p>
+                                                        </Col>
+                                                        <Col xs="6" style={{ textAlign: "right", marginLeft: "-20px" }}>
+                                                            <p className="debitor-tbl-head">Amount</p>
+                                                        </Col>
+                                                    </Row>
+                                                    <hr style={{ width: "90%", marginLeft: "50px" }}></hr>
+                                                    {this.state.pumpersCash.map((data) => {
+                                                        return (
+                                                            <Row key={data._id}>
+                                                                <Col xs="6" style={{ textAlign: "center" }}>
+                                                                    <p className="debitor-tbl-body">{data.time}</p>
+                                                                </Col>
+                                                                <Col xs="6" style={{ textAlign: "right" }}>
+                                                                    <p className="debitor-tbl-body">{data.amount}</p>
+                                                                </Col>
+                                                            </Row>
+                                                        )
+                                                    })}
+                                                </Col>
+                                            </Row>
+                                            <hr></hr>
+                                            <Row>
+                                                <Col xs="10" style={{ textAlign: "right" }}>
+                                                    <p className="debitor-tbl-head">Total Amount : </p>
+                                                </Col>
+                                                <Col xs="2" style={{ textAlign: "right", marginLeft: "-20px" }}>
+                                                    <p className="debitor-tbl-head">{this.state.totAmount}.00</p>
+                                                </Col>
+                                            </Row>
+                                        </div>
+                                    )}
                                 </Card>
                             </div>
                         </div>
                     </div>
                 </div>
-
             </React.Fragment >
         )
     }

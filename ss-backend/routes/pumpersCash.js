@@ -33,6 +33,8 @@ router.get('/get/:setId', function (req, res) {
     var today = new Date();
     var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
     const setId = req.params.setId
+    console.log(req.params.setId);
+
 
     PumpersCash.find({ date: date, setNumber: setId })
         .exec()
@@ -48,7 +50,7 @@ router.get('/get/:setId', function (req, res) {
 router.delete('/delete/:id', function (req, res) {
     const _id = req.params.id
 
-    PumpSet.remove({ _id: _id })
+    PumpersCash.remove({ _id: _id })
         .exec()
         .then(result => {
             res.status(200).json({
@@ -63,4 +65,20 @@ router.delete('/delete/:id', function (req, res) {
         });
 })
 
+//get data by date and set
+router.get('/getByDateSet/:set', function (req, res) {
+    var today = new Date();
+    var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+    const set = req.params.set
+
+    PumpersCash
+        .find({ date: date, setNumber: set })
+        .exec()
+        .then(result => {
+            res.json({ state: true, msg: "Data Transfer Successfully..!", data: result });
+        })
+        .catch(error => {
+            res.json({ state: false, msg: "Data Transfering Unsuccessfull..!" });
+        })
+})
 module.exports = router;

@@ -10,12 +10,20 @@ import Snackbar from '@material-ui/core/Snackbar'
 import IconButton from '@material-ui/core/IconButton'
 
 class meterBlock {
-    constructor(pumpId, fuelType, yesterday, today, sale) {
+    constructor(pumpId, fuelType, yesterday, today, sale, debit, gross) {
         this.pumpId = pumpId;
         this.fuelType = fuelType;
         this.yesterday = yesterday;
         this.today = today;
         this.sale = sale
+        this.debit = debit
+        this.gross = gross
+    }
+}
+class totDebit {
+    constructor(pumpId, debit){
+        this.pumpId = pumpId;
+        this.debit = debit;
     }
 }
 export default class dailyPumperCalculations extends Component {
@@ -35,6 +43,8 @@ export default class dailyPumperCalculations extends Component {
             yesReading: [],
             todayReading: [],
             meterBlock: [],
+            debits: [],
+            pumperCash: [],
         }
         this.onChangePumpSet = this.onChangePumpSet.bind(this)
         this.onChangeDate = this.onChangeDate.bind(this)
@@ -65,39 +75,63 @@ export default class dailyPumperCalculations extends Component {
             })
         }
         else {
+            //get Pumps Names
             await axios.get('http://localhost:4000/pumpsRegistration/getSet/' + this.state.pumpSet)
                 .then(res => {
                     this.setState({
                         pumpsNames: res.data.data
                     })
                 })
+            //get yesterday meter reading
             await axios.get('http://localhost:4000/machinesData/getYes/' + this.state.startDate)
                 .then(res => {
                     this.setState({
                         yesReading: res.data.data
                     })
                 })
+            //get today meter reading
             await axios.get('http://localhost:4000/machinesData/getToday/' + this.state.startDate)
                 .then(res => {
                     this.setState({
                         todayReading: res.data.data
                     })
                 })
+            //get debiters data
+            await axios.get('http://localhost:4000/debitorsAccount/get')
+                .then(res => {
+                    this.setState({
+                        debits: res.data.data
+                    })
+                })
+            //get pumpers Cash
+            await axios.get('http://localhost:4000/pumpersCash/getByDateSet/' + this.state.pumpSet)
+                .then(res => {
+                    console.log(res)
+                    this.setState({
+                        pumperCash: res.data.data
+                    })
+                })
+            for(var m = 0; m < this.state.debits.length; m++) {
+                
+            }
 
             for (var i = 0; i < this.state.pumpsNames.length; i++) {
                 for (var j = 0; j < this.state.yesReading.length; j++) {
                     for (var k = 0; k < this.state.todayReading.length; k++) {
-                        if (this.state.pumpsNames[i].machineNumber === this.state.yesReading[j].machineNumber && this.state.pumpsNames[i].machineNumber === this.state.todayReading[k].machineNumber) {
-                            var sale = this.state.todayReading[k].meterReading - this.state.yesReading[j].meterReading;
-                            var block = new meterBlock(this.state.pumpsNames[i].machineNumber, this.state.pumpsNames[i].fuelType, this.state.yesReading[j].meterReading, this.state.todayReading[k].meterReading, sale)
-                            this.state.meterBlock.push(block)
+                        for(var l = 0; l < this.state.debit.length; l++){
+                            if (this.state.pumpsNames[i].machineNumber === this.state.yesReading[j].machineNumber && this.state.pumpsNames[i].machineNumber === this.state.todayReading[k].machineNumber && this.state.pumpsNames[i].machineNumber === this.state.debits[l].machineNumber) {
+                                var sale = this.state.todayReading[k].meterReading - this.state.yesReading[j].meterReading;
+                                var gross = sale - this.state.debits[j].debit
+                                var block = new meterBlock(this.state.pumpsNames[i].machineNumber, this.state.pumpsNames[i].fuelType, this.state.yesReading[j].meterReading, this.state.todayReading[k].meterReading, sale)
+                                this.state.meterBlock.push(block)
+                            }
                         }
                     }
                 }
             }
-            for (var i = 0; i < this.state.meterBlock.length; i++) {
-                console.log(this.state.meterBlock[i]);
-            }
+            // for (var i = 0; i < this.state.meterBlock.length; i++) {
+            //     console.log(this.state.meterBlock[i]);
+            // }
 
         }
 
@@ -196,24 +230,28 @@ export default class dailyPumperCalculations extends Component {
                             {/******************************************************************************************/}
                             <div className="container second-div">
                                 <div className="container">
+                                    {this.state.meterBlock.map((data) => {
+                                        return (
+                                            <div className="row pump-meters-div" key={data.pumpId}>
+                                                <div className="col-md-2">
+                                                    <p>{data.pumpId}</p>
+                                                </div>
+                                                <div className="col-md-2">
+                                                    <p>{data.fuelType}</p>
+                                                </div>
+                                                <div className="col-md-2">
+                                                    <p>{data.today}</p>
+                                                </div>
 
-                                    <div className="row pump-meters-div">
-                                        <div className="col-md-2">
-                                            <p>Before</p>
-                                        </div>
-                                        <div className="col-md-3">
-                                            <input type="text" className="form-control" ></input>
-                                        </div>
-                                        <div className="col-md-2">
-                                            <p>After</p>
-                                        </div>
-                                        <div className="col-md-3">
-                                            <input type="text" className="form-control" ></input>
-                                        </div>
-                                        <div className="col-md-2">
-                                            <span>Diffrence</span>
-                                        </div>
-                                    </div>
+                                                <div className="col-md-2">
+                                                    <p>{data.yesterday}</p>
+                                                </div>
+                                                <div className="col-md-2">
+                                                    <span>{data.sale}</span>
+                                                </div>
+                                            </div>
+                                        )
+                                    })}
 
                                     <div className="row">
                                         <div className="col-md-3">

@@ -4,19 +4,10 @@ import { Col, Row } from 'react-bootstrap';
 import Sidebar from '../Auth/sidebar';
 import "react-datepicker/dist/react-datepicker.css";
 import '../../Css/Basic/cusprofile.css';
-// import { getFromStorage } from '../../utils/storage';
-// import Snackbar from '@material-ui/core/Snackbar';
-
 import Snackbar from '@material-ui/core/Snackbar';
-
 import IconButton from '@material-ui/core/IconButton';
 
-
-{/* <Debt delete={this.deleteDebtor} debt={currentDebt} key={i} />; */}
 const Debt = React.memo(props => (
-
-
-
     <tr>
         <td>{props.debt.fullName}</td>
         <td>{props.debt.debtorId}</td>
@@ -25,7 +16,6 @@ const Debt = React.memo(props => (
         <td>{props.debt.fax}</td>
         <td>
             <button className="btn btn-danger btn-info  " type="delete" onClick={() => props.delete(props.debt._id)}>DELETE</button>
-
         </td>
     </tr>
 ));
@@ -55,28 +45,7 @@ export default class profile extends Component {
         this.handleSearch = this.handleSearch.bind(this);
         this.deleteDebtor = this.deleteDebtor.bind(this);
     }
-    deleteDebtor() {
-        console.log("sachin");
 
-        // axios.delete('http://localhost:4000/debtors/deleteDebtor/' + data)
-        //     .then(res => {
-        //         console.log(res);
-        //         this.setState({
-        //             // users: this.state.users.filter(u => u._id !== data),
-        //             snackbaropen: true,
-        //             snackbarmsg: res.data.message
-        //         })
-        //         window.location.reload();
-        //     })
-        //     .catch(err => {
-        //         console.log(err);
-        //         this.setState({
-        //             snackbaropen: true,
-        //             snackbarmsg: err
-        //         })
-        //     })
-
-    }
     snackbarClose = (event) => {
         this.setState({ snackbaropen: false })
     }
