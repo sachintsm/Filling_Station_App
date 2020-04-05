@@ -20,7 +20,7 @@ export default class pumpsRegistration extends Component {
             authState: '',
             machineNumber: '',
             fuelType: '',
-            meterReading: '',
+            productId: '',
             pumps: [],
             pumpSet: '',
             snackbaropen: false,
@@ -64,7 +64,7 @@ export default class pumpsRegistration extends Component {
 
     onChangeMeterReading(e) {
         this.setState({
-            meterReading: e.target.value
+            productId: e.target.value
         })
     }
     onChangeSetNumber(e) {
@@ -143,7 +143,7 @@ export default class pumpsRegistration extends Component {
         const data = {
             machineNumber: this.state.machineNumber,
             fuelType: this.state.fuelType,
-            meterReading: this.state.meterReading
+            productId: this.state.productId
         }
         if (this.state.machineNumber === '') {
             this.setState({
@@ -308,7 +308,6 @@ export default class pumpsRegistration extends Component {
                                     </div>
                                     <div className="col-md-8">
                                         <p className="tpic">Add New Machine</p>
-
                                         <Card>
                                             <form>
                                                 <div className="container">
@@ -333,7 +332,7 @@ export default class pumpsRegistration extends Component {
 
                                                         </div>
                                                         <div className="col-md-3">
-                                                            <MDBInput outline label="Merter Reading" type="text" name="meterReading" onChange={this.onChangeMeterReading} />
+                                                            <MDBInput outline label="Product Id" type="text" name="productId" onChange={this.onChangeMeterReading} />
                                                         </div>
                                                         <div className="col-md-3" style={{ marginTop: "20px" }}>
                                                             <Button className="reg-btn" color="primary" onClick={this.onSubmit}>+ Machine</Button>
@@ -356,7 +355,7 @@ export default class pumpsRegistration extends Component {
                                                 <label className="topic-pump"> Fuel Type </label>
                                             </div>
                                             <div className="col-md-3">
-                                                <label className="topic-pump" > Initial Merter Reading</label>
+                                                <label className="topic-pump" > Product Id</label>
                                             </div>
                                             <div className="col-md-3">
                                                 <label className="topic-pump"> Assumed Pumper</label>
@@ -378,7 +377,7 @@ export default class pumpsRegistration extends Component {
                                                         <label className="des-pump" > {pump.fuelType} </label>
                                                     </div>
                                                     <div className="col-md-3">
-                                                        <label className="des-pump"> {pump.meterReading}</label>
+                                                        <label className="des-pump"> {pump.productId}</label>
                                                     </div>
                                                     <div className="col-md-3">
                                                         <select className="form-control" onChange={this.onChangePumpSet} onBlur={() => this.onPumpsetBlur(pump)}>

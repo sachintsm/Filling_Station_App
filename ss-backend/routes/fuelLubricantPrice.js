@@ -87,4 +87,16 @@ router.delete('/deleteProduct/:id', function (req, res) {
             });
         });
 })
+
+router.get('/getFuelPrice', function (req, res) {
+    FuelLubPrice.find({pType : 'Fuel'})
+        .select('pId sellPrice')
+        .exec()
+        .then(result => {
+            res.json({ state: true, msg: "Data Transfer Successfully..!", data: result });
+        })
+        .catch(error => {
+            res.json({ state: false, msg: "Data Transfering Unsuccessfull..!" });
+        })
+})
 module.exports = router;

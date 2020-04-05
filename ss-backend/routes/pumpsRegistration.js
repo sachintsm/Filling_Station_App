@@ -14,6 +14,7 @@ router.post('/add', verify, async function (req, res, next) {
         machineNumber: req.body.machineNumber,
         fuelType: req.body.fuelType,
         meterReading: req.body.meterReading,
+        productId : req.body.productId,
         pumpSet: 'none'
     });
     data.save()

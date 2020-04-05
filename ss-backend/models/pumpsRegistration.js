@@ -6,6 +6,7 @@ var pumpRegistrationSchema = mongoose.Schema({
     fuelType: {type: String},
     meterReading: {type: String},
     pumpSet: {type: String},  
+    productId : {type: String}
 });
 
 const PumpRegistration = module.exports = mongoose.model("PumpRegistration", pumpRegistrationSchema);
