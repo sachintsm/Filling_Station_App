@@ -46,7 +46,7 @@
     color: rgb(82, 82, 82);
     font-size: 17px;
     font-weight: 500;
-    /* text-align: center; */
+    text-align: left;
 }
 
 .debitor-tbl-body{
@@ -55,4 +55,10 @@
 }
 .debit-btn{
     width: 94%;
+}
+
+.debtHead{
+    font-size: 17px;
+    font-weight: 500;
+    color: rgb(82, 82, 82);
 }

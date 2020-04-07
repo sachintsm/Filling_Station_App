@@ -39,7 +39,7 @@ export default class dailyPumperCalculations extends Component {
             todayPetroleumDebit: [],
             todayOtherDebit: [],
             debitProducts: [],
-            newDebits:{
+            newDebits: {
                 newDDebitorId: '',
                 newDBillNo: '',
                 newDInvoiceNo: '',
@@ -50,7 +50,7 @@ export default class dailyPumperCalculations extends Component {
                 newDOname: '',
                 newDOamount: '',
             },
-            newCredits : {
+            newCredits: {
                 newCDebitorId: '',
                 newCInvoiceNo: '',
                 newCChequeNo: '',
@@ -247,14 +247,14 @@ export default class dailyPumperCalculations extends Component {
                 })
             })
 
-        // // load debidtor id and names
-        // await axios.get('http://localhost:4000/')
-        //     .then(res => {
-        //         console.log(res);
-        //         this.setState({
-        //             debitorsData: res.data.data
-        //         })
-        //     })
+        // load debidtor id and names
+        await axios.get('http://localhost:4000/debtors/getNameId')
+            .then(res => {
+                this.setState({
+                    debitorsData: res.data.data
+                })
+            })
+
         //get today petroleum debit data
         await axios.get('http://localhost:4000/debitorsAccount/get')
             .then(res => {
@@ -296,7 +296,7 @@ export default class dailyPumperCalculations extends Component {
                         tot2 = tot2 + parseFloat(this.state.todayOtherDebit[j].creditAmount)
                     }
                 }
-                    this.setState({
+                this.setState({
                     otherDebit: tot1.toFixed(2),
                     otherCredit: tot2.toFixed(2)
                 })
@@ -876,21 +876,25 @@ export default class dailyPumperCalculations extends Component {
                                                     <p className="first-topic" style={{ marginTop: "20px" }}>Debitors</p>
                                                     <Card style={{ height: "543px" }}>
                                                         <Row className="container" style={{ marginTop: "20px" }}>
-                                                            <Col xs="3">
-                                                                <p className="debitor-tbl-head">Cust.ID</p>
+                                                            <Col xs="3" style={{textAlign:"left"}}>
+                                                                <p className="debtHead">Cust.ID</p>
                                                             </Col>
                                                             <Col xs="9">
-                                                                <p className="debitor-tbl-head">Customer Name</p>
+                                                                <p className="debtHead">Customer Name</p>
                                                             </Col>
                                                         </Row>
-                                                        <Row className="container" style={{ marginTop: "20px" }}>
-                                                            <Col xs="3">
-                                                                <p className="debitor-tbl-head"> </p>
-                                                            </Col>
-                                                            <Col xs="9">
-                                                                <p className="debitor-tbl-head"> </p>
-                                                            </Col>
-                                                        </Row>
+                                                        {this.state.debitorsData.map((data) => {
+                                                            return (
+                                                                <Row className="container" style={{ marginTop: "0px" }}  key={data.debtorId}>
+                                                                    <Col xs="3">
+                                                                        <p className="debitor-tbl-body"> {data.debtorId}</p>
+                                                                    </Col>
+                                                                    <Col xs="9">
+                                                                        <p className="debitor-tbl-body"> {data.fullName}</p>
+                                                                    </Col>
+                                                                </Row>
+                                                            )
+                                                        })}
                                                     </Card>
                                                 </Col>
                                             </Row>
@@ -901,34 +905,34 @@ export default class dailyPumperCalculations extends Component {
                                             <Card className="container">
                                                 <Row style={{ marginTop: "20px" }}>
                                                     <Col xs="2">
-                                                        <p className="debitor-tbl-head">Date</p>
+                                                        <p className="debtHead">Date</p>
                                                     </Col>
                                                     <Col xs="1">
-                                                        <p className="debitor-tbl-head">Debitor ID</p>
+                                                        <p className="debtHead">Debitor ID</p>
                                                     </Col>
                                                     <Col xs="1">
-                                                        <p className="debitor-tbl-head">Bill No.</p>
+                                                        <p className="debtHead">Bill No.</p>
                                                     </Col>
                                                     <Col xs="2">
-                                                        <p className="debitor-tbl-head">Product Name</p>
+                                                        <p className="debtHead">Product Name</p>
                                                     </Col>
                                                     <Col xs="1">
-                                                        <p className="debitor-tbl-head">Size</p>
+                                                        <p className="debtHead">Size</p>
                                                     </Col>
                                                     <Col xs="1">
-                                                        <p className="debitor-tbl-head">Quentity</p>
+                                                        <p className="debtHead">Quentity</p>
                                                     </Col>
                                                     <Col xs="1">
-                                                        <p className="debitor-tbl-head">Debit</p>
+                                                        <p className="debtHead">Debit</p>
                                                     </Col>
                                                     <Col xs="1">
-                                                        <p className="debitor-tbl-head">Credit</p>
+                                                        <p className="debtHead">Credit</p>
                                                     </Col>
                                                     <Col xs="1">
-                                                        <p className="debitor-tbl-head">Pump ID</p>
+                                                        <p className="debtHead">Pump ID</p>
                                                     </Col>
-                                                    <Col xs="1">
-                                                        <p className="debitor-tbl-head">Action</p>
+                                                    <Col xs="1"  style={{textAlign: "left" }}>
+                                                        <p className="debtHead">Action</p>
                                                     </Col>
                                                 </Row>
                                                 {this.state.todayPetroleumDebit.map((data) => {
@@ -991,19 +995,19 @@ export default class dailyPumperCalculations extends Component {
                                             <Card className="container">
                                                 <Row style={{ marginTop: "20px" }}>
                                                     <Col xs="2">
-                                                        <p className="debitor-tbl-head">Date</p>
+                                                        <p className="debtHead">Date</p>
                                                     </Col>
                                                     <Col xs="5">
-                                                        <p className="debitor-tbl-head">Name/ Reason</p>
+                                                        <p className="debtHead">Name/ Reason</p>
                                                     </Col>
                                                     <Col xs="2">
-                                                        <p className="debitor-tbl-head">Debit</p>
+                                                        <p className="debtHead">Debit</p>
                                                     </Col>
                                                     <Col xs="2">
-                                                        <p className="debitor-tbl-head">Credit</p>
+                                                        <p className="debtHead">Credit</p>
                                                     </Col>
                                                     <Col xs="1">
-                                                        <p className="debitor-tbl-head">Action</p>
+                                                        <p className="debtHead">Action</p>
                                                     </Col>
                                                 </Row>
                                                 {this.state.todayOtherDebit.map((data) => {
@@ -1015,10 +1019,10 @@ export default class dailyPumperCalculations extends Component {
                                                             <Col xs="5">
                                                                 <p className="debitor-tbl-body">{data.debitorId}</p>
                                                             </Col>
-                                                            <Col xs="2" style={{textAlign: "right"}}>
+                                                            <Col xs="2" style={{ textAlign: "right" }}>
                                                                 <p className="debitor-tbl-body">{data.debitAmount}</p>
                                                             </Col>
-                                                            <Col xs="2" style={{textAlign: "right"}}>
+                                                            <Col xs="2" style={{ textAlign: "right" }}>
                                                                 <p className="debitor-tbl-body">{data.creditAmount}</p>
                                                             </Col>
                                                             <Col xs="1">
@@ -1032,11 +1036,11 @@ export default class dailyPumperCalculations extends Component {
                                                 <Row style={{ marginTop: "10px" }}>
                                                     <Col xs="7">
                                                     </Col>
-                                                    <Col xs="2" style={{textAlign: "right"}}>
-                                                        <p className="debitor-tbl-head">{this.state.otherDebit}</p>
+                                                    <Col xs="2" style={{ textAlign: "right"}}>
+                                                        <p className="debtHead">{this.state.otherDebit}</p>
                                                     </Col>
-                                                    <Col xs="2" style={{textAlign: "right"}}>
-                                                        <p className="debitor-tbl-head">{this.state.otherCredit}</p>
+                                                    <Col xs="2" style={{ textAlign: "right" }}>
+                                                        <p className="debtHead">{this.state.otherCredit}</p>
                                                     </Col>
                                                     <Col xs="1">
                                                     </Col>
@@ -1114,7 +1118,7 @@ export default class dailyPumperCalculations extends Component {
                                                             {this.state.endReadingArray.map((data) => {
                                                                 return (
                                                                     <div className="row" key={data._id}>
-                                                                        <div className="col-md-5">
+                                                                        <div className="col-md-5" >
                                                                             <p className="product">{data.machineNumber}</p>
                                                                         </div>
                                                                         <div className="col-md-5" style={{ textAlign: "right" }}>

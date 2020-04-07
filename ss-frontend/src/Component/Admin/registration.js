@@ -254,7 +254,7 @@ export default class registration extends Component {
                                         </div>
                                         <div className="form-group">
                                             <label>Upload Your Profile Image : </label>
-                                            <input type="file" className="form-control" name="myImage" onChange={this.handleImageChange} />
+                                            <input type="file" name="myImage" onChange={this.handleImageChange} />
                                         </div>
                                         <div className="form-group">
                                             <button className="btn btn-info my-4 btn-block " type="submit">Register Now</button>

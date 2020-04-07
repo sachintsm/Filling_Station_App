@@ -9,11 +9,8 @@ const fs = require('fs');
 var jwt = require('jsonwebtoken');
 const verify = require('../authentication');
 
-
-
 //User registration
 router.post('/register', function (req, res) {
-    
         //check fullName 
         if (req.body.fullName == '') return res.json({ state: false, msg: "Name Empty..!" })
         if (req.body.debtorId == '') return res.json({ state: false, msg: "Debtor ID Empty..!" })
@@ -21,15 +18,6 @@ router.post('/register', function (req, res) {
         if (req.body.damount == '') return res.json({ state: false, msg: "Amount Empty..!" })
         // if (req.body.nic == '') return res.json({ state: false, msg: "NIC Empty..!" })
         if (req.body.mobile == '') return res.json({ state: false, msg: "Mobile Number Empty..!" })
-        
-
-        //checking if the userId is already in the database
-        // const debtorIdExist = await Debtor.findOne({ debtorId: req.body.debtorId })
-        // if (debtorIdExist) return res.json({ state: false, msg: "This debtorId already in use..!" })
-
-        
-
-      
 
         //create a new user
         const newDebtor = new Debtor({
@@ -51,15 +39,10 @@ router.post('/register', function (req, res) {
             console.log(err);
             res.json({ state: false, msg: "Data Adding Unsuccessfull..!" })
         })
-
-  
- 
 })
 
 //get data from backend
-
 router.get('/get', function (req, res) {
-
     Debtor.find()
         .exec()
         .then(result => {
@@ -89,6 +72,16 @@ router.delete('/deleteDebtor/:id', function (req, res) {
         });
 })
 
-
-
+//get name and ID
+router.get('/getNameId', function (req, res) {
+    Debtor.find()
+        .select('fullName debtorId')
+        .exec()
+        .then(result => {
+            res.json({ state: true, msg: "Data Transfer Successfully..!", data: result });
+        })
+        .catch(error => {
+            res.json({ state: false, msg: "Data Transfering Unsuccessfull..!" });
+        })
+})
 module.exports = router

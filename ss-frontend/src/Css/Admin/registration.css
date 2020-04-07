@@ -1,9 +1,11 @@
-.card{
+.card {
     margin: auto;
     margin-top: 50px;
     margin-bottom: 50px;
-    width:80%;
+    width: 80%;
 }
-.fuel-selector{
+.fuel-selector {
     margin-top: 24px;
 }
+
+
