@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import Sidebar from '../Auth/sidebar'
 import DatePicker from "react-datepicker";
 import { verifyAuth } from '../../utils/authentication'
-// import { getFromStorage } from '../../utils/storage';
 import '../../Css/Basic/dailyPumperCalculations.css'
 import axios from 'axios'
 import { MDBInput } from "mdbreact";
@@ -10,6 +9,7 @@ import Snackbar from '@material-ui/core/Snackbar'
 import IconButton from '@material-ui/core/IconButton'
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
+import { getFromStorage } from '../../utils/storage';
 
 class meterBlock {
     constructor(pumpId, fuelType, yesterday, today, sale, debit, gross, productId) {
@@ -79,6 +79,10 @@ export default class dailyPumperCalculations extends Component {
 
             dataDiv: false,
 
+            /********************************************************* */
+            el_pumperId : '',
+            el_date : '',
+            el_dataArray : [],
         }
         this.onChangePumpSet = this.onChangePumpSet.bind(this)
         this.onChangeDate = this.onChangeDate.bind(this)
@@ -88,6 +92,8 @@ export default class dailyPumperCalculations extends Component {
         this.calculate = this.calculate.bind(this)
         this.submitNow = this.submitNow.bind(this)
 
+        this.getEarlierData = this.getEarlierData.bind(this)
+        this.onChangeEarlier = this.onChangeEarlier.bind(this)
     }
 
     snackbarClose = (event) => {
@@ -116,7 +122,32 @@ export default class dailyPumperCalculations extends Component {
             pumpSet: e.target.value
         })
     }
+
+    onChangeEarlier(e){
+        this.setState({
+            el_pumperId : e.target.value
+        })
+    }
+    
+    async getEarlierData(){
+        const data = {
+            el_pumperId : this.state.el_pumperId,
+            el_date : this.state.startDate
+        }
+        //get data from pumpersCalculations
+        await axios.post('http://localhost:4000/pumpersCalculations/get', data)
+            .then(res =>{
+                this.setState({
+                    el_dataArray : res.data.data[0]
+                })
+                console.log(this.state.el_dataArray);
+            })
+    }
+
     async getData() {
+        this.setState({
+            finalBlock: []
+        })
         if (this.state.pumperId === '') {
             this.setState({
                 snackbaropen: true,
@@ -124,8 +155,15 @@ export default class dailyPumperCalculations extends Component {
             })
         }
         else {
-            this.setState({ dataDiv: true });
+            // this.state.pumpNames = [];  // empty the meter block Array
+            this.state.yesReading = [];  // empty the meter block Array
+            this.state.todayReading = [];  // empty the meter block Array
+            this.state.debits = [];  // empty the meter block Array
+            this.state.meterBlock = [];  // empty the meter block Array
+            this.state.distinctDebit = [];
 
+            // for (var i = 0; i < this.state.pumpsNames.length; i++) {
+            // }
             //get Pumps Names
             await axios.get('http://localhost:4000/pumpsRegistration/getSet/' + this.state.pumpSet)
                 .then(res => {
@@ -134,6 +172,7 @@ export default class dailyPumperCalculations extends Component {
                     })
                 })
 
+            // console.log(this.state.pumpsNames.length)
             //get yesterday meter reading
             await axios.get('http://localhost:4000/machinesData/getYes/' + this.state.startDate)
                 .then(res => {
@@ -148,10 +187,25 @@ export default class dailyPumperCalculations extends Component {
                         todayReading: res.data.data
                     })
                 })
+            //get debiters data
+            await axios.get('http://localhost:4000/debitorsAccount/get/' + this.state.startDate)
+                .then(res => {
+                    this.setState({
+                        debits: res.data.data
+                    })
+                    for (var m = 0; m < this.state.pumpNames.length; m++) {
+                        var debitTotal = 0;
+                        for (let n = 0; n < this.state.debits.length; n++) {
+                            if (this.state.pumpNames[m].machineNumber === this.state.debits[n].pumpId) {
+                                debitTotal = debitTotal + parseFloat(this.state.debits[n].qty)
+                            }
+                        }
+                        var debitBlock = new totDebit(this.state.pumpNames[m].machineNumber, debitTotal)
+                        this.state.distinctDebit.push(debitBlock);
+                    }
+                })
 
 
-
-            this.state.meterBlock = [];  // empty the meter block Array
             for (var i = 0; i < this.state.pumpsNames.length; i++) {
                 for (var j = 0; j < this.state.yesReading.length; j++) {
                     for (var k = 0; k < this.state.todayReading.length; k++) {
@@ -168,7 +222,6 @@ export default class dailyPumperCalculations extends Component {
                     }
                 }
             }
-            this.state.finalBlock = [];
             for (var m = 0; m < this.state.meterBlock.length; m++) {
                 for (var n = 0; n < this.state.products.length; n++) {
                     if (this.state.meterBlock[m].productId === this.state.products[n].pId) {
@@ -178,9 +231,10 @@ export default class dailyPumperCalculations extends Component {
                     }
                 }
             }
+            this.setState({ dataDiv: true });
         }
     }
-   
+
     componentDidMount = async () => {
         const authState = await verifyAuth();
         this.setState({ authState: authState })
@@ -212,23 +266,7 @@ export default class dailyPumperCalculations extends Component {
                     products: res.data.data
                 })
             })
-        //get debiters data
-        await axios.get('http://localhost:4000/debitorsAccount/get')
-            .then(res => {
-                this.setState({
-                    debits: res.data.data
-                })
-                for (var m = 0; m < this.state.pumpNames.length; m++) {
-                    var debitTotal = 0;
-                    for (let n = 0; n < this.state.debits.length; n++) {
-                        if (this.state.pumpNames[m].machineNumber === this.state.debits[n].pumpId) {
-                            debitTotal = debitTotal + parseFloat(this.state.debits[n].qty)
-                        }
-                    }
-                    var debitBlock = new totDebit(this.state.pumpNames[m].machineNumber, debitTotal)
-                    this.state.distinctDebit.push(debitBlock);
-                }
-            })
+
     }
 
     async calculate() {
@@ -268,8 +306,12 @@ export default class dailyPumperCalculations extends Component {
             totalSaleAmount: totSaleAmt,
         })
 
+        const data = {
+            date: this.state.startDate,
+            set: this.state.pumpSet
+        }
         //get pumpers Cash
-        await axios.get('http://localhost:4000/pumpersCash/getByDateSet/' + this.state.pumpSet)
+        await axios.post('http://localhost:4000/pumpersCash/getByDateSet/', data)
             .then(res => {
                 this.setState({
                     pumperCash: res.data.data
@@ -291,7 +333,44 @@ export default class dailyPumperCalculations extends Component {
     }
 
     submitNow() {
-        
+        const obj = getFromStorage('auth-token');
+
+        const data = {
+            setNumber: this.state.pumpSet,
+            date: this.state.startDate,
+            pumperId: this.state.pumperId,
+            twoStrokeOil: this.state.twostrokeQty,
+            engineOil: this.state.engineQty,
+            otherSales: this.state.totalOtherSales,
+            saleAmount: this.state.totalSaleAmount,
+            receivedAmount: this.state.totalReceivedAmount,
+            profit: this.state.totalProfit
+        }
+
+        fetch('http://localhost:4000/pumpersCalculations/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'auth-token': obj.token
+            },
+            body: JSON.stringify(data),
+        })
+            .then(res => res.json())
+            .then(json => {
+                this.setState({
+                    snackbaropen: true,
+                    snackbarmsg: json.msg
+                })
+
+                // window.location.reload();
+            })
+            .catch(err => {
+                console.log(err)
+                this.setState({
+                    snackbaropen: true,
+                    snackbarmsg: err
+                })
+            })
     }
 
     render() {
@@ -329,7 +408,7 @@ export default class dailyPumperCalculations extends Component {
                         <div className="col-md-10" style={{ backgroundColor: "#f5f5f5" }}>
                             <div className="container">
 
-                                <Tabs defaultActiveKey="sales" id="uncontrolled-tab-example" style={{ marginTop: "20px" }}>
+                                <Tabs defaultActiveKey="previous" id="uncontrolled-tab-example" style={{ marginTop: "20px" }}>
 
                                     <Tab eventKey="sales" title="Today Calculations">
                                         <div className="container main-div-box" >
@@ -517,26 +596,26 @@ export default class dailyPumperCalculations extends Component {
                                                                     <p className="tag-value">{this.state.fuelSaleAmount}</p>
                                                                 </div>
 
-                                                                <div className="col-md-6"  style={{marginTop:"18px"}}>
+                                                                <div className="col-md-6" style={{ marginTop: "18px" }}>
                                                                     <p className="tag-text">Total  Sales Amount </p>
                                                                 </div>
-                                                                <div className="col-md-1" style={{marginTop:"18px"}}>
+                                                                <div className="col-md-1" style={{ marginTop: "18px" }}>
                                                                     <p className="tag-value">-</p>
                                                                 </div>
-                                                                <div className="col-md-5" style={{marginTop:"18px"}}>
+                                                                <div className="col-md-5" style={{ marginTop: "18px" }}>
                                                                     <p className="tag-value">{this.state.totalSaleAmount}</p>
                                                                 </div>
 
-                                                                <div className="col-md-6" style={{marginTop:"18px"}}>
+                                                                <div className="col-md-6" style={{ marginTop: "18px" }}>
                                                                     <p className="tag-text">Total Received Amount </p>
                                                                 </div>
-                                                                <div className="col-md-1" style={{marginTop:"18px"}}>
+                                                                <div className="col-md-1" style={{ marginTop: "18px" }}>
                                                                     <p className="tag-value">-</p>
                                                                 </div>
-                                                                <div className="col-md-5" style={{marginTop:"18px"}}>
+                                                                <div className="col-md-5" style={{ marginTop: "18px" }}>
                                                                     <p className="tag-value">{this.state.totalReceivedAmount}</p>
                                                                 </div>
-                                                                <hr  style={{marginTop:"28px"}}></hr>
+                                                                <hr style={{ marginTop: "28px" }}></hr>
                                                                 <div className="col-md-6">
                                                                     <p className="tag-profit">Total Profit </p>
                                                                 </div>
@@ -547,7 +626,7 @@ export default class dailyPumperCalculations extends Component {
                                                                     <p className="tag-profit-value">{this.state.totalProfit}</p>
                                                                 </div>
                                                                 <hr></hr>
-                                                                <hr style={{marginTop:"-25px"}}></hr>
+                                                                <hr style={{ marginTop: "-25px" }}></hr>
 
                                                             </div>
                                                         </div>
@@ -564,7 +643,7 @@ export default class dailyPumperCalculations extends Component {
                                                         </div>
                                                         <div className="col-md-3">
                                                             <div className="form-group">
-                                                                <input type="submit" value="Submit Now" className="btn btn-primary submit-btn"></input>
+                                                                <input type="submit" value="Submit Now" onClick={this.submitNow} className="btn btn-primary submit-btn"></input>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -573,8 +652,38 @@ export default class dailyPumperCalculations extends Component {
                                         )}
                                     </Tab>
 
-                                    <Tab eventKey="debit" title="Earlier Records">
+                                    <Tab eventKey="previous" title="Earlier Records">
+                                        <div className="container main-div-box" >
+                                            <div className="container">
 
+                                                <div className="row first-div">
+                                                    
+                                                    <div className="col-md-6" style={{ marginTop: "-24px" }}>
+                                                        <MDBInput outline label="Pumper ID" type="text" name="el_pumperId" onChange={this.onChangeEarlier} />
+                                                    </div>
+                                                    <div className="col-md-2">
+                                                        <div className="form-group">
+                                                            <DatePicker
+                                                                className="form-control"
+                                                                selected={this.state.startDate}
+                                                                onChange={this.onChangeDate}
+                                                                dateFormat="yyyy-MM-dd"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <div className="col-md-4" style={{ marginTop: "-7px" }}>
+                                                        <button className="btn btn-primary sub-btn" onClick={this.getEarlierData}>Get Data</button>
+                                                    </div>
+
+                                                </div>
+                                                <div className="container">
+                                                    <div className="row">
+                                                        <div className="form-group">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </Tab>
                                 </Tabs>
                             </div>

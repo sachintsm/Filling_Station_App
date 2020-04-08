@@ -33,7 +33,7 @@ router.get('/get/:setId', function (req, res) {
     var today = new Date();
     var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
     const setId = req.params.setId
-    console.log(req.params.setId);
+    // console.log(req.params.setId);
 
 
     PumpersCash.find({ date: date, setNumber: setId })
@@ -65,12 +65,20 @@ router.delete('/delete/:id', function (req, res) {
         });
 })
 
-//get data by date and set
-router.get('/getByDateSet/:set', function (req, res) {
-    var today = new Date();
-    var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
-    const set = req.params.set
 
+function convertToday(str) {
+    var date = new Date(str),
+        mnth = ("" + (date.getMonth() + 1)).slice(-2),
+        day = ("" + date.getDate()).slice(-2);
+    return [date.getFullYear(), mnth, day].join("-");
+}
+
+//get data by date and set
+router.post('/getByDateSet', function (req, res) {
+    
+    var date = convertToday(req.body.date)
+    const set = req.body.set
+    
     PumpersCash
         .find({ date: date, setNumber: set })
         .exec()

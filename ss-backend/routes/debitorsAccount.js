@@ -35,7 +35,7 @@ router.post('/add', verify, function (req, res) {
 })
 
 router.post('/addOther', verify, function (req, res) {
-    console.log(req.body);
+    // console.log(req.body);
 
     var today = new Date();
     var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
@@ -103,8 +103,8 @@ router.delete('/delete/:id', function (req, res) {
 })
 
 router.post('/addOtherCredit', verify, function (req, res) {
-    console.log(req.body);
-
+    // console.log(req.body);
+// 
     var today = new Date();
     var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
 
@@ -125,7 +125,7 @@ router.post('/addOtherCredit', verify, function (req, res) {
 })
 
 router.post('/addCredit', verify, function (req, res) {
-    console.log(req.body);
+    // console.log(req.body);
 
     var today = new Date();
     var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
@@ -146,4 +146,22 @@ router.post('/addCredit', verify, function (req, res) {
             res.send({ state: false, msg: "Data Adding Not Successfull..!" })
         })
 })
+function convertToday(str) {
+    var date = new Date(str),
+        mnth = ("" + (date.getMonth() + 1)).slice(-2),
+        day = ("" + date.getDate()).slice(-2);
+    return [date.getFullYear(), mnth, day].join("-");
+}
+//get by date
+router.get('/get/:date', function (req, res) {
+    var date = convertToday(req.params.date) 
+    DebitorAccount.find({ date: date, debitType: 'products' })
+        .then(data => {
+            res.send({ state: true, msg: "Data Transefer Done..!", data: data })
+        })
+        .catch(err => {
+            res.send({ state: false, msg: "data Tranfr Unsuccessful..!" })
+        })
+})
+
 module.exports = router

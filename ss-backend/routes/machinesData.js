@@ -103,7 +103,7 @@ router.get('/getYes/:date', function (req, res) {
 
     const param = req.params.date
     let date = convertYesterDay(param)
-    console.log(date)
+    // console.log(date)
     MachineData.find({ date: date })
         .then(data => {
             res.send({ state: true, msg: "Data Transefer Done..!", data: data })
@@ -123,7 +123,7 @@ router.get('/getToday/:date', function (req, res) {
 
     const param = req.params.date
     let date = convertToday(param)
-    console.log(date)
+    // console.log(date)
     MachineData.find({ date: date })
         .then(data => {
             res.send({ state: true, msg: "Data Transefer Done..!", data: data })
