@@ -7,8 +7,6 @@ import axios from 'axios'
 import { MDBInput } from "mdbreact";
 import Snackbar from '@material-ui/core/Snackbar'
 import IconButton from '@material-ui/core/IconButton'
-import Tab from 'react-bootstrap/Tab';
-import Tabs from 'react-bootstrap/Tabs';
 import { getFromStorage } from '../../utils/storage';
 
 class meterBlock {
@@ -41,17 +39,6 @@ class finalBlock {
         this.amount = amount
     }
 }
-class el_finalBlock {
-    constructor(pumpId, fuelType, yesterday, today, sale, debit, gross) {
-        this.pumpId = pumpId;
-        this.fuelType = fuelType;
-        this.yesterday = yesterday;
-        this.today = today;
-        this.sale = sale
-        this.debit = debit
-        this.gross = gross
-    }
-}
 export default class dailyPumperCalculations extends Component {
 
     constructor(props) {
@@ -65,7 +52,7 @@ export default class dailyPumperCalculations extends Component {
             startDate: new Date(),
             pumperId: '',
             pumpSet: '',
-            pumpsNames: [],    //get fuelTypes
+            pumpsNames: [], //get fuelTypes
             yesReading: [], //load yesterday merter reading
             todayReading: [],   //load today merter reading
             debits: [], //load all debits
@@ -89,15 +76,6 @@ export default class dailyPumperCalculations extends Component {
             totalProfit: 0.00.toFixed(2),
 
             dataDiv: false,
-
-            /********************************************************* */
-            el_pumperId: '',
-            el_date: '',
-            el_dataArray: [],
-            el_yesterday: [],
-            el_today: [],
-            el_pumpsNames: [],
-            el_finalBlock: [],
         }
         this.onChangePumpSet = this.onChangePumpSet.bind(this)
         this.onChangeDate = this.onChangeDate.bind(this)
@@ -107,8 +85,6 @@ export default class dailyPumperCalculations extends Component {
         this.calculate = this.calculate.bind(this)
         this.submitNow = this.submitNow.bind(this)
 
-        this.getEarlierData = this.getEarlierData.bind(this)
-        this.onChangeEarlier = this.onChangeEarlier.bind(this)
     }
 
     snackbarClose = (event) => {
@@ -136,95 +112,6 @@ export default class dailyPumperCalculations extends Component {
         this.setState({
             pumpSet: e.target.value
         })
-    }
-
-    onChangeEarlier(e) {
-        this.setState({
-            el_pumperId: e.target.value
-        })
-    }
-
-    async getEarlierData() {
-        this.setState({
-            el_finalBlock: []
-        })
-        const data = {
-            el_pumperId: this.state.el_pumperId,
-            el_date: this.state.startDate
-        }
-        this.state.debits = [];
-        this.state.pumpNames = [];
-        this.state.el_yesterday = [];
-        this.state.el_today = [];
-        this.state.el_yesterday = [];
-        this.state.distinctDebit = [];
-        // this.state.el_finalBlock = [];
-
-        //get data from pumpersCalculations
-        await axios.post('http://localhost:4000/pumpersCalculations/get', data)
-            .then(res => {
-                this.setState({
-                    el_dataArray: res.data.data[0]
-                })
-                // console.log(this.state.el_dataArray);
-            })
-
-        //get yesterday meter reading
-        await axios.get('http://localhost:4000/machinesData/getYes/' + this.state.startDate)
-            .then(res => {
-                this.setState({
-                    el_yesterday: res.data.data
-                })
-            })
-        //get today meter reading
-        await axios.get('http://localhost:4000/machinesData/getToday/' + this.state.startDate)
-            .then(res => {
-                this.setState({
-                    el_today: res.data.data
-                })
-            })
-
-        //get Pumps Names
-        await axios.get('http://localhost:4000/pumpsRegistration/getSet/' + this.state.el_dataArray.setNumber)
-            .then(res => {
-                this.setState({
-                    el_pumpsNames: res.data.data
-                })
-            })
-
-        //get debiters data
-        await axios.get('http://localhost:4000/debitorsAccount/get/' + this.state.startDate)
-            .then(res => {
-                this.setState({
-                    debits: res.data.data
-                })
-                for (var m = 0; m < this.state.el_pumpsNames.length; m++) {
-                    var debitTotal = 0;
-                    for (let n = 0; n < this.state.debits.length; n++) {
-                        if (this.state.el_pumpsNames[m].machineNumber === this.state.debits[n].pumpId) {
-                            debitTotal = debitTotal + parseFloat(this.state.debits[n].qty)
-                        }
-                    }
-                    var debitBlock = new totDebit(this.state.el_pumpsNames[m].machineNumber, debitTotal)
-                    this.state.distinctDebit.push(debitBlock);
-                }
-            })
-
-        for (var i = 0; i < this.state.el_pumpsNames.length; i++) {
-            for (var j = 0; j < this.state.el_yesterday.length; j++) {
-                for (var k = 0; k < this.state.el_today.length; k++) {
-                    for (var l = 0; l < this.state.distinctDebit.length; l++) {
-                        if (this.state.el_pumpsNames[i].machineNumber === this.state.el_yesterday[j].machineNumber && this.state.el_pumpsNames[i].machineNumber === this.state.el_today[k].machineNumber
-                            && this.state.el_pumpsNames[i].machineNumber === this.state.distinctDebit[l].pumpId) {
-                            var sale = (this.state.el_today[k].meterReading - this.state.el_yesterday[j].meterReading).toFixed(3)     //get pump whole sale
-                            var gross = (sale - this.state.distinctDebit[l].debit).toFixed(3)    //get gross size spesific pump
-                            var block = new el_finalBlock(this.state.el_pumpsNames[i].machineNumber, this.state.el_pumpsNames[i].fuelType, this.state.el_yesterday[j].meterReading, this.state.el_today[k].meterReading, sale, this.state.distinctDebit[l].debit, gross);
-                            this.state.el_finalBlock.push(block)
-                        }
-                    }
-                }
-            }
-        }
     }
 
     async getData() {
@@ -488,357 +375,246 @@ export default class dailyPumperCalculations extends Component {
                         <div className="col-md-10" style={{ backgroundColor: "#f5f5f5" }}>
                             <div className="container">
 
-                                <Tabs defaultActiveKey="previous" id="uncontrolled-tab-example" style={{ marginTop: "20px" }}>
+                                <div className="container main-div-box" >
+                                    <div className="container">
 
-                                    <Tab eventKey="sales" title="Today Calculations">
-                                        <div className="container main-div-box" >
-                                            <div className="container">
-
-                                                <div className="row first-div">
-                                                    <div className="col-md-4">
-                                                        <select className="form-control" onChange={this.onChangePumpSet}>
-                                                            <option>Select Pump Set</option>
-                                                            {pumpSetList}
-                                                        </select>
-                                                    </div>
-                                                    <div className="col-md-4" style={{ marginTop: "-24px" }}>
-                                                        <MDBInput outline label="Pumper ID" type="text" name="pumperId" onChange={this.onChangepumperID} />
-                                                    </div>
-                                                    <div className="col-md-2">
-                                                        <div className="form-group">
-                                                            <DatePicker
-                                                                className="form-control"
-                                                                selected={this.state.startDate}
-                                                                onChange={this.onChangeDate}
-                                                                dateFormat="yyyy-MM-dd"
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                    <div className="col-md-2" style={{ marginTop: "-7px" }}>
-                                                        <button className="btn btn-primary sub-btn" onClick={this.getData}>Get Data</button>
-                                                    </div>
-
+                                        <div className="row first-div">
+                                            <div className="col-md-4">
+                                                <select className="form-control" onChange={this.onChangePumpSet}>
+                                                    <option>Select Pump Set</option>
+                                                    {pumpSetList}
+                                                </select>
+                                            </div>
+                                            <div className="col-md-4" style={{ marginTop: "-24px" }}>
+                                                <MDBInput outline label="Pumper ID" type="text" name="pumperId" onChange={this.onChangepumperID} />
+                                            </div>
+                                            <div className="col-md-2">
+                                                <div className="form-group">
+                                                    <DatePicker
+                                                        className="form-control"
+                                                        selected={this.state.startDate}
+                                                        onChange={this.onChangeDate}
+                                                        dateFormat="yyyy-MM-dd"
+                                                    />
                                                 </div>
-                                                <div className="container">
-                                                    <div className="row">
-                                                        <div className="form-group">
-                                                        </div>
-                                                    </div>
+                                            </div>
+                                            <div className="col-md-2" style={{ marginTop: "-7px" }}>
+                                                <button className="btn btn-primary sub-btn" onClick={this.getData}>Get Data</button>
+                                            </div>
+
+                                        </div>
+                                        <div className="container">
+                                            <div className="row">
+                                                <div className="form-group">
                                                 </div>
                                             </div>
                                         </div>
-                                        {/******************************************************************************************/}
-                                        {dataDiv && (
-                                            <div className="container second-div">
-                                                <div className="container">
-                                                    <div className="row">
-                                                        {this.state.finalBlock.map((data) => {
-                                                            return (
-                                                                // yesterday, today, sale, debit, gross, credit
-                                                                <div className="col-md-6" key={data.pumpId} style={{ marginTop: "20px" }}>
-                                                                    <div className="row" >
-                                                                        <div className="col-md-2">
-                                                                            <p className="pump-name">{data.pumpId}</p>
-                                                                        </div>
-                                                                        <div className="col-md-10">
-                                                                            <p className="pump-name">{data.fuelType}</p>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div className="row" style={{ marginTop: "-10px" }}>
-                                                                        <div className="col-md-6">
-                                                                            <p className="tag-text">Today Reading : </p>
-                                                                        </div>
-                                                                        <div className="col-md-1">
-                                                                            <p className="tag-value">-</p>
-                                                                        </div>
-                                                                        <div className="col-md-5">
-                                                                            <p className="tag-value">{data.today}</p>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div className="row" style={{ marginTop: "-10px" }}>
-                                                                        <div className="col-md-6">
-                                                                            <p className="tag-text">Previous day Reading : </p>
-                                                                        </div>
-                                                                        <div className="col-md-1">
-                                                                            <p className="tag-value">-</p>
-                                                                        </div>
-                                                                        <div className="col-md-5">
-                                                                            <p className="tag-value">{data.yesterday}</p>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div className="row" style={{ marginTop: "-10px" }} >
-                                                                        <div className="col-md-6">
-                                                                            <p className="tag-text">Total Sale : </p>
-                                                                        </div>
-                                                                        <div className="col-md-1">
-                                                                            <p className="tag-value">-</p>
-                                                                        </div>
-                                                                        <div className="col-md-5">
-                                                                            <p className="tag-value">{data.sale}</p>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div className="row" style={{ marginTop: "-10px" }}>
-                                                                        <div className="col-md-6">
-                                                                            <p className="tag-text">Debit Amount : </p>
-                                                                        </div>
-                                                                        <div className="col-md-1">
-                                                                            <p className="tag-value">-</p>
-                                                                        </div>
-                                                                        <div className="col-md-5">
-                                                                            <p className="tag-value">{data.debit}</p>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div className="row" style={{ marginTop: "-10px" }}>
-                                                                        <div className="col-md-6">
-                                                                            <p className="tag-text">Gross Sale : </p>
-                                                                        </div>
-                                                                        <div className="col-md-1">
-                                                                            <p className="tag-value">-</p>
-                                                                        </div>
-                                                                        <div className="col-md-5">
-                                                                            <p className="tag-value">{data.gross}</p>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div className="row">
-                                                                        <div className="col-md-6" style={{ marginTop: "30px" }}>
-                                                                            <p className="tag-text">Credit Balance : </p>
-                                                                        </div>
-                                                                        <div className="col-md-1" style={{ marginTop: "30px" }}>
-                                                                            <p className="tag-value">-</p>
-                                                                        </div>
-                                                                        <div className="col-md-5">
-                                                                            <hr></hr>
-                                                                            <p className="tag-value">{data.amount}</p>
-                                                                        </div>
-                                                                    </div>
-                                                                    <hr></hr>
+                                    </div>
+                                </div>
+                                {/******************************************************************************************/}
+                                {dataDiv && (
+                                    <div className="container second-div">
+                                        <div className="container">
+                                            <div className="row">
+                                                {this.state.finalBlock.map((data) => {
+                                                    return (
+                                                        // yesterday, today, sale, debit, gross, credit
+                                                        <div className="col-md-6" key={data.pumpId} style={{ marginTop: "20px" }}>
+                                                            <div className="row" >
+                                                                <div className="col-md-2">
+                                                                    <p className="pump-name">{data.pumpId}</p>
                                                                 </div>
-                                                            )
-                                                        })}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        )}
-                                        {/******************************************************************************************/}
-                                        {dataDiv && (
-
-                                            <div className="container second-div">
-                                                <div className="container">
-                                                    <div className="row">
-                                                        <div className="col-md-6">
+                                                                <div className="col-md-10">
+                                                                    <p className="pump-name">{data.fuelType}</p>
+                                                                </div>
+                                                            </div>
+                                                            <div className="row" style={{ marginTop: "-10px" }}>
+                                                                <div className="col-md-6">
+                                                                    <p className="tag-text">Today Reading : </p>
+                                                                </div>
+                                                                <div className="col-md-1">
+                                                                    <p className="tag-value">-</p>
+                                                                </div>
+                                                                <div className="col-md-5">
+                                                                    <p className="tag-value">{data.today}</p>
+                                                                </div>
+                                                            </div>
+                                                            <div className="row" style={{ marginTop: "-10px" }}>
+                                                                <div className="col-md-6">
+                                                                    <p className="tag-text">Previous day Reading : </p>
+                                                                </div>
+                                                                <div className="col-md-1">
+                                                                    <p className="tag-value">-</p>
+                                                                </div>
+                                                                <div className="col-md-5">
+                                                                    <p className="tag-value">{data.yesterday}</p>
+                                                                </div>
+                                                            </div>
+                                                            <div className="row" style={{ marginTop: "-10px" }} >
+                                                                <div className="col-md-6">
+                                                                    <p className="tag-text">Total Sale : </p>
+                                                                </div>
+                                                                <div className="col-md-1">
+                                                                    <p className="tag-value">-</p>
+                                                                </div>
+                                                                <div className="col-md-5">
+                                                                    <p className="tag-value">{data.sale}</p>
+                                                                </div>
+                                                            </div>
+                                                            <div className="row" style={{ marginTop: "-10px" }}>
+                                                                <div className="col-md-6">
+                                                                    <p className="tag-text">Debit Amount : </p>
+                                                                </div>
+                                                                <div className="col-md-1">
+                                                                    <p className="tag-value">-</p>
+                                                                </div>
+                                                                <div className="col-md-5">
+                                                                    <p className="tag-value">{data.debit}</p>
+                                                                </div>
+                                                            </div>
+                                                            <div className="row" style={{ marginTop: "-10px" }}>
+                                                                <div className="col-md-6">
+                                                                    <p className="tag-text">Gross Sale : </p>
+                                                                </div>
+                                                                <div className="col-md-1">
+                                                                    <p className="tag-value">-</p>
+                                                                </div>
+                                                                <div className="col-md-5">
+                                                                    <p className="tag-value">{data.gross}</p>
+                                                                </div>
+                                                            </div>
                                                             <div className="row">
-                                                                <div className="col-md-3">
-                                                                    <p className="tag-text">2 Stroke Oil </p>
+                                                                <div className="col-md-6" style={{ marginTop: "30px" }}>
+                                                                    <p className="tag-text">Credit Balance : </p>
                                                                 </div>
-                                                                <div className="col-md-4" style={{ marginTop: "-30px" }}>
-                                                                    <MDBInput outline label="Unit Price (Rs.)" type="text" name="twostrokeUnit" onChange={this.onChangeOil} />
+                                                                <div className="col-md-1" style={{ marginTop: "30px" }}>
+                                                                    <p className="tag-value">-</p>
                                                                 </div>
-                                                                <div className="col-md-4" style={{ marginTop: "-30px" }}>
-                                                                    <MDBInput outline label="Quentity (Ltr)" type="text" name="twostrokeQty" onChange={this.onChangeOil} />
-                                                                </div>
-
-                                                                <div className="col-md-3">
-                                                                    <p className="tag-text">Engine Oil </p>
-                                                                </div>
-                                                                <div className="col-md-4" style={{ marginTop: "-30px" }}>
-                                                                    <MDBInput outline label="Unit Price (Rs.)" type="text" name="engineUnit" onChange={this.onChangeOil} />
-                                                                </div>
-                                                                <div className="col-md-4" style={{ marginTop: "-30px" }}>
-                                                                    <MDBInput outline label="Quentity (Ltr)" type="text" name="engineQty" onChange={this.onChangeOil} />
-                                                                </div>
-                                                                <div className="col-md-3">
-                                                                    <p className="tag-text">Other Sales </p>
-                                                                </div>
-                                                                <div className="col-md-8" style={{ marginTop: "-30px" }}>
-                                                                    <MDBInput outline label="Amount (Rs.)" type="text" name="otherSales" onChange={this.onChangeOil} />
+                                                                <div className="col-md-5">
+                                                                    <hr></hr>
+                                                                    <p className="tag-value">{data.amount}</p>
                                                                 </div>
                                                             </div>
                                                             <hr></hr>
-                                                            <div className="row">
-                                                                <div className="col-md-4">
-                                                                    <p className="tag-text">Total</p>
-                                                                </div>
-
-                                                                <div className="col-md-8" style={{ textAlign: "right", paddingRight: "50px" }}>
-                                                                    <p className="tag-value">{this.state.totalOtherSales}</p>
-                                                                </div>
-                                                            </div>
                                                         </div>
-                                                        <div className="col-md-6">
-                                                            <div className="row">
-                                                                <div className="col-md-6">
-                                                                    <p className="tag-text">Fuel Sales Amount </p>
-                                                                </div>
-                                                                <div className="col-md-1">
-                                                                    <p className="tag-value">-</p>
-                                                                </div>
-                                                                <div className="col-md-5">
-                                                                    <p className="tag-value">{this.state.fuelSaleAmount}</p>
-                                                                </div>
-
-                                                                <div className="col-md-6" style={{ marginTop: "18px" }}>
-                                                                    <p className="tag-text">Total  Sales Amount </p>
-                                                                </div>
-                                                                <div className="col-md-1" style={{ marginTop: "18px" }}>
-                                                                    <p className="tag-value">-</p>
-                                                                </div>
-                                                                <div className="col-md-5" style={{ marginTop: "18px" }}>
-                                                                    <p className="tag-value">{this.state.totalSaleAmount}</p>
-                                                                </div>
-
-                                                                <div className="col-md-6" style={{ marginTop: "18px" }}>
-                                                                    <p className="tag-text">Total Received Amount </p>
-                                                                </div>
-                                                                <div className="col-md-1" style={{ marginTop: "18px" }}>
-                                                                    <p className="tag-value">-</p>
-                                                                </div>
-                                                                <div className="col-md-5" style={{ marginTop: "18px" }}>
-                                                                    <p className="tag-value">{this.state.totalReceivedAmount}</p>
-                                                                </div>
-                                                                <hr style={{ marginTop: "28px" }}></hr>
-                                                                <div className="col-md-6">
-                                                                    <p className="tag-profit">Total Profit </p>
-                                                                </div>
-                                                                <div className="col-md-1">
-                                                                    <p className="tag-value">-</p>
-                                                                </div>
-                                                                <div className="col-md-5">
-                                                                    <p className="tag-profit-value">{this.state.totalProfit}</p>
-                                                                </div>
-                                                                <hr></hr>
-                                                                <hr style={{ marginTop: "-25px" }}></hr>
-
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-
-                                                    <div className="row btn-div">
-                                                        <div className="col-md-6">
-                                                        </div>
-                                                        <div className="col-md-3">
-                                                            <div className="form-group">
-                                                                <input type="submit" onClick={this.calculate} value="Calculate" className="btn btn-primary submit-btn"></input>
-                                                            </div>
-                                                        </div>
-                                                        <div className="col-md-3">
-                                                            <div className="form-group">
-                                                                <input type="submit" value="Submit Now" onClick={this.submitNow} className="btn btn-primary submit-btn"></input>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                                    )
+                                                })}
                                             </div>
-                                        )}
-                                    </Tab>
-
-                                    <Tab eventKey="previous" title="Earlier Records">
-                                        <div className="container main-div-box" >
-                                            <div className="container">
-
-                                                <div className="row first-div">
-
-                                                    <div className="col-md-6" style={{ marginTop: "-24px" }}>
-                                                        <MDBInput outline label="Pumper ID" type="text" name="el_pumperId" onChange={this.onChangeEarlier} />
-                                                    </div>
-                                                    <div className="col-md-2">
-                                                        <div className="form-group">
-                                                            <DatePicker
-                                                                className="form-control"
-                                                                selected={this.state.startDate}
-                                                                onChange={this.onChangeDate}
-                                                                dateFormat="yyyy-MM-dd"
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                    <div className="col-md-4" style={{ marginTop: "-7px" }}>
-                                                        <button className="btn btn-primary sub-btn" onClick={this.getEarlierData}>Get Data</button>
-                                                    </div>
-
-                                                </div>
-
-                                            </div>
-
                                         </div>
-                                        <div className="container second-div" style={{ marginTop: "20px" }}>
-                                            <div className="container">
-                                                <div className="row">
-                                                    {this.state.el_finalBlock.map((data) => {
-                                                        return (
-                                                            <div className="col-md-6" key={data.pumpId} style={{ marginTop: "20px" }}>
-                                                                <div className="row" >
-                                                                    <div className="col-md-2">
-                                                                        <p className="pump-name">{data.pumpId}</p>
-                                                                    </div>
-                                                                    <div className="col-md-10">
-                                                                        <p className="pump-name">{data.fuelType}</p>
-                                                                    </div>
-                                                                </div>
-                                                                <div className="row" style={{ marginTop: "-10px" }}>
-                                                                    <div className="col-md-6">
-                                                                        <p className="tag-text">Today Reading : </p>
-                                                                    </div>
-                                                                    <div className="col-md-1">
-                                                                        <p className="tag-value">-</p>
-                                                                    </div>
-                                                                    <div className="col-md-5">
-                                                                        <p className="tag-value">{data.today}</p>
-                                                                    </div>
-                                                                </div>
-                                                                <div className="row" style={{ marginTop: "-10px" }}>
-                                                                    <div className="col-md-6">
-                                                                        <p className="tag-text">Previous day Reading : </p>
-                                                                    </div>
-                                                                    <div className="col-md-1">
-                                                                        <p className="tag-value">-</p>
-                                                                    </div>
-                                                                    <div className="col-md-5">
-                                                                        <p className="tag-value">{data.yesterday}</p>
-                                                                    </div>
-                                                                </div>
-                                                                <div className="row" style={{ marginTop: "-10px" }} >
-                                                                    <div className="col-md-6">
-                                                                        <p className="tag-text">Total Sale : </p>
-                                                                    </div>
-                                                                    <div className="col-md-1">
-                                                                        <p className="tag-value">-</p>
-                                                                    </div>
-                                                                    <div className="col-md-5">
-                                                                        <p className="tag-value">{data.sale}</p>
-                                                                    </div>
-                                                                </div>
-                                                                <div className="row" style={{ marginTop: "-10px" }}>
-                                                                    <div className="col-md-6">
-                                                                        <p className="tag-text">Debit Amount : </p>
-                                                                    </div>
-                                                                    <div className="col-md-1">
-                                                                        <p className="tag-value">-</p>
-                                                                    </div>
-                                                                    <div className="col-md-5">
-                                                                        <p className="tag-value">{data.debit}</p>
-                                                                    </div>
-                                                                </div>
-                                                                <div className="row" style={{ marginTop: "-10px" }}>
-                                                                    <div className="col-md-6">
-                                                                        <p className="tag-text">Gross Sale : </p>
-                                                                    </div>
-                                                                    <div className="col-md-1">
-                                                                        <p className="tag-value">-</p>
-                                                                    </div>
-                                                                    <div className="col-md-5">
-                                                                        <p className="tag-value">{data.gross}</p>
-                                                                    </div>
-                                                                </div>
+                                    </div>
+                                )}
+                                {/******************************************************************************************/}
+                                {dataDiv && (
 
-                                                                <hr></hr>
-                                                            </div>
-                                                        )
-                                                    })}
+                                    <div className="container second-div">
+                                        <div className="container">
+                                            <div className="row">
+                                                <div className="col-md-6">
+                                                    <div className="row">
+                                                        <div className="col-md-3">
+                                                            <p className="tag-text">2 Stroke Oil </p>
+                                                        </div>
+                                                        <div className="col-md-4" style={{ marginTop: "-30px" }}>
+                                                            <MDBInput outline label="Unit Price (Rs.)" type="text" name="twostrokeUnit" onChange={this.onChangeOil} />
+                                                        </div>
+                                                        <div className="col-md-4" style={{ marginTop: "-30px" }}>
+                                                            <MDBInput outline label="Quentity (Ltr)" type="text" name="twostrokeQty" onChange={this.onChangeOil} />
+                                                        </div>
+
+                                                        <div className="col-md-3">
+                                                            <p className="tag-text">Engine Oil </p>
+                                                        </div>
+                                                        <div className="col-md-4" style={{ marginTop: "-30px" }}>
+                                                            <MDBInput outline label="Unit Price (Rs.)" type="text" name="engineUnit" onChange={this.onChangeOil} />
+                                                        </div>
+                                                        <div className="col-md-4" style={{ marginTop: "-30px" }}>
+                                                            <MDBInput outline label="Quentity (Ltr)" type="text" name="engineQty" onChange={this.onChangeOil} />
+                                                        </div>
+                                                        <div className="col-md-3">
+                                                            <p className="tag-text">Other Sales </p>
+                                                        </div>
+                                                        <div className="col-md-8" style={{ marginTop: "-30px" }}>
+                                                            <MDBInput outline label="Amount (Rs.)" type="text" name="otherSales" onChange={this.onChangeOil} />
+                                                        </div>
+                                                    </div>
+                                                    <hr></hr>
+                                                    <div className="row">
+                                                        <div className="col-md-4">
+                                                            <p className="tag-text">Total</p>
+                                                        </div>
+
+                                                        <div className="col-md-8" style={{ textAlign: "right", paddingRight: "50px" }}>
+                                                            <p className="tag-value">{this.state.totalOtherSales}</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="col-md-6">
+                                                    <div className="row">
+                                                        <div className="col-md-6">
+                                                            <p className="tag-text">Fuel Sales Amount </p>
+                                                        </div>
+                                                        <div className="col-md-1">
+                                                            <p className="tag-value">-</p>
+                                                        </div>
+                                                        <div className="col-md-5">
+                                                            <p className="tag-value">{this.state.fuelSaleAmount}</p>
+                                                        </div>
+
+                                                        <div className="col-md-6" style={{ marginTop: "18px" }}>
+                                                            <p className="tag-text">Total  Sales Amount </p>
+                                                        </div>
+                                                        <div className="col-md-1" style={{ marginTop: "18px" }}>
+                                                            <p className="tag-value">-</p>
+                                                        </div>
+                                                        <div className="col-md-5" style={{ marginTop: "18px" }}>
+                                                            <p className="tag-value">{this.state.totalSaleAmount}</p>
+                                                        </div>
+
+                                                        <div className="col-md-6" style={{ marginTop: "18px" }}>
+                                                            <p className="tag-text">Total Received Amount </p>
+                                                        </div>
+                                                        <div className="col-md-1" style={{ marginTop: "18px" }}>
+                                                            <p className="tag-value">-</p>
+                                                        </div>
+                                                        <div className="col-md-5" style={{ marginTop: "18px" }}>
+                                                            <p className="tag-value">{this.state.totalReceivedAmount}</p>
+                                                        </div>
+                                                        <hr style={{ marginTop: "28px" }}></hr>
+                                                        <div className="col-md-6">
+                                                            <p className="tag-profit">Total Profit </p>
+                                                        </div>
+                                                        <div className="col-md-1">
+                                                            <p className="tag-value">-</p>
+                                                        </div>
+                                                        <div className="col-md-5">
+                                                            <p className="tag-profit-value">{this.state.totalProfit}</p>
+                                                        </div>
+                                                        <hr></hr>
+                                                        <hr style={{ marginTop: "-25px" }}></hr>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
+                                            <div className="row btn-div">
+                                                <div className="col-md-6">
+                                                </div>
+                                                <div className="col-md-3">
+                                                    <div className="form-group">
+                                                        <input type="submit" onClick={this.calculate} value="Calculate" className="btn btn-primary submit-btn"></input>
+                                                    </div>
+                                                </div>
+                                                <div className="col-md-3">
+                                                    <div className="form-group">
+                                                        <input type="submit" value="Submit Now" onClick={this.submitNow} className="btn btn-primary submit-btn"></input>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </Tab>
-                                </Tabs>
+                                    </div>
+                                )}
+
                             </div>
                         </div>
                     </div>

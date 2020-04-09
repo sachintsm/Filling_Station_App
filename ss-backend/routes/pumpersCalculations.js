@@ -12,7 +12,7 @@ function convertToday(str) {
 }
 
 router.post('/add', verify, function (req, res) {
-    
+
     console.log(req.body);
     const date = convertToday(req.body.date)
 
@@ -38,11 +38,14 @@ router.post('/add', verify, function (req, res) {
 })
 
 //get data by date and pumper id for earlier data
-router.post('/get', function (req, res) {
+router.post('/get', async function (req, res) {
     var date = convertToday(req.body.el_date)
     var pumperId = req.body.el_pumperId
-    
-    PumpersCalculation.find({ date: date , pumperId : pumperId})
+    //checking if the userId is already in the database
+    const userIdExist = await PumpersCalculation.findOne({ pumperId: pumperId })
+    if (!userIdExist) return res.json({ state: false, msg: "This pumperId does not exists..!" })
+
+    PumpersCalculation.find({ date: date, pumperId: pumperId })
         .then(data => {
             res.send({ state: true, msg: "Data Transefer Done..!", data: data })
         })

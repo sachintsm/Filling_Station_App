@@ -17,12 +17,13 @@ import DailyPumpersCalculations from './Component/Basic/dailyPumperCalculations'
 import FuelLubricantPrice from './Component/Basic/fuelLubricantPrice'
 import DailySales from './Component/Basic/dailySales'
 import DailyPumpersManagement from './Component/Basic/dailyPumpersManagement'
+import EarlierPumpersCalculations from './Component/Basic/earlierPumperCalculation'
 
 function App() {
   return (
     <React.Fragment>
       <Navbar />
-      
+
       <Router>
 
         <Switch>
@@ -38,11 +39,12 @@ function App() {
           <Route path="/daily$pumpers$management" component={DailyPumpersManagement}></Route>
           <Route path="/fuel$lubricant$price" component={FuelLubricantPrice}></Route>
           <Route path="/daily$sales" component={DailySales}></Route>
+          <Route path="/earlier$pumpers$management" component={EarlierPumpersCalculations}></Route>
         </Switch>
 
       </Router>
 
-      <Footer/>
+      <Footer />
     </React.Fragment>
   );
 }

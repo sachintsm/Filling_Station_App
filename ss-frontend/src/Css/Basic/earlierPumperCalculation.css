@@ -1,0 +1,79 @@
+.main-div-box{
+    background-color: #fff;
+    margin-top: 20px;
+    border-radius: 4px;
+}
+
+.first-div{
+    padding-top: 30px;
+}
+
+.submit-btn{
+    width: 100%;
+}
+
+.second-div{
+    background-color: #fff;
+    margin-top: 20px;
+    border-radius: 4px;
+    padding-top: 30px;
+    margin-bottom: 20px;
+}
+
+.pump-meters-div{
+    margin-bottom: 30px;
+}
+
+.pump-sales{
+    margin-top: 30px;
+}
+
+.btn-div{
+    margin-top: 30px;
+    text-align: right;
+}
+.sub-btn{
+    margin-top: -10px;
+    width: 100%;
+}
+
+.pump-name{
+    font-size: 18px;
+    font-weight : 500;
+    color: #3d3d3d;
+}
+
+
+.tag-text-a{
+    text-align: left;
+    font-weight:500;
+    color: #3d3d3d;
+    font-size: 21px;
+}
+.tag-text{
+    text-align: left;
+    font-weight:400;
+    color: #3d3d3d;
+}
+
+.tag-value{
+    padding-right: 20px;
+    text-align: right;
+    font-weight:400;
+    color: #3d3d3d;
+}
+
+.tag-profit{
+    text-align: left;
+    font-weight:400;
+    color: #c50000;
+    font-size: 22px;
+}
+
+.tag-profit-value{
+    padding-right: 20px;
+    text-align: right;
+    font-weight:400;
+    color: #c50000;
+    font-size: 22px;
+}

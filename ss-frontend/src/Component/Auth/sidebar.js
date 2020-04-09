@@ -68,6 +68,19 @@ export default class sidebar extends Component {
                     </Link>
                 </div>
                 <div className="side-row-div">
+                    <Link to={'/earlier$pumpers$management'}>
+
+                        <div className="row">
+                            <div className="col-md-2 side-icn">
+                                <EvStationIcon />
+                            </div>
+                            <div className="col-md-10 side-txt">
+                                <p>Pumpers Calculation History</p>
+                            </div>
+                        </div>
+                    </Link>
+                </div>
+                <div className="side-row-div">
                     <Link to={'/fuel$lubricant$price'}>
 
                         <div className="row">

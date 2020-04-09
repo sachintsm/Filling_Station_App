@@ -207,4 +207,22 @@ router.get('/getPumpers', function (req, res) {
         })
 })
 
+//get pumer name to pumpers daily calculation 
+router.get('/getPumperName/:id', async function (req, res) {
+    //checking if the userId is already in the database
+    const userIdExist = await User.findOne({ userId: req.params.id })
+    if (!userIdExist) return res.json({ state: false, msg: "This userId does not exists..!" })
+
+    User
+        .find({ userId: req.params.id })
+        .select('fullName')
+        .exec()
+        .then(data => {
+            res.json({ state: true, msg: "Data Trnsfer Success..!", data: data });
+        })
+        .catch(err => {
+            res.json({ state: false, msg: 'Data retrive Unsuccess .. !' })
+        })
+})
+
 module.exports = router
