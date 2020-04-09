@@ -41,6 +41,17 @@ class finalBlock {
         this.amount = amount
     }
 }
+class el_finalBlock {
+    constructor(pumpId, fuelType, yesterday, today, sale, debit, gross) {
+        this.pumpId = pumpId;
+        this.fuelType = fuelType;
+        this.yesterday = yesterday;
+        this.today = today;
+        this.sale = sale
+        this.debit = debit
+        this.gross = gross
+    }
+}
 export default class dailyPumperCalculations extends Component {
 
     constructor(props) {
@@ -80,9 +91,13 @@ export default class dailyPumperCalculations extends Component {
             dataDiv: false,
 
             /********************************************************* */
-            el_pumperId : '',
-            el_date : '',
-            el_dataArray : [],
+            el_pumperId: '',
+            el_date: '',
+            el_dataArray: [],
+            el_yesterday: [],
+            el_today: [],
+            el_pumpsNames: [],
+            el_finalBlock: [],
         }
         this.onChangePumpSet = this.onChangePumpSet.bind(this)
         this.onChangeDate = this.onChangeDate.bind(this)
@@ -123,25 +138,93 @@ export default class dailyPumperCalculations extends Component {
         })
     }
 
-    onChangeEarlier(e){
+    onChangeEarlier(e) {
         this.setState({
-            el_pumperId : e.target.value
+            el_pumperId: e.target.value
         })
     }
-    
-    async getEarlierData(){
+
+    async getEarlierData() {
+        this.setState({
+            el_finalBlock: []
+        })
         const data = {
-            el_pumperId : this.state.el_pumperId,
-            el_date : this.state.startDate
+            el_pumperId: this.state.el_pumperId,
+            el_date: this.state.startDate
         }
+        this.state.debits = [];
+        this.state.pumpNames = [];
+        this.state.el_yesterday = [];
+        this.state.el_today = [];
+        this.state.el_yesterday = [];
+        this.state.distinctDebit = [];
+        // this.state.el_finalBlock = [];
+
         //get data from pumpersCalculations
         await axios.post('http://localhost:4000/pumpersCalculations/get', data)
-            .then(res =>{
+            .then(res => {
                 this.setState({
-                    el_dataArray : res.data.data[0]
+                    el_dataArray: res.data.data[0]
                 })
-                console.log(this.state.el_dataArray);
+                // console.log(this.state.el_dataArray);
             })
+
+        //get yesterday meter reading
+        await axios.get('http://localhost:4000/machinesData/getYes/' + this.state.startDate)
+            .then(res => {
+                this.setState({
+                    el_yesterday: res.data.data
+                })
+            })
+        //get today meter reading
+        await axios.get('http://localhost:4000/machinesData/getToday/' + this.state.startDate)
+            .then(res => {
+                this.setState({
+                    el_today: res.data.data
+                })
+            })
+
+        //get Pumps Names
+        await axios.get('http://localhost:4000/pumpsRegistration/getSet/' + this.state.el_dataArray.setNumber)
+            .then(res => {
+                this.setState({
+                    el_pumpsNames: res.data.data
+                })
+            })
+
+        //get debiters data
+        await axios.get('http://localhost:4000/debitorsAccount/get/' + this.state.startDate)
+            .then(res => {
+                this.setState({
+                    debits: res.data.data
+                })
+                for (var m = 0; m < this.state.el_pumpsNames.length; m++) {
+                    var debitTotal = 0;
+                    for (let n = 0; n < this.state.debits.length; n++) {
+                        if (this.state.el_pumpsNames[m].machineNumber === this.state.debits[n].pumpId) {
+                            debitTotal = debitTotal + parseFloat(this.state.debits[n].qty)
+                        }
+                    }
+                    var debitBlock = new totDebit(this.state.el_pumpsNames[m].machineNumber, debitTotal)
+                    this.state.distinctDebit.push(debitBlock);
+                }
+            })
+
+        for (var i = 0; i < this.state.el_pumpsNames.length; i++) {
+            for (var j = 0; j < this.state.el_yesterday.length; j++) {
+                for (var k = 0; k < this.state.el_today.length; k++) {
+                    for (var l = 0; l < this.state.distinctDebit.length; l++) {
+                        if (this.state.el_pumpsNames[i].machineNumber === this.state.el_yesterday[j].machineNumber && this.state.el_pumpsNames[i].machineNumber === this.state.el_today[k].machineNumber
+                            && this.state.el_pumpsNames[i].machineNumber === this.state.distinctDebit[l].pumpId) {
+                            var sale = (this.state.el_today[k].meterReading - this.state.el_yesterday[j].meterReading).toFixed(3)     //get pump whole sale
+                            var gross = (sale - this.state.distinctDebit[l].debit).toFixed(3)    //get gross size spesific pump
+                            var block = new el_finalBlock(this.state.el_pumpsNames[i].machineNumber, this.state.el_pumpsNames[i].fuelType, this.state.el_yesterday[j].meterReading, this.state.el_today[k].meterReading, sale, this.state.distinctDebit[l].debit, gross);
+                            this.state.el_finalBlock.push(block)
+                        }
+                    }
+                }
+            }
+        }
     }
 
     async getData() {
@@ -155,15 +238,12 @@ export default class dailyPumperCalculations extends Component {
             })
         }
         else {
-            // this.state.pumpNames = [];  // empty the meter block Array
             this.state.yesReading = [];  // empty the meter block Array
             this.state.todayReading = [];  // empty the meter block Array
             this.state.debits = [];  // empty the meter block Array
             this.state.meterBlock = [];  // empty the meter block Array
             this.state.distinctDebit = [];
 
-            // for (var i = 0; i < this.state.pumpsNames.length; i++) {
-            // }
             //get Pumps Names
             await axios.get('http://localhost:4000/pumpsRegistration/getSet/' + this.state.pumpSet)
                 .then(res => {
@@ -657,7 +737,7 @@ export default class dailyPumperCalculations extends Component {
                                             <div className="container">
 
                                                 <div className="row first-div">
-                                                    
+
                                                     <div className="col-md-6" style={{ marginTop: "-24px" }}>
                                                         <MDBInput outline label="Pumper ID" type="text" name="el_pumperId" onChange={this.onChangeEarlier} />
                                                     </div>
@@ -676,11 +756,84 @@ export default class dailyPumperCalculations extends Component {
                                                     </div>
 
                                                 </div>
-                                                <div className="container">
-                                                    <div className="row">
-                                                        <div className="form-group">
-                                                        </div>
-                                                    </div>
+
+                                            </div>
+
+                                        </div>
+                                        <div className="container second-div" style={{ marginTop: "20px" }}>
+                                            <div className="container">
+                                                <div className="row">
+                                                    {this.state.el_finalBlock.map((data) => {
+                                                        return (
+                                                            <div className="col-md-6" key={data.pumpId} style={{ marginTop: "20px" }}>
+                                                                <div className="row" >
+                                                                    <div className="col-md-2">
+                                                                        <p className="pump-name">{data.pumpId}</p>
+                                                                    </div>
+                                                                    <div className="col-md-10">
+                                                                        <p className="pump-name">{data.fuelType}</p>
+                                                                    </div>
+                                                                </div>
+                                                                <div className="row" style={{ marginTop: "-10px" }}>
+                                                                    <div className="col-md-6">
+                                                                        <p className="tag-text">Today Reading : </p>
+                                                                    </div>
+                                                                    <div className="col-md-1">
+                                                                        <p className="tag-value">-</p>
+                                                                    </div>
+                                                                    <div className="col-md-5">
+                                                                        <p className="tag-value">{data.today}</p>
+                                                                    </div>
+                                                                </div>
+                                                                <div className="row" style={{ marginTop: "-10px" }}>
+                                                                    <div className="col-md-6">
+                                                                        <p className="tag-text">Previous day Reading : </p>
+                                                                    </div>
+                                                                    <div className="col-md-1">
+                                                                        <p className="tag-value">-</p>
+                                                                    </div>
+                                                                    <div className="col-md-5">
+                                                                        <p className="tag-value">{data.yesterday}</p>
+                                                                    </div>
+                                                                </div>
+                                                                <div className="row" style={{ marginTop: "-10px" }} >
+                                                                    <div className="col-md-6">
+                                                                        <p className="tag-text">Total Sale : </p>
+                                                                    </div>
+                                                                    <div className="col-md-1">
+                                                                        <p className="tag-value">-</p>
+                                                                    </div>
+                                                                    <div className="col-md-5">
+                                                                        <p className="tag-value">{data.sale}</p>
+                                                                    </div>
+                                                                </div>
+                                                                <div className="row" style={{ marginTop: "-10px" }}>
+                                                                    <div className="col-md-6">
+                                                                        <p className="tag-text">Debit Amount : </p>
+                                                                    </div>
+                                                                    <div className="col-md-1">
+                                                                        <p className="tag-value">-</p>
+                                                                    </div>
+                                                                    <div className="col-md-5">
+                                                                        <p className="tag-value">{data.debit}</p>
+                                                                    </div>
+                                                                </div>
+                                                                <div className="row" style={{ marginTop: "-10px" }}>
+                                                                    <div className="col-md-6">
+                                                                        <p className="tag-text">Gross Sale : </p>
+                                                                    </div>
+                                                                    <div className="col-md-1">
+                                                                        <p className="tag-value">-</p>
+                                                                    </div>
+                                                                    <div className="col-md-5">
+                                                                        <p className="tag-value">{data.gross}</p>
+                                                                    </div>
+                                                                </div>
+
+                                                                <hr></hr>
+                                                            </div>
+                                                        )
+                                                    })}
                                                 </div>
                                             </div>
                                         </div>
