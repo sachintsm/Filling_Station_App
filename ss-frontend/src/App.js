@@ -18,6 +18,8 @@ import FuelLubricantPrice from './Component/Basic/fuelLubricantPrice'
 import DailySales from './Component/Basic/dailySales'
 import DailyPumpersManagement from './Component/Basic/dailyPumpersManagement'
 import EarlierPumpersCalculations from './Component/Basic/earlierPumperCalculation'
+import SalesStocks from './Component/Basic/salesStocks'
+import BankDetails from './Component/Basic/bankDetails'
 
 function App() {
   return (
@@ -40,6 +42,9 @@ function App() {
           <Route path="/fuel$lubricant$price" component={FuelLubricantPrice}></Route>
           <Route path="/daily$sales" component={DailySales}></Route>
           <Route path="/earlier$pumpers$management" component={EarlierPumpersCalculations}></Route>
+          <Route path="/salesStocks" component={SalesStocks}></Route>
+          <Route path="/bank$details" component={BankDetails}></Route>
+          
         </Switch>
 
       </Router>

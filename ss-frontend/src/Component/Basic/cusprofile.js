@@ -20,8 +20,6 @@ const Debt = React.memo(props => (
     </tr>
 ));
 
-
-
 export default class profile extends Component {
     constructor(props) {
         super(props);
@@ -76,22 +74,20 @@ export default class profile extends Component {
         if (local == null || local === "") {
 
             // console.log(this.state.users);
-            return this.state.users.map( (currentDebt, i)=> {
+            return this.state.users.map((currentDebt, i) => {
 
                 return <Debt delete={this.deleteDebtor} debt={currentDebt} key={i} />;
             }
             )
         }
         else {
-            return this.state.users.map( (currentDebt, i)=> {
+            return this.state.users.map((currentDebt, i) => {
                 if (currentDebt.debtorId === local) {
                     return <Debt delete={this.deleteDebtor} debt={currentDebt} key={i} />;
                 }
                 return null;
             })
         }
-
-
     }
 
     deleteDebtor(data) {
@@ -99,7 +95,6 @@ export default class profile extends Component {
             .then(res => {
                 console.log(res);
                 this.setState({
-                    // users: this.state.users.filter(u => u._id !== data),
                     snackbaropen: true,
                     snackbarmsg: res.data.message
                 })
@@ -107,12 +102,11 @@ export default class profile extends Component {
             })
             .catch(err => {
                 console.log(err);
-                // this.setState({
-                //     snackbaropen: true,
-                //     snackbarmsg: err
-                // })
+                this.setState({
+                    snackbaropen: true,
+                    snackbarmsg: err
+                })
             })
-
     }
 
     onSubmit(e) {
@@ -129,19 +123,12 @@ export default class profile extends Component {
 
         axios.post('http://localhost:4000/debtors/register', obj)
             .then(res => console.log(res.data));
-
     }
 
     render() {
-
-
         return (
-
-
             <React.Fragment>
-
                 <div className="container-fluid">
-
                     <Snackbar
                         open={this.state.snackbaropen}
                         autoHideDuration={2000}
@@ -171,7 +158,6 @@ export default class profile extends Component {
                                 </div>
                             </div>
                             <div className="card">
-
                                 <div>
                                     <h3 className="sp_head">List of Debtors</h3>
                                     <form>
@@ -180,7 +166,6 @@ export default class profile extends Component {
                                         </div>
                                     </form>
                                     <div className="sp_table">
-
                                         <table className="table table-striped" style={{ marginTop: 20 }} >
                                             <thead>
                                                 <tr>
@@ -189,87 +174,70 @@ export default class profile extends Component {
                                                     <th>Amount</th>
                                                     <th>Mobile Number</th>
                                                     <th>Fax Number</th>
-
-
                                                 </tr>
                                             </thead>
                                             <tbody>
-
                                                 {this.UserList()}
                                             </tbody>
                                         </table>
                                     </div>
                                 </div>
-
                             </div>
                             <div className="card">
 
                                 <div style={{ width: "90%", margin: 'auto' }}>
                                     <div className="row">
-
-                                        <div className="card">
-                                            <div style={{ width: "90%", margin: 'auto' }}>
-                                                <form onSubmit={this.onSubmit} >
-
-                                                    <div className="form-group" style={{ marginTop: "50px" }}>
-                                                        <label>Name / Company Name : </label>
-                                                        <input type="text" className="form-control" name="fullName" defaultValue={this.state.fullName} onChange={this.onChange}></input>
-                                                    </div>
-
-                                                    <div className="row">
-                                                        <div className="col-md-6">
-                                                            <div className="form-group">
-                                                                <label>Debtor ID : </label>
-                                                                <input type="text" className="form-control" name="debtorId" defaultValue={this.state.debtorId} onChange={this.onChange}></input>
-                                                            </div>
+                                        <div style={{ width: "90%", margin: 'auto' }}>
+                                            <form onSubmit={this.onSubmit} >
+                                                <div className="form-group" style={{ marginTop: "50px" }}>
+                                                    <label>Name / Company Name : </label>
+                                                    <input type="text" className="form-control" name="fullName" defaultValue={this.state.fullName} onChange={this.onChange}></input>
+                                                </div>
+                                                <div className="row">
+                                                    <div className="col-md-6">
+                                                        <div className="form-group">
+                                                            <label>Debtor ID : </label>
+                                                            <input type="text" className="form-control" name="debtorId" defaultValue={this.state.debtorId} onChange={this.onChange}></input>
                                                         </div>
-                                                        <div className="col-md-6">
-                                                            <div className="form-group">
-                                                                <label>Deposited Amount : </label>
-                                                                <input type="text" className="form-control" name="damount" defaultValue={this.state.damount} onChange={this.onChange}></input>
-                                                            </div>
+                                                    </div>
+                                                    <div className="col-md-6">
+                                                        <div className="form-group">
+                                                            <label>Deposited Amount : </label>
+                                                            <input type="text" className="form-control" name="damount" defaultValue={this.state.damount} onChange={this.onChange}></input>
                                                         </div>
-
                                                     </div>
+                                                </div>
+                                                <Row>
+                                                    <Col>
+                                                        <div className="form-group">
+                                                            <label>Mobile Number : </label>
+                                                            <input type="text" className="form-control" name="mobile" defaultValue={this.state.mobile} onChange={this.onChange}></input>
+                                                        </div>
+                                                    </Col>
+                                                    <Col>
+                                                        <div className="form-group">
+                                                            <label>Fax Mumber : </label>
+                                                            <input type="text" className="form-control" name="fax" defaultValue={this.state.fax} onChange={this.onChange}></input>
+                                                        </div>
+                                                    </Col>
+                                                </Row>
+                                                <div className="form-group">
+                                                    <label>Address : </label>
+                                                    <textarea type="text" className="form-control" name="address" defaultValue={this.state.address} onChange={this.onChange}></textarea>
+                                                </div>
+                                                <div className="form-group">
+                                                    <label>Others : </label>
+                                                    <textarea type="text" className="form-control" name="other" defaultValue={this.state.other} onChange={this.onChange}></textarea>
+                                                </div>
 
-                                                    <Row>
-                                                        <Col>
-                                                            <div className="form-group">
-                                                                <label>Mobile Number : </label>
-                                                                <input type="text" className="form-control" name="mobile" defaultValue={this.state.mobile} onChange={this.onChange}></input>
-                                                            </div>
-                                                        </Col>
-                                                        <Col>
-                                                            <div className="form-group">
-                                                                <label>Fax Mumber : </label>
-                                                                <input type="text" className="form-control" name="fax" defaultValue={this.state.fax} onChange={this.onChange}></input>
-                                                            </div>
-                                                        </Col>
-                                                    </Row>
-                                                    <div className="form-group">
-                                                        <label>Address : </label>
-                                                        <textarea type="text" className="form-control" name="address" defaultValue={this.state.address} onChange={this.onChange}></textarea>
-                                                    </div>
-                                                    <div className="form-group">
-                                                        <label>Others : </label>
-                                                        <textarea type="text" className="form-control" name="other" defaultValue={this.state.other} onChange={this.onChange}></textarea>
-                                                    </div>
-
-                                                    <div className="form-group">
-                                                        <button className="btn btn-info my-4 btn-block " type="submit">ADD</button>
-                                                    </div>
-
-                                                </form>
-                                            </div>
+                                                <div className="form-group">
+                                                    <button className="btn btn-info my-4 btn-block " type="submit">ADD</button>
+                                                </div>
+                                            </form>
                                         </div>
-
-                                        {/* )
-                                        })} */}
                                     </div>
-
                                 </div>
                             </div>
-
                         </div>
                     </div>
                 </div>

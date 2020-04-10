@@ -51,7 +51,12 @@ export default class dailyPumperCalculations extends Component {
 
     async onSetBlur() {
         // const { cashDiv } = this.state;
-
+        this.setState({
+            pumperNameRes: '',
+            pumperIdRes: '',
+            pumperSetRes:'',
+            pumperDateRes: ''
+        })
         console.log(this.state.setId);
         this.state.pumpersCash = [];
         this.state.totAmount = 0.00
@@ -126,7 +131,7 @@ export default class dailyPumperCalculations extends Component {
     dataSetSubmit() {
         const obj = getFromStorage('auth-token');
 
-        if (this.state.setNumber === '' || this.state.pumperId === '') {
+        if (this.state.setNumber === '' || this.state.pumperId === '' || this.state.amount === '') {
             this.setState({
                 snackbaropen: true,
                 snackbarmsg: "Please Fill the Data ..!"

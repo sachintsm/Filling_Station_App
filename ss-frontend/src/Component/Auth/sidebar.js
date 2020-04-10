@@ -9,6 +9,10 @@ import AttachMoneyIcon from '@material-ui/icons/AttachMoney';
 import MonetizationOnIcon from '@material-ui/icons/MonetizationOn';
 // import TransferWithinAStationIcon from '@material-ui/icons/TransferWithinAStation';
 import FunctionsIcon from '@material-ui/icons/Functions';
+import ListIcon from '@material-ui/icons/List';
+import PeopleIcon from '@material-ui/icons/People';
+import HistoryIcon from '@material-ui/icons/History';
+import AccountBalanceIcon from '@material-ui/icons/AccountBalance';
 
 export default class sidebar extends Component {
     render() {
@@ -72,10 +76,10 @@ export default class sidebar extends Component {
 
                         <div className="row">
                             <div className="col-md-2 side-icn">
-                                <EvStationIcon />
+                                <HistoryIcon />
                             </div>
                             <div className="col-md-10 side-txt">
-                                <p>Pumpers Calculation History</p>
+                                <p>Pumpers Cal. History</p>
                             </div>
                         </div>
                     </Link>
@@ -104,17 +108,43 @@ export default class sidebar extends Component {
                                 <p>Daily Sales</p>
                             </div>
                         </div>
-                    </Link>
+                    </Link>    
                 </div>
                 <div className="side-row-div">
                     <Link to={'/cusprofile'}>
 
                         <div className="row">
                             <div className="col-md-2 side-icn">
-                                <MonetizationOnIcon />
+                                <PeopleIcon />
                             </div>
                             <div className="col-md-10 side-txt">
                                 <p>Customer Profile</p>
+                            </div>
+                        </div>
+                    </Link>
+                </div>
+                <div className="side-row-div">
+                    <Link to={'/salesStocks'}>
+
+                        <div className="row">
+                            <div className="col-md-2 side-icn">
+                                <ListIcon />
+                            </div>
+                            <div className="col-md-10 side-txt">
+                                <p>Sales Stocks</p>
+                            </div>
+                        </div>
+                    </Link>
+                </div>
+                <div className="side-row-div">
+                    <Link to={'/bank$details'}>
+
+                        <div className="row">
+                            <div className="col-md-2 side-icn">
+                                <AccountBalanceIcon />
+                            </div>
+                            <div className="col-md-10 side-txt">
+                                <p>Bank Details</p>
                             </div>
                         </div>
                     </Link>
