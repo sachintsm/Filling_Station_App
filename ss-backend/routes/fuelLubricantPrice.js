@@ -16,7 +16,8 @@ router.post('/add', verify, async function (req, res, next) {
         size: req.body.size,
         buyPrice: req.body.buyPrice,
         sellPrice: req.body.sellPrice,
-        pType: req.body.pType
+        pType: req.body.pType,
+        availStock : 0
     });
     data.save()
         .then(result => {

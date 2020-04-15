@@ -75,7 +75,6 @@ export default class profile extends Component {
 
             // console.log(this.state.users);
             return this.state.users.map((currentDebt, i) => {
-
                 return <Debt delete={this.deleteDebtor} debt={currentDebt} key={i} />;
             }
             )

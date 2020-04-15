@@ -17,7 +17,7 @@ router.post('/add', verify, async function (req, res) {
         accountNumber: req.body.dip_account,
         type: req.body.dip_type,
         chequeNo: req.body.dip_cheque,
-        amount: req.body.dip_amount,
+        amount: parseFloat(req.body.dip_amount).toFixed(2),
         date: convertToday(req.body.dip_date)
     })
 
@@ -32,15 +32,50 @@ router.post('/add', verify, async function (req, res) {
         })
 })
 
-// router.get('/getAccountNames', function (req, res){
-//     BankAccounts
-//         .find()
-//         .exec()
-//         .then(result => {
-//             res.json({state: true, msg: "Data Transfer Success..!", data : result})
-//         })
-//         .catch(err => {
-//             res.json({state: false, msg: "Data Transfer Error..!"})
-//         })
-// })
+router.get('/getLastSeven', function (req, res) {
+    BankAccountData
+        .find()
+        .limit(10)
+        .sort({ "_id": -1 })
+        .exec()
+        .then(result => {
+            res.json({ state: true, msg: "Data Transfer Success..!", data: result })
+        })
+        .catch(err => {
+            res.json({ state: false, msg: "Data Transfer Error..!" })
+        })
+})
+
+router.get('/getLastMonth', function (req, res) {
+    BankAccountData
+        .find()
+        .limit(100)
+        .sort({ "_id": -1 })
+        .exec()
+        .then(result => {
+            res.json({ state: true, msg: "Data Transfer Success..!", data: result })
+        })
+        .catch(err => {
+            res.json({ state: false, msg: "Data Transfer Error..!" })
+        })
+})
+
+router.delete('/delete/:id', function (req, res) {
+    const id = req.params.id
+
+    BankAccountData
+        .remove({ _id: id })
+        .exec()
+        .then(result => {
+            res.status(200).json({
+                message: 'Deleted Successfully'
+            });
+        })
+        .catch(error => {
+            console.log(error);
+            res.status(500).json({
+                error: error
+            });
+        });
+})
 module.exports = router
