@@ -8,6 +8,7 @@ router.post('/add', verify, function (req, res) {
 
     var today = new Date();
     var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+    var dt = Date.parse(req.body.dip_date)
 
     const data = new DebitorAccount({
         date: date,
@@ -22,7 +23,8 @@ router.post('/add', verify, function (req, res) {
         debitAmount: req.body.amount,
         debitType: 'products',
         pumpId: req.body.pumpId,
-        state: 'Pending'
+        state: 'Pending',
+        timeStamp: dt/1000
     })
 
     data.save()
@@ -39,13 +41,15 @@ router.post('/addOther', verify, function (req, res) {
 
     var today = new Date();
     var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+    var dt = Date.parse(req.body.dip_date)
 
     const data = new DebitorAccount({
         date: date,
         debitorId: req.body.newDOname,
         debitAmount: req.body.newDOamount,
         debitType: 'other',
-        state: 'Pending'
+        state: 'Pending',
+        timeStamp: dt/1000
     })
 
     data.save()
@@ -107,12 +111,14 @@ router.post('/addOtherCredit', verify, function (req, res) {
 // 
     var today = new Date();
     var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+    var dt = Date.parse(req.body.dip_date)
 
     const data = new DebitorAccount({
         date: date,
         debitorId: req.body.newCOname,
         creditAmount: req.body.newCOamount,
         debitType: 'other',
+        timeStamp: dt/1000
     })
 
     data.save()
@@ -129,6 +135,7 @@ router.post('/addCredit', verify, function (req, res) {
 
     var today = new Date();
     var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+    var dt = Date.parse(req.body.dip_date)
 
     const data = new DebitorAccount({
         date: date,
@@ -136,6 +143,7 @@ router.post('/addCredit', verify, function (req, res) {
         creditAmount: req.body.creditAmount,
         chequeNo : req.body.chequeNo,
         debitType: 'products',
+        timeStamp: dt/1000
     })
 
     data.save()

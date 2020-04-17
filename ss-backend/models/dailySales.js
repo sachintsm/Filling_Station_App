@@ -8,6 +8,7 @@ var dailySalesSchema = mongoose.Schema({
     price: {type: String},
     qty: {type: String}, 
     date: {type: String},
+    timeStamp: { type: String },
 });
 
 const dailySales = module.exports = mongoose.model("dailySales", dailySalesSchema);

@@ -33,6 +33,10 @@ export default class bankDetails extends Component {
 
             lastSeven: [],
             lastMonth: [],
+
+            date1_date: new Date(),
+            date2_date: new Date(),
+
         }
 
         this.onChangeReg = this.onChangeReg.bind(this)
@@ -43,6 +47,10 @@ export default class bankDetails extends Component {
         this.onDiposit = this.onDiposit.bind(this)
         this.onChangeDate = this.onChangeDate.bind(this)
         this.bankDelete = this.bankDelete.bind(this)
+
+        this.onChangeDate1 = this.onChangeDate1.bind(this)
+        this.onChangeDate2 = this.onChangeDate2.bind(this)
+
     }
     snackbarClose = (event) => {
         this.setState({ snackbaropen: false })
@@ -50,6 +58,16 @@ export default class bankDetails extends Component {
     onChangeDate = date => {
         this.setState(prevState => ({
             dip_date: date
+        }))
+    }
+    onChangeDate1 = date => {
+        this.setState(prevState => ({
+            date1_date: date
+        }))
+    }
+    onChangeDate2 = date => {
+        this.setState(prevState => ({
+            date2_date: date
         }))
     }
     componentDidMount = async () => {
@@ -70,12 +88,7 @@ export default class bankDetails extends Component {
                     lastSeven: res.data.data
                 })
             })
-        axios.get('http://localhost:4000/bankAccountData/getLastMonth')
-            .then(res => {
-                this.setState({
-                    lastMonth: res.data.data
-                })
-            })
+
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -194,6 +207,19 @@ export default class bankDetails extends Component {
     }
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    getMonthDate = () => {
+        const data = {
+            date1: this.state.date1_date,
+            date2: this.state.date2_date
+        }
+        axios.post('http://localhost:4000/bankAccountData/getLastMonth', data)
+            .then(res => {
+                this.setState({
+                    lastMonth: res.data.data
+                })
+            })
+    }
+
     bankDelete(data) {
         axios.delete('http://localhost:4000/bankAccountData/delete/' + data)
             .then(res => {
@@ -244,11 +270,8 @@ export default class bankDetails extends Component {
                         </div>
                         <div className="col-md-10" style={{ backgroundColor: "#f5f5f5" }}>
                             <div className="container">
-                                <Tabs defaultActiveKey="month" id="uncontrolled-tab-example" style={{ marginTop: "20px" }}>
+                                <Tabs defaultActiveKey="seven" id="uncontrolled-tab-example" style={{ marginTop: "20px" }}>
                                     <Tab eventKey="seven" title="Bank Deposits">
-
-
-
                                         <p className="topic">Bank Deposits</p>
                                         <div style={{ backgroundColor: "#ffffff", marginTop: "10px", borderRadius: "4px" }}>
                                             <div className="container">
@@ -359,6 +382,24 @@ export default class bankDetails extends Component {
                                             </div>
                                         </div>
                                         <p className="topic">Past Bank Details</p>
+                                        <div className="form-group">
+                                            <DatePicker
+                                                className="form-control"
+                                                selected={this.state.date1_date}
+                                                onChange={this.onChangeDate1}
+                                                dateFormat="yyyy-MM-dd"
+                                            />
+                                        </div>
+                                        <div className="form-group">
+                                            <DatePicker
+                                                className="form-control"
+                                                selected={this.state.date2_date}
+                                                onChange={this.onChangeDate2}
+                                                dateFormat="yyyy-MM-dd"
+                                            />
+                                        </div>
+                                        <Button className="sub-btn" color="primary" onClick={this.getMonthDate}>Add Account</Button>
+
                                         <div style={{ backgroundColor: "#ffffff", marginTop: "10px", borderRadius: "4px", marginBottom: "20px" }}>
                                             <div className="container">
                                                 <div className="row">
@@ -374,7 +415,7 @@ export default class bankDetails extends Component {
                                                     <Col xs="3" style={{ textAlign: 'center' }}>
                                                         <p className="tbl-head">Amount</p>
                                                     </Col>
-                                                    
+
                                                 </div>
                                                 {this.state.lastMonth.map(data => {
                                                     return (
@@ -391,7 +432,7 @@ export default class bankDetails extends Component {
                                                             <Col xs="3" style={{ textAlign: 'right' }}>
                                                                 <p className="tbl-body">{data.amount}</p>
                                                             </Col>
-                                                           
+
                                                         </div>
                                                     )
                                                 })}

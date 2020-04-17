@@ -5,6 +5,7 @@ var lockerStateSchema = mongoose.Schema({
     lockerAmount: { type: String },
     date: { type: String },
     time: { type: String },
+    timeStamp:{ type: String}
 });
 
 const lockerState = module.exports = mongoose.model("lockerState", lockerStateSchema);
