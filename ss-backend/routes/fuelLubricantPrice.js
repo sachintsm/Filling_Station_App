@@ -70,6 +70,33 @@ router.post('/updateProductPrice', async function (req, res) {
         })
 })
 
+//update available stock data
+router.post('/updateAvailableStock', async function (req, res) {
+    console.log(req.body);
+    const pId = req.body.pId;
+    const availStock = req.body.availStock;
+    
+
+
+    await FuelLubPrice
+        .update({ pId: pId },
+            {
+                $set: {
+                    availStock: availStock,
+                }
+            })    //update user data with correspond to userid
+        .exec()
+        .then(data => {
+            console.log("Data Update Success..!")
+            res.json({ state: true, msg: "Data Update Success..!" });
+
+        })
+        .catch(error => {
+            console.log("Data Updating Unsuccessfull..!")
+            res.json({ state: false, msg: "Data Updating Unsuccessfull..!" });
+        })
+})
+
 //delete product
 router.delete('/deleteProduct/:id', function (req, res) {
     const _id = req.params.id

@@ -17,7 +17,7 @@ const Fu = React.memo(props => (
         <td>{props.fu.pName}</td>
         <td>{props.fu.sellPrice}</td>
         <td>
-            <input className="form-control inputValue" defaultValue={props.fu.sellPrice} onBlur={() => props.stock} onChange={() => props.stockchng} />
+            <input className="form-control inputValue" defaultValue={props.fu.availStock} onBlur={() => props.stock} onChange={() => props.stockchng} />
         </td>
         {/* <td>{props.fu.state}</td> */}
         {/* <td>
@@ -32,7 +32,7 @@ const Ga = React.memo(props => (
         <td>{props.ga.pName}</td>
         <td>{props.ga.sellPrice}</td>
         <td>
-            <input className="form-control inputValue" defaultValue={props.ga.sellPrice} onBlur={() => props.stock} onChange={() => props.stockchng} />
+            <input className="form-control inputValue" defaultValue={props.ga.availStock} onBlur={() => props.stock} onChange={() => props.stockchng} />
         </td>
         {/* <td>{props.fu.state}</td> */}
         {/* <td>
@@ -47,7 +47,7 @@ const Lu = React.memo(props => (
         <td>{props.lu.pName}</td>
         <td>{props.lu.sellPrice}</td>
         <td>
-            <input className="form-control inputValue" defaultValue={props.lu.sellPrice} onBlur={() => props.stock} onChange={() => props.stockchng} />
+            <input className="form-control inputValue" defaultValue={props.lu.availStock} onBlur={() => props.stock} onChange={() => props.stockchng} />
         </td>
         {/* <td>{props.fu.state}</td> */}
         {/* <td>
@@ -62,7 +62,7 @@ const Ot = React.memo(props => (
         <td>{props.ot.pName}</td>
         <td>{props.ot.sellPrice}</td>
         <td>
-            <input className="form-control inputValue" defaultValue={props.ot.sellPrice} onBlur={() => props.stock} onChange={() => props.stockchng} />
+            <input className="form-control inputValue" defaultValue={props.ot.availStock} onBlur={() => props.stock} onChange={() => props.stockchng} />
         </td>
         {/* <td>{props.fu.state}</td> */}
         {/* <td>
@@ -81,7 +81,7 @@ class salesStocks extends Component {
             pName: '',
             sellPrice: '',
             pType:'',
-            availableStock: '',
+            availStock: '',
             userData: [],
             products: [],
             // dataObj1:[],
@@ -148,7 +148,7 @@ class salesStocks extends Component {
 
     onAvailableStockChange(e) {
         this.setState({
-            sellPrice: e.target.value,
+            availStock: e.target.value,
         })
     }
 
@@ -159,9 +159,7 @@ class salesStocks extends Component {
 
         var urlencoded = new URLSearchParams();
         urlencoded.append("pId", data.pId);
-        urlencoded.append("sellPrice", this.state.sellPrice);
-        urlencoded.append("buyPrice", data.buyPrice);
-
+        urlencoded.append("availStock", this.state.availStock);
 
         var requestOptions = {
             method: 'POST',
@@ -170,7 +168,7 @@ class salesStocks extends Component {
             redirect: 'follow'
         };
 
-        fetch("http://localhost:4000/fuelLubricantPrice/updateProductPrice", requestOptions)
+        fetch("http://localhost:4000/fuelLubricantPrice/updateAvailableStock", requestOptions)
             .then(response => response.json())
             .then(result => console.log(result))
             .catch(error => console.log('error', error));
