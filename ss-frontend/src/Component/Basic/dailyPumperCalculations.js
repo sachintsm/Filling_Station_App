@@ -139,7 +139,6 @@ export default class dailyPumperCalculations extends Component {
                     })
                 })
 
-            // console.log(this.state.pumpsNames.length)
             //get yesterday meter reading
             await axios.get('http://localhost:4000/machinesData/getYes/' + this.state.startDate)
                 .then(res => {
@@ -172,7 +171,6 @@ export default class dailyPumperCalculations extends Component {
                     }
                 })
 
-
             for (var i = 0; i < this.state.pumpsNames.length; i++) {
                 for (var j = 0; j < this.state.yesReading.length; j++) {
                     for (var k = 0; k < this.state.todayReading.length; k++) {
@@ -189,6 +187,7 @@ export default class dailyPumperCalculations extends Component {
                     }
                 }
             }
+            
             for (var m = 0; m < this.state.meterBlock.length; m++) {
                 for (var n = 0; n < this.state.products.length; n++) {
                     if (this.state.meterBlock[m].productId === this.state.products[n].pId) {

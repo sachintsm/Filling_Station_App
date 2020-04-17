@@ -10,11 +10,13 @@ router.post('/add', verify, function (req, res) {
     var today = new Date();
     var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
     var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+    var dt = Date.parse(req.body.dip_date)
 
     const data = new LockerState({
         lockerAmount: req.body.lockerAmount,
         date: date,
-        time: time
+        time: time,
+        timeStamp: dt/1000
     })
 
     data.save()

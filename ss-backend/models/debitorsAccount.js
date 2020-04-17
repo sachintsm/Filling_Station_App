@@ -16,7 +16,8 @@ var DebitorAccountSchema = mongoose.Schema({
     creditAmount : {type:String},
     debitType: { type: String },
     pumpId: { type: String },
-    state : {type  :String}
+    state : {type  :String},
+    timeStamp: { type: String },
 });
 
 const DebitorAccount = module.exports = mongoose.model("DebitorAccount", DebitorAccountSchema);

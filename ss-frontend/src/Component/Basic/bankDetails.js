@@ -6,10 +6,12 @@ import { MDBInput } from "mdbreact";
 import Snackbar from '@material-ui/core/Snackbar'
 import IconButton from '@material-ui/core/IconButton'
 import { Button, Row, Col } from 'reactstrap';
-import Card from '@material-ui/core/Card';
 import '../../Css/Basic/bankDetails.css'
+import Tab from 'react-bootstrap/Tab';
+import Tabs from 'react-bootstrap/Tabs';
 import { getFromStorage } from "../../utils/storage";
 import DatePicker from "react-datepicker";
+import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 
 export default class bankDetails extends Component {
     constructor(props) {
@@ -28,6 +30,13 @@ export default class bankDetails extends Component {
             dip_amount: '',
             dip_cheque: '',
             dip_date: new Date(),
+
+            lastSeven: [],
+            lastMonth: [],
+
+            date1_date: new Date(),
+            date2_date: new Date(),
+
         }
 
         this.onChangeReg = this.onChangeReg.bind(this)
@@ -37,6 +46,11 @@ export default class bankDetails extends Component {
         this.onChangeDiposit = this.onChangeDiposit.bind(this)
         this.onDiposit = this.onDiposit.bind(this)
         this.onChangeDate = this.onChangeDate.bind(this)
+        this.bankDelete = this.bankDelete.bind(this)
+
+        this.onChangeDate1 = this.onChangeDate1.bind(this)
+        this.onChangeDate2 = this.onChangeDate2.bind(this)
+
     }
     snackbarClose = (event) => {
         this.setState({ snackbaropen: false })
@@ -44,6 +58,16 @@ export default class bankDetails extends Component {
     onChangeDate = date => {
         this.setState(prevState => ({
             dip_date: date
+        }))
+    }
+    onChangeDate1 = date => {
+        this.setState(prevState => ({
+            date1_date: date
+        }))
+    }
+    onChangeDate2 = date => {
+        this.setState(prevState => ({
+            date2_date: date
         }))
     }
     componentDidMount = async () => {
@@ -57,6 +81,14 @@ export default class bankDetails extends Component {
                     BankAccount: res.data.data
                 })
             })
+
+        axios.get('http://localhost:4000/bankAccountData/getLastSeven')
+            .then(res => {
+                this.setState({
+                    lastSeven: res.data.data
+                })
+            })
+
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -173,6 +205,39 @@ export default class bankDetails extends Component {
                 })
             })
     }
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    getMonthDate = () => {
+        const data = {
+            date1: this.state.date1_date,
+            date2: this.state.date2_date
+        }
+        axios.post('http://localhost:4000/bankAccountData/getLastMonth', data)
+            .then(res => {
+                this.setState({
+                    lastMonth: res.data.data
+                })
+            })
+    }
+
+    bankDelete(data) {
+        axios.delete('http://localhost:4000/bankAccountData/delete/' + data)
+            .then(res => {
+                console.log(res);
+                this.setState({
+                    snackbaropen: true,
+                    snackbarmsg: res.data.message
+                })
+                window.location.reload();
+            })
+            .catch(err => {
+                console.log(err);
+                this.setState({
+                    snackbaropen: true,
+                    snackbarmsg: err
+                })
+            })
+    }
 
     render() {
         const { BankAccount } = this.state;
@@ -205,71 +270,176 @@ export default class bankDetails extends Component {
                         </div>
                         <div className="col-md-10" style={{ backgroundColor: "#f5f5f5" }}>
                             <div className="container">
-                                <p className="topic">Bank Account Registraion</p>
-                                <div style={{ bgcolor: "#ffffff", marginTop: "10px" }}>
-                                    <div className="container" style={{backgroundColor: "#ffffff", borderRadius:"4px"}}>
-                                        <div className="row">
-                                            <Col xs="3">
-                                                <MDBInput outline label="Bank Name" type="text" name="bankName" onChange={this.onChangeReg} />
-                                            </Col>
-                                            <Col xs="3">
-                                                <MDBInput outline label="Account Name" type="text" name="accountName" onChange={this.onChangeReg} />
-                                            </Col>
-                                            <Col xs="3">
-                                                <MDBInput outline label="Account Number" type="text" name="accountNumber" onChange={this.onChangeReg} />
-                                            </Col>
-                                            <Col xs="3" style={{ marginTop: "18px" }}>
-                                                <Button className="sub-btn" color="primary" onClick={this.onRegisterAccount}>Add Account</Button>
-                                            </Col>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="container">
-                                <p className="topic">Bank Deposits</p>
-                                <div style={{ backgroundColor: "#ffffff", marginTop: "10px", borderRadius:"4px" }}>
-                                    <div className="container">
-                                        <div className="row">
-                                            <div className="col-md-5 fuel-selector">
-                                                <select className="form-control" onChange={this.onChangeAccount}>
-                                                    <option>Select Account </option>
-                                                    {BankAccountList}
-                                                </select>
+                                <Tabs defaultActiveKey="seven" id="uncontrolled-tab-example" style={{ marginTop: "20px" }}>
+                                    <Tab eventKey="seven" title="Bank Deposits">
+                                        <p className="topic">Bank Deposits</p>
+                                        <div style={{ backgroundColor: "#ffffff", marginTop: "10px", borderRadius: "4px" }}>
+                                            <div className="container">
+                                                <div className="row">
+                                                    <div className="col-md-5 fuel-selector">
+                                                        <select className="form-control" onChange={this.onChangeAccount}>
+                                                            <option>Select Account </option>
+                                                            {BankAccountList}
+                                                        </select>
 
-                                            </div>
-                                            <div className="col-md-4 fuel-selector">
-                                                <select className="form-control" onChange={this.onChangeType}>
-                                                    <option>Select Diposit Type</option>
-                                                    <option value="Cash">Cash</option>
-                                                    <option value="Cheque">Cheque</option>
-                                                </select>
-                                            </div>
-                                            <div className="col-md-3 fuel-selector">
-                                                <div className="form-group">
-                                                    <DatePicker
-                                                        className="form-control"
-                                                        selected={this.state.dip_date}
-                                                        onChange={this.onChangeDate}
-                                                        dateFormat="yyyy-MM-dd"
-                                                    />
+                                                    </div>
+                                                    <div className="col-md-4 fuel-selector">
+                                                        <select className="form-control" onChange={this.onChangeType}>
+                                                            <option>Select Diposit Type</option>
+                                                            <option value="Cash">Cash</option>
+                                                            <option value="Cheque">Cheque</option>
+                                                        </select>
+                                                    </div>
+                                                    <div className="col-md-3 fuel-selector">
+                                                        <div className="form-group">
+                                                            <DatePicker
+                                                                className="form-control"
+                                                                selected={this.state.dip_date}
+                                                                onChange={this.onChangeDate}
+                                                                dateFormat="yyyy-MM-dd"
+                                                            />
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                                <div className="row">
+                                                    <Col xs="4">
+                                                        <MDBInput outline label="Cheque Number" type="text" name="dip_cheque" onChange={this.onChangeDiposit} />
+                                                    </Col>
+                                                    <Col xs="4">
+                                                        <MDBInput outline label="Amount" type="text" name="dip_amount" onChange={this.onChangeDiposit} />
+                                                    </Col>
+
+                                                    <Col xs="4" style={{ marginTop: "18px" }}>
+                                                        <Button className="sub-btn" color="primary" onClick={this.onDiposit}>Diposit</Button>
+                                                    </Col>
                                                 </div>
                                             </div>
-
                                         </div>
-                                        <div className="row">
-                                            <Col xs="4">
-                                                <MDBInput outline label="Cheque Number" type="text" name="dip_cheque" onChange={this.onChangeDiposit} />
-                                            </Col>
-                                            <Col xs="4">
-                                                <MDBInput outline label="Amount" type="text" name="dip_amount" onChange={this.onChangeDiposit} />
-                                            </Col>
 
-                                            <Col xs="4" style={{ marginTop: "18px" }}>
-                                                <Button className="sub-btn" color="primary" onClick={this.onDiposit}>Diposit</Button>
-                                            </Col>
+                                        <p className="topic">Latest Bank Details</p>
+                                        <div style={{ backgroundColor: "#ffffff", marginTop: "10px", borderRadius: "4px", marginBottom: "20px" }}>
+                                            <div className="container">
+                                                <div className="row">
+                                                    <Col xs="2">
+                                                        <p className="tbl-head">Date</p>
+                                                    </Col>
+                                                    <Col xs="4">
+                                                        <p className="tbl-head">Account Number</p>
+                                                    </Col>
+                                                    <Col xs="3">
+                                                        <p className="tbl-head">Cheque Number</p>
+                                                    </Col>
+                                                    <Col xs="2" style={{ textAlign: 'center' }}>
+                                                        <p className="tbl-head">Amount</p>
+                                                    </Col>
+                                                    <Col xs="1" style={{ textAlign: 'center' }}>
+                                                        <p className="tbl-head">Action</p>
+                                                    </Col>
+                                                </div>
+                                                {this.state.lastSeven.map(data => {
+                                                    return (
+                                                        <div className="row" key={data._id}>
+                                                            <Col xs="2">
+                                                                <p className="tbl-body">{data.date}</p>
+                                                            </Col>
+                                                            <Col xs="4">
+                                                                <p className="tbl-body">{data.accountNumber}</p>
+                                                            </Col>
+                                                            <Col xs="3">
+                                                                <p className="tbl-body">{data.chequeNo}</p>
+                                                            </Col>
+                                                            <Col xs="2" style={{ textAlign: 'right' }}>
+                                                                <p className="tbl-body">{data.amount}</p>
+                                                            </Col>
+                                                            <Col xs="1" style={{ textAlign: 'center' }}>
+                                                                <DeleteForeverIcon className="del-btn" onClick={() => this.bankDelete(data._id)} />
+                                                            </Col>
+                                                        </div>
+                                                    )
+                                                })}
+                                            </div>
                                         </div>
-                                    </div>
-                                </div>
+                                    </Tab>
+                                    <Tab eventKey="month" title="Account Management">
+                                        <p className="topic">Bank Account Registraion</p>
+                                        <div style={{ bgcolor: "#ffffff", marginTop: "10px" }}>
+                                            <div className="container" style={{ backgroundColor: "#ffffff", borderRadius: "4px" }}>
+                                                <div className="row">
+                                                    <Col xs="3">
+                                                        <MDBInput outline label="Bank Name" type="text" name="bankName" onChange={this.onChangeReg} />
+                                                    </Col>
+                                                    <Col xs="3">
+                                                        <MDBInput outline label="Account Name" type="text" name="accountName" onChange={this.onChangeReg} />
+                                                    </Col>
+                                                    <Col xs="3">
+                                                        <MDBInput outline label="Account Number" type="text" name="accountNumber" onChange={this.onChangeReg} />
+                                                    </Col>
+                                                    <Col xs="3" style={{ marginTop: "18px" }}>
+                                                        <Button className="sub-btn" color="primary" onClick={this.onRegisterAccount}>Add Account</Button>
+                                                    </Col>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <p className="topic">Past Bank Details</p>
+                                        <div className="form-group">
+                                            <DatePicker
+                                                className="form-control"
+                                                selected={this.state.date1_date}
+                                                onChange={this.onChangeDate1}
+                                                dateFormat="yyyy-MM-dd"
+                                            />
+                                        </div>
+                                        <div className="form-group">
+                                            <DatePicker
+                                                className="form-control"
+                                                selected={this.state.date2_date}
+                                                onChange={this.onChangeDate2}
+                                                dateFormat="yyyy-MM-dd"
+                                            />
+                                        </div>
+                                        <Button className="sub-btn" color="primary" onClick={this.getMonthDate}>Add Account</Button>
+
+                                        <div style={{ backgroundColor: "#ffffff", marginTop: "10px", borderRadius: "4px", marginBottom: "20px" }}>
+                                            <div className="container">
+                                                <div className="row">
+                                                    <Col xs="2">
+                                                        <p className="tbl-head">Date</p>
+                                                    </Col>
+                                                    <Col xs="4">
+                                                        <p className="tbl-head">Account Number</p>
+                                                    </Col>
+                                                    <Col xs="3">
+                                                        <p className="tbl-head">Cheque Number</p>
+                                                    </Col>
+                                                    <Col xs="3" style={{ textAlign: 'center' }}>
+                                                        <p className="tbl-head">Amount</p>
+                                                    </Col>
+
+                                                </div>
+                                                {this.state.lastMonth.map(data => {
+                                                    return (
+                                                        <div className="row" key={data._id}>
+                                                            <Col xs="2">
+                                                                <p className="tbl-body">{data.date}</p>
+                                                            </Col>
+                                                            <Col xs="4">
+                                                                <p className="tbl-body">{data.accountNumber}</p>
+                                                            </Col>
+                                                            <Col xs="3">
+                                                                <p className="tbl-body">{data.chequeNo}</p>
+                                                            </Col>
+                                                            <Col xs="3" style={{ textAlign: 'right' }}>
+                                                                <p className="tbl-body">{data.amount}</p>
+                                                            </Col>
+
+                                                        </div>
+                                                    )
+                                                })}
+                                            </div>
+                                        </div>
+                                    </Tab>
+                                </Tabs>
                             </div>
                         </div>
                     </div>

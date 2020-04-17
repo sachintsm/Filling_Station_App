@@ -69,8 +69,6 @@ export default class registration extends Component {
             .catch(err => {
                 console.log(err);
             })
-
-
     }
 
     async componentDidMount() {
@@ -92,7 +90,6 @@ export default class registration extends Component {
                 birthday: Val
             }
         }))
-        console.log(date);
     };
 
 
@@ -104,8 +101,6 @@ export default class registration extends Component {
                 userType: Val
             }
         }))
-        console.log(e.target.value);
-
     }
 
     handleImageChange = (e) => {
@@ -116,17 +111,13 @@ export default class registration extends Component {
                 file: Val
             }
         }))
-        console.log(e.target.files[0]);
-
     }
-
 
     onChange = (e) => {
         e.persist = () => { };
         let store = this.state;
         store.form[e.target.name] = e.target.value
         this.setState(store);
-
     }
 
     render() {

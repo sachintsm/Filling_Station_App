@@ -11,6 +11,7 @@ var pumpersCalculationSchema = mongoose.Schema({
         saleAmount: { type: String },
         receivedAmount: { type: String },
         profit: { type: String },
+        timeStamp: { type: String },
 });
 
 const pumpersCalculation = module.exports = mongoose.model("pumpersCalculation", pumpersCalculationSchema);

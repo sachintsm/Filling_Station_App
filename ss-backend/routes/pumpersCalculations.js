@@ -15,6 +15,7 @@ router.post('/add', verify, function (req, res) {
 
     console.log(req.body);
     const date = convertToday(req.body.date)
+    var dt = Date.parse(req.body.dip_date)
 
     const data = new PumpersCalculation({
         setNumber: req.body.setNumber,
@@ -26,6 +27,7 @@ router.post('/add', verify, function (req, res) {
         saleAmount: req.body.saleAmount,
         receivedAmount: req.body.receivedAmount,
         profit: req.body.profit,
+        timeStamp: dt/1000
     })
 
     data.save()

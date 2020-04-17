@@ -7,6 +7,7 @@ var BankAccountDataSchema = mongoose.Schema({
     chequeNo: {type: String},
     amount: {type: String},
     date: {type: String},
+    timeStamp : { type: String },
 });
 
 const BankAccountData = module.exports = mongoose.model("BankAccountData", BankAccountDataSchema);
