@@ -13,6 +13,7 @@ import ListIcon from '@material-ui/icons/List';
 import PeopleIcon from '@material-ui/icons/People';
 import HistoryIcon from '@material-ui/icons/History';
 import AccountBalanceIcon from '@material-ui/icons/AccountBalance';
+import LocalAtmIcon from '@material-ui/icons/LocalAtm';
 
 export default class sidebar extends Component {
     render() {
@@ -145,6 +146,19 @@ export default class sidebar extends Component {
                             </div>
                             <div className="col-md-10 side-txt">
                                 <p>Bank Details</p>
+                            </div>
+                        </div>
+                    </Link>
+                </div>
+                <div className="side-row-div">
+                    <Link to={'/emp$salary'}>
+
+                        <div className="row">
+                            <div className="col-md-2 side-icn">
+                                <LocalAtmIcon />
+                            </div>
+                            <div className="col-md-10 side-txt">
+                                <p>Employee Salary</p>
                             </div>
                         </div>
                     </Link>

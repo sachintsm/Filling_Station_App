@@ -20,6 +20,7 @@
   import EarlierPumpersCalculations from './Component/Basic/earlierPumperCalculation'
   import SalesStocks from './Component/Basic/salesStocks'
   import BankDetails from './Component/Basic/bankDetails'
+  import EmployeeSalary from './Component/Basic/employeeSalary'
 
   function App() {
     return (
@@ -44,6 +45,7 @@
             <Route path="/earlier$pumpers$management" component={EarlierPumpersCalculations}></Route>
             <Route path="/salesStocks" component={SalesStocks}></Route>
             <Route path="/bank$details" component={BankDetails}></Route>
+            <Route path="/emp$salary" component={EmployeeSalary}></Route>
             
           </Switch>
 

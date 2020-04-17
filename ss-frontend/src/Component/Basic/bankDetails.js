@@ -37,6 +37,7 @@ export default class bankDetails extends Component {
             date1_date: new Date(),
             date2_date: new Date(),
 
+            dataDiv : false,
         }
 
         this.onChangeReg = this.onChangeReg.bind(this)
@@ -218,6 +219,8 @@ export default class bankDetails extends Component {
                     lastMonth: res.data.data
                 })
             })
+        this.setState({ dataDiv: true });
+
     }
 
     bankDelete(data) {
@@ -241,6 +244,8 @@ export default class bankDetails extends Component {
 
     render() {
         const { BankAccount } = this.state;
+        const { dataDiv } = this.state;
+
         let BankAccountList = BankAccount.length > 0
             && BankAccount.map((item, i) => {
                 return (
@@ -382,62 +387,73 @@ export default class bankDetails extends Component {
                                             </div>
                                         </div>
                                         <p className="topic">Past Bank Details</p>
-                                        <div className="form-group">
-                                            <DatePicker
-                                                className="form-control"
-                                                selected={this.state.date1_date}
-                                                onChange={this.onChangeDate1}
-                                                dateFormat="yyyy-MM-dd"
-                                            />
-                                        </div>
-                                        <div className="form-group">
-                                            <DatePicker
-                                                className="form-control"
-                                                selected={this.state.date2_date}
-                                                onChange={this.onChangeDate2}
-                                                dateFormat="yyyy-MM-dd"
-                                            />
-                                        </div>
-                                        <Button className="sub-btn" color="primary" onClick={this.getMonthDate}>Add Account</Button>
-
-                                        <div style={{ backgroundColor: "#ffffff", marginTop: "10px", borderRadius: "4px", marginBottom: "20px" }}>
-                                            <div className="container">
-                                                <div className="row">
-                                                    <Col xs="2">
-                                                        <p className="tbl-head">Date</p>
-                                                    </Col>
-                                                    <Col xs="4">
-                                                        <p className="tbl-head">Account Number</p>
-                                                    </Col>
-                                                    <Col xs="3">
-                                                        <p className="tbl-head">Cheque Number</p>
-                                                    </Col>
-                                                    <Col xs="3" style={{ textAlign: 'center' }}>
-                                                        <p className="tbl-head">Amount</p>
-                                                    </Col>
-
+                                        <Row>
+                                            <Col xs="2">
+                                                <div className="form-group">
+                                                    <DatePicker
+                                                        className="form-control"
+                                                        selected={this.state.date1_date}
+                                                        onChange={this.onChangeDate1}
+                                                        dateFormat="yyyy-MM-dd"
+                                                    />
                                                 </div>
-                                                {this.state.lastMonth.map(data => {
-                                                    return (
-                                                        <div className="row" key={data._id}>
-                                                            <Col xs="2">
-                                                                <p className="tbl-body">{data.date}</p>
-                                                            </Col>
-                                                            <Col xs="4">
-                                                                <p className="tbl-body">{data.accountNumber}</p>
-                                                            </Col>
-                                                            <Col xs="3">
-                                                                <p className="tbl-body">{data.chequeNo}</p>
-                                                            </Col>
-                                                            <Col xs="3" style={{ textAlign: 'right' }}>
-                                                                <p className="tbl-body">{data.amount}</p>
-                                                            </Col>
 
-                                                        </div>
-                                                    )
-                                                })}
+                                            </Col>
+                                            <Col xs="2">
+                                                <div className="form-group">
+                                                    <DatePicker
+                                                        className="form-control"
+                                                        selected={this.state.date2_date}
+                                                        onChange={this.onChangeDate2}
+                                                        dateFormat="yyyy-MM-dd"
+                                                    />
+                                                </div>
+                                            </Col>
+                                            <Col xs="2" style={{ marginTop: "-5px" }}>
+                                                <Button className="sub-btn" color="primary" onClick={this.getMonthDate}>Search</Button>
+                                            </Col>
+                                        </Row>
+                                        {dataDiv && (
+
+                                            <div style={{ backgroundColor: "#ffffff", marginTop: "10px", borderRadius: "4px", marginBottom: "20px" }}>
+                                                <div className="container">
+                                                    <div className="row">
+                                                        <Col xs="2">
+                                                            <p className="tbl-head">Date</p>
+                                                        </Col>
+                                                        <Col xs="4">
+                                                            <p className="tbl-head">Account Number</p>
+                                                        </Col>
+                                                        <Col xs="3">
+                                                            <p className="tbl-head">Cheque Number</p>
+                                                        </Col>
+                                                        <Col xs="3" style={{ textAlign: 'center' }}>
+                                                            <p className="tbl-head">Amount</p>
+                                                        </Col>
+
+                                                    </div>
+                                                    {this.state.lastMonth.map(data => {
+                                                        return (
+                                                            <div className="row" key={data._id}>
+                                                                <Col xs="2">
+                                                                    <p className="tbl-body">{data.date}</p>
+                                                                </Col>
+                                                                <Col xs="4">
+                                                                    <p className="tbl-body">{data.accountNumber}</p>
+                                                                </Col>
+                                                                <Col xs="3">
+                                                                    <p className="tbl-body">{data.chequeNo}</p>
+                                                                </Col>
+                                                                <Col xs="3" style={{ textAlign: 'right' }}>
+                                                                    <p className="tbl-body">{data.amount}</p>
+                                                                </Col>
+
+                                                            </div>
+                                                        )
+                                                    })}
+                                                </div>
                                             </div>
-                                        </div>
+                                        )}
                                     </Tab>
                                 </Tabs>
                             </div>
