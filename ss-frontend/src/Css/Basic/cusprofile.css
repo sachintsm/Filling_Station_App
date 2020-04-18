@@ -18,8 +18,7 @@
 }
 
 .btn-info{
-    margin: auto;
-    width: 80%;
-    height: 10%;
+    height: 40px;
+    width: 100%;
     background-color: blue;
 }

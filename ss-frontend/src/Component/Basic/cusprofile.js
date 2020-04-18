@@ -15,7 +15,7 @@ const Debt = React.memo(props => (
         <td>{props.debt.mobile}</td>
         <td>{props.debt.fax}</td>
         <td>
-            <button className="btn btn-danger btn-info  " type="delete" onClick={() => props.delete(props.debt._id)}>DELETE</button>
+            <button className="btn btn-danger btn-info  " style={{ marginTop: "-8px", marginBottom:"-8px"}} type="delete" onClick={() => props.delete(props.debt._id)}>DELETE</button>
         </td>
     </tr>
 ));
