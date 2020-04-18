@@ -54,7 +54,7 @@ export default class fuelLubricantPrice extends Component {
         this.setState(store);
     }
 
-    onChangeType(e) {
+    onChangeType = (e) => {
         this.setState({
             pType: e.target.value
         })
@@ -131,7 +131,6 @@ export default class fuelLubricantPrice extends Component {
                         snackbaropen: true,
                         snackbarmsg: json.msg
                     })
-
                     // window.location.reload();
                 })
                 .catch(err => {
@@ -179,7 +178,6 @@ export default class fuelLubricantPrice extends Component {
             .catch(error => console.log('error', error));
     }
     async onSellPriceBlur(data) {
-
         var myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
 
@@ -187,7 +185,6 @@ export default class fuelLubricantPrice extends Component {
         urlencoded.append("pId", data.pId);
         urlencoded.append("sellPrice", this.state.sellPrice);
         urlencoded.append("buyPrice", data.buyPrice);
-
 
         var requestOptions = {
             method: 'POST',
@@ -289,7 +286,7 @@ export default class fuelLubricantPrice extends Component {
 
                                                             </div>
                                                             <div className="col-md-3" style={{ marginTop: "20px" }}>
-                                                                <Button className="reg-btn" color="primary" onClick={this.onSubmit}>Add NOw</Button>
+                                                                <Button className="reg-btn" color="primary" onClick={this.onSubmit}>Add Now</Button>
                                                             </div>
 
                                                         </div>

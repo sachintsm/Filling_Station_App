@@ -49,7 +49,6 @@ router.post('/updateProductPrice', async function (req, res) {
     const buyPrice = req.body.buyPrice;
     const sellPrice = req.body.sellPrice;
 
-
     await FuelLubPrice
         .update({ pId: pId },
             {
@@ -75,8 +74,6 @@ router.post('/updateAvailableStock', async function (req, res) {
     console.log(req.body);
     const pId = req.body.pId;
     const availStock = req.body.availStock;
-    
-
 
     await FuelLubPrice
         .update({ pId: pId },

@@ -32,7 +32,7 @@ const Ga = React.memo(props => (
         <td>{props.ga.pName}</td>
         <td>{props.ga.sellPrice}</td>
         <td>
-            <input className="form-control inputValue" defaultValue={props.ga.availStock} onBlur={() => props.stock} onChange={() => props.stockchng} />
+            <input className="form-control inputValue" defaultValue={props.ga.availStock} onBlur={() => props.stock()} onChange={() => props.stockchng} />
         </td>
         {/* <td>{props.fu.state}</td> */}
         {/* <td>
@@ -62,7 +62,7 @@ const Ot = React.memo(props => (
         <td>{props.ot.pName}</td>
         <td>{props.ot.sellPrice}</td>
         <td>
-            <input className="form-control inputValue" defaultValue={props.ot.availStock} onBlur={() => props.stock} onChange={() => props.stockchng} />
+            <input className="form-control inputValue" defaultValue={props.ot.availStock} onBlur={() => props.stock()} onChange={() => props.stockchng} />
         </td>
         {/* <td>{props.fu.state}</td> */}
         {/* <td>
@@ -80,7 +80,7 @@ class salesStocks extends Component {
             pId: '',
             pName: '',
             sellPrice: '',
-            pType:'',
+            pType: '',
             availStock: '',
             userData: [],
             products: [],
@@ -152,8 +152,7 @@ class salesStocks extends Component {
         })
     }
 
-    async onAvailableStockBlur(data) {
-
+    onAvailableStockBlur(data) {
         var myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
 
@@ -177,15 +176,12 @@ class salesStocks extends Component {
     UserListF() {
         const local = this.state.pId;
         if (local == null || local === "") {
-
-            // console.log(this.state.users);
             return this.state.products.map((currentFu, i) => {
-                if(currentFu.pType === "Fuel"){
-                return <Fu delete={this.deleteDebtor} stock={this.onAvailableStockBlur} stockchng={this.onAvailableStockChange} fu={currentFu} key={i} />;
-            }
-            return null;
-            }
-            )
+                if (currentFu.pType === "Fuel") {
+                    return <Fu delete={this.deleteDebtor} stock={this.onAvailableStockBlur} stockchng={this.onAvailableStockChange} fu={currentFu} key={i} />;
+                }
+                return null;
+            })
         }
         else {
             return this.state.products.map((currentFu, i) => {
@@ -204,10 +200,10 @@ class salesStocks extends Component {
 
             // console.log(this.state.users);
             return this.state.products.map((currentGa, i) => {
-                if(currentGa.pType === "Gas"){
-                return <Ga delete={this.deleteDebtor} stock={this.onAvailableStockBlur} stockchng={this.onAvailableStockChange} ga={currentGa} key={i} />;
-            }
-            return null;
+                if (currentGa.pType === "Gas") {
+                    return <Ga delete={this.deleteDebtor} stock={this.onAvailableStockBlur} stockchng={this.onAvailableStockChange} ga={currentGa} key={i} />;
+                }
+                return null;
             }
             )
         }
@@ -228,10 +224,10 @@ class salesStocks extends Component {
 
             // console.log(this.state.users);
             return this.state.products.map((currentLu, i) => {
-                if(currentLu.pType === "Lubricant"){
-                return <Lu delete={this.deleteDebtor} stock={this.onAvailableStockBlur} stockchng={this.onAvailableStockChange} lu={currentLu} key={i} />;
-            }
-            return null;
+                if (currentLu.pType === "Lubricant") {
+                    return <Lu delete={this.deleteDebtor} stock={this.onAvailableStockBlur} stockchng={this.onAvailableStockChange} lu={currentLu} key={i} />;
+                }
+                return null;
             }
             )
         }
@@ -252,10 +248,10 @@ class salesStocks extends Component {
 
             // console.log(this.state.users);
             return this.state.products.map((currentOt, i) => {
-                if(currentOt.pType === "Other"){
-                return <Ot delete={this.deleteDebtor} stock={this.onAvailableStockBlur} stockchng={this.onAvailableStockChange} ot={currentOt} key={i} />;
-            }
-            return null;
+                if (currentOt.pType === "Other") {
+                    return <Ot delete={this.deleteDebtor} stock={this.onAvailableStockBlur} stockchng={this.onAvailableStockChange} ot={currentOt} key={i} />;
+                }
+                return null;
             }
             )
         }
