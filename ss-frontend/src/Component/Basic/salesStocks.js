@@ -17,7 +17,7 @@ const Fu = React.memo(props => (
         <td>{props.fu.pName}</td>
         <td>{props.fu.sellPrice}</td>
         <td>
-            <input className="form-control inputValue" defaultValue={props.fu.availStock} onBlur={() => props.stock} onChange={() => props.stockchng} />
+            <input className="form-control inputValue" defaultValue={props.fu.availStock} onBlur={() => props.stock(props.fu)} onChange={() => props.stockchng} />
         </td>
         {/* <td>{props.fu.state}</td> */}
         {/* <td>
@@ -32,7 +32,7 @@ const Ga = React.memo(props => (
         <td>{props.ga.pName}</td>
         <td>{props.ga.sellPrice}</td>
         <td>
-            <input className="form-control inputValue" defaultValue={props.ga.availStock} onBlur={() => props.stock} onChange={() => props.stockchng} />
+            <input className="form-control inputValue" type="text"  name="availStock" defaultValue={props.ga.availStock} onBlur={() => props.stock(props.ga)} onChange={() => props.stockchng} />
         </td>
         {/* <td>{props.fu.state}</td> */}
         {/* <td>
@@ -47,7 +47,7 @@ const Lu = React.memo(props => (
         <td>{props.lu.pName}</td>
         <td>{props.lu.sellPrice}</td>
         <td>
-            <input className="form-control inputValue" defaultValue={props.lu.availStock} onBlur={() => props.stock} onChange={() => props.stockchng} />
+            <input className="form-control inputValue" defaultValue={props.lu.availStock} onBlur={() => props.stock(props.lu)} onChange={() => props.stockchng} />
         </td>
         {/* <td>{props.fu.state}</td> */}
         {/* <td>
@@ -62,7 +62,7 @@ const Ot = React.memo(props => (
         <td>{props.ot.pName}</td>
         <td>{props.ot.sellPrice}</td>
         <td>
-            <input className="form-control inputValue" defaultValue={props.ot.availStock} onBlur={() => props.stock} onChange={() => props.stockchng} />
+            <input className="form-control inputValue" defaultValue={props.ot.availStock} onBlur={() => props.stock(props.ot)} onChange={() => props.stockchng} />
         </td>
         {/* <td>{props.fu.state}</td> */}
         {/* <td>
@@ -147,13 +147,18 @@ class salesStocks extends Component {
     }
 
     onAvailableStockChange(e) {
-        this.setState({
-            availStock: e.target.value,
-        })
+        console.log("sachin");
+
+        // this.setState({
+        //     availStock: e.target.value,
+        // })
     }
 
-    async onAvailableStockBlur(data) {
+    onAvailableStockBlur(data) {
 
+        console.log("bhaya");
+        console.log(data);
+        
         var myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
 
@@ -181,7 +186,7 @@ class salesStocks extends Component {
             // console.log(this.state.users);
             return this.state.products.map((currentFu, i) => {
                 if(currentFu.pType === "Fuel"){
-                return <Fu delete={this.deleteDebtor} stock={this.onAvailableStockBlur} stockchng={this.onAvailableStockChange} fu={currentFu} key={i} />;
+                return <Fu delete={this.deleteDebtor} stock={this.onAvailableStockBlur} stockchng={this.onAvailableStockChange} onChange={this.onChange} fu={currentFu} key={i} />;
             }
             return null;
             }
