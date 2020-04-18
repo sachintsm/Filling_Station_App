@@ -23,6 +23,8 @@ const pumpersCash = require('./routes/pumpersCash')
 const pumpersCalculations = require('./routes/pumpersCalculations')
 const bankAccountRegistration = require('./routes/bankAccountRegistration')
 const bankAccountData = require('./routes/bankAccountData')
+const employeeLoan = require('./routes/employeeLoan')
+const employeeSalary = require('./routes/employeeSalary')
 
 const connection = mongoose.connect(config.database, { useUnifiedTopology: true, useNewUrlParser: true })
 if (connection) {
@@ -53,6 +55,8 @@ app.use('/pumpersCash', pumpersCash)
 app.use('/pumpersCalculations', pumpersCalculations)
 app.use('/bankAccountRegistration', bankAccountRegistration)
 app.use('/bankAccountData', bankAccountData)
+app.use('/employeeLoan', employeeLoan)
+app.use('/employeeSalary', employeeSalary)
 
 app.get("/", function (req, res) {
     res.send("Hello world");
