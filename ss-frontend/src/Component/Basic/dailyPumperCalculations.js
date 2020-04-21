@@ -180,8 +180,10 @@ export default class dailyPumperCalculations extends Component {
                                 var sale = (this.state.todayReading[k].meterReading - this.state.yesReading[j].meterReading).toFixed(3)     //get pump whole sale
                                 var gross = (sale - this.state.distinctDebit[l].debit).toFixed(3)    //get gross size spesific pump
                                 var productId = this.state.pumpNames[i].productId
-                                var block = new meterBlock(this.state.pumpsNames[i].machineNumber, this.state.pumpsNames[i].fuelType, this.state.yesReading[j].meterReading, this.state.todayReading[k].meterReading, sale, this.state.distinctDebit[l].debit, gross, productId);
+                                var block = new meterBlock(this.state.pumpsNames[i].machineNumber, this.state.pumpsNames[i].fuelType, this.state.yesReading[j].meterReading, this.state.todayReading[k].meterReading, sale, this.state.distinctDebit[l].debit, gross, this.state.pumpsNames[i].productId);
                                 this.state.meterBlock.push(block)
+                                console.log(block);
+                                
                             }
                         }
                     }
@@ -191,6 +193,7 @@ export default class dailyPumperCalculations extends Component {
             for (var m = 0; m < this.state.meterBlock.length; m++) {
                 for (var n = 0; n < this.state.products.length; n++) {
                     if (this.state.meterBlock[m].productId === this.state.products[n].pId) {
+                        // console.log(this.state.meterBlock[m].productId +','+ this.state.meterBlock[m].fuelType)
                         var amount = (this.state.meterBlock[m].gross * this.state.products[n].sellPrice).toFixed(2)
                         var block2 = new finalBlock(this.state.meterBlock[m].pumpId, this.state.meterBlock[m].fuelType, this.state.meterBlock[m].yesterday, this.state.meterBlock[m].today, this.state.meterBlock[m].sale, this.state.meterBlock[m].debit, this.state.meterBlock[m].gross, amount)
                         this.state.finalBlock.push(block2);
