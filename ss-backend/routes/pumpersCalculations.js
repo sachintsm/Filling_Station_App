@@ -13,10 +13,9 @@ function convertToday(str) {
 
 router.post('/add', verify, function (req, res) {
 
-    console.log(req.body);
     const date = convertToday(req.body.date)
-    var dt = Date.parse(req.body.dip_date)
-
+    var dt = Date.parse(req.body.date)
+    
     const data = new PumpersCalculation({
         setNumber: req.body.setNumber,
         date: date,

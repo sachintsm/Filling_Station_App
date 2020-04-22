@@ -4,8 +4,8 @@ const Schema = mongoose.schema;
 var employeeLoanSchema = mongoose.Schema({
     date: {type: String},
     empId: {type: String},
-    credit: {type: String},
-    debit: {type: String},
+    type: {type: String},
+    amount: {type: String},
     timeStamp: {type: String},
 });
 

@@ -715,7 +715,7 @@ export default class dailyPumperCalculations extends Component {
                                                                             <p className="product">{data.time}</p>
                                                                         </div>
                                                                         <div className="col-md-5" style={{ textAlign: "right" }}>
-                                                                            <p className="product">{data.lockerAmount}.00</p>
+                                                                            <p className="product">{data.lockerAmount}</p>
                                                                         </div>
                                                                         <div className="col-md-2" style={{ textAlign: "center" }}>
                                                                             <DeleteForeverIcon className="del-btn" onClick={() => this.lockerDelete(data._id)} />

@@ -9,7 +9,7 @@ router.post('/add', verify, async function (req, res) {
     var today = new Date();
     var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
     var price = req.body.price.toFixed(2);
-    var dt = Date.parse(req.body.dip_date)
+    var dt = Date.parse(today)
 
     const data = new DailySales({
         pId: req.body.pId,

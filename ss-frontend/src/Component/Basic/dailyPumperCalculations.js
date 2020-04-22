@@ -179,7 +179,6 @@ export default class dailyPumperCalculations extends Component {
                                 && this.state.pumpsNames[i].machineNumber === this.state.distinctDebit[l].pumpId) {
                                 var sale = (this.state.todayReading[k].meterReading - this.state.yesReading[j].meterReading).toFixed(3)     //get pump whole sale
                                 var gross = (sale - this.state.distinctDebit[l].debit).toFixed(3)    //get gross size spesific pump
-                                var productId = this.state.pumpNames[i].productId
                                 var block = new meterBlock(this.state.pumpsNames[i].machineNumber, this.state.pumpsNames[i].fuelType, this.state.yesReading[j].meterReading, this.state.todayReading[k].meterReading, sale, this.state.distinctDebit[l].debit, gross, this.state.pumpsNames[i].productId);
                                 this.state.meterBlock.push(block)
                                 console.log(block);

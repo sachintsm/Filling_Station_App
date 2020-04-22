@@ -13,7 +13,7 @@ router.post('/add', verify, function (req, res) {
     var dt = Date.parse(req.body.dip_date)
 
     const data = new LockerState({
-        lockerAmount: req.body.lockerAmount,
+        lockerAmount: parseFloat(req.body.lockerAmount).toFixed(2),
         date: date,
         time: time,
         timeStamp: dt/1000

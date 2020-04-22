@@ -8,8 +8,8 @@ router.post('/add', verify, function (req, res) {
 
     var today = new Date();
     var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
-    var dt = Date.parse(req.body.dip_date)
-
+    var dt = Date.parse(today)
+    console.log(dt)
     const data = new DebitorAccount({
         date: date,
         debitorId: req.body.debitorId,

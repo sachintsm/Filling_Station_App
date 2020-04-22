@@ -35,6 +35,9 @@ export default class employeeSalary extends Component {
 
             loanSearch: '',
 
+            employeeSalary: [],
+            employeeLoan: [],
+            credit: '',
         }
         this.onChangeSalInput = this.onChangeSalInput.bind(this)
         this.addSalary = this.addSalary.bind(this)
@@ -56,6 +59,20 @@ export default class employeeSalary extends Component {
         this.setState({ authState: authState })
         if (!authState) this.props.history.push('/login');
 
+        axios.get('http://localhost:4000/employeeSalary/get')
+            .then(res => {
+                this.setState({
+                    employeeSalary: res.data.data
+                })
+                console.log(res.data.data);
+            })
+        axios.get('http://localhost:4000/employeeLoan/get')
+            .then(res => {
+                this.setState({
+                    employeeLoan: res.data.data
+                })
+                console.log(res.data.data);
+            })
     }
     /*********************************************************** */
     onChangeSalInput = (e) => {
@@ -66,19 +83,72 @@ export default class employeeSalary extends Component {
     }
 
     addSalary = () => {
+        const obj = getFromStorage('auth-token');
 
+
+        if (this.state.empId === '' || this.state.empAmount === '') {
+            this.setState({
+                snackbaropen: true,
+                snackbarmsg: "Please Fill the Data ..!"
+            })
+        }
+        else {
+            const data = {
+                empId: this.state.empId,
+                amount: this.state.empAmount
+            }
+
+            fetch('http://localhost:4000/employeeSalary/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'auth-token': obj.token
+                },
+                body: JSON.stringify(data),
+            })
+                .then(res => res.json())
+                .then(json => {
+                    // alert(json.msg)
+                    this.setState({
+                        snackbaropen: true,
+                        snackbarmsg: json.msg
+                    })
+                    // window.location.reload();
+                })
+                .catch(err => {
+                    this.setState({
+                        snackbaropen: true,
+                        snackbarmsg: err
+                    })
+                    console.log(err)
+                })
+        }
     }
-
 
     /*********************************************************** */
     onChangeSalSearch = (e) => {
         this.setState({
-            empIdSearch : e.target.value
+            empIdSearch: e.target.value
         })
     }
 
     onSalaryDelete = (data) => {
-
+        axios.delete('http://localhost:4000/employeeSalary/delete/' + data)
+            .then((res) => {
+                console.log(res);
+                this.setState({
+                    snackbaropen: true,
+                    snackbarmsg: res.data.message
+                })
+                window.location.reload();
+            })
+            .catch(err => {
+                console.log(err);
+                this.setState({
+                    snackbaropen: true,
+                    snackbarmsg: err
+                })
+            })
     }
 
     /*********************************************************** */
@@ -98,13 +168,67 @@ export default class employeeSalary extends Component {
             loanSearch: e.target.value
         })
     }
-    
-    addLoan() {
 
+    addLoan() {
+        const obj = getFromStorage('auth-token');
+
+        if (this.state.loanEmpId === '' || this.state.loanAmount === '' || this.state.loanType === '') {
+            this.setState({
+                snackbaropen: true,
+                snackbarmsg: "Please Fill the Data ..!"
+            })
+        }
+        else {
+            const data = {
+                empId: this.state.loanEmpId,
+                amount: this.state.loanAmount,
+                type: this.state.loanType
+            }
+
+            fetch('http://localhost:4000/employeeLoan/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'auth-token': obj.token
+                },
+                body: JSON.stringify(data),
+            })
+                .then(res => res.json())
+                .then(json => {
+                    // alert(json.msg)
+                    this.setState({
+                        snackbaropen: true,
+                        snackbarmsg: json.msg
+                    })
+                    // window.location.reload();
+                })
+                .catch(err => {
+                    this.setState({
+                        snackbaropen: true,
+                        snackbarmsg: err
+                    })
+                    console.log(err)
+                })
+        }
     }
 
     onLoanDelete = (data) => {
-
+        axios.delete('http://localhost:4000/employeeLoan/delete/' + data)
+            .then((res) => {
+                console.log(res);
+                this.setState({
+                    snackbaropen: true,
+                    snackbarmsg: res.data.message
+                })
+                window.location.reload();
+            })
+            .catch(err => {
+                console.log(err);
+                this.setState({
+                    snackbaropen: true,
+                    snackbarmsg: err
+                })
+            })
     }
 
     render() {
@@ -184,20 +308,24 @@ export default class employeeSalary extends Component {
                                                     </Row>
                                                 </div>
                                                 <div className="container">
-                                                    <Row>
-                                                        <Col xs="3">
-                                                            <p className="tbl-body">Date</p>
-                                                        </Col>
-                                                        <Col xs="3">
-                                                            <p className="tbl-body">Employee ID</p>
-                                                        </Col>
-                                                        <Col xs="3">
-                                                            <p className="tbl-body">Amount</p>
-                                                        </Col>
-                                                        <Col xs="3">
-                                                            <DeleteForeverIcon className="del-btn" onClick={() => this.onSalaryDelete()} />
-                                                        </Col>
-                                                    </Row>
+                                                    {this.state.employeeSalary.map(data => {
+                                                        return (
+                                                            <Row key={data._id}>
+                                                                <Col xs="3">
+                                                                    <p className="tbl-body">{data.date}</p>
+                                                                </Col>
+                                                                <Col xs="3">
+                                                                    <p className="tbl-body">{data.empId}</p>
+                                                                </Col>
+                                                                <Col xs="3">
+                                                                    <p className="tbl-body">{data.amount}</p>
+                                                                </Col>
+                                                                <Col xs="3">
+                                                                    <DeleteForeverIcon className="del-btn" onClick={() => this.onSalaryDelete(data._id)} />
+                                                                </Col>
+                                                            </Row>
+                                                        )
+                                                    })}
                                                 </div>
                                             </Card>
                                         </div>
@@ -224,13 +352,13 @@ export default class employeeSalary extends Component {
                                                                     </select>
                                                                 </Col>
                                                                 <Col xs="3" style={{ marginTop: "18px" }}>
-                                                                    <Button className="sub-btn" color="primary" onClick={this.addSalary}>Submit</Button>
+                                                                    <Button className="sub-btn" color="primary" onClick={this.addLoan}>Submit</Button>
                                                                 </Col>
                                                             </Row>
                                                         </div>
                                                     </Card>
 
-                                                    <div style={{ marginTop: "20px" }}>
+                                                    <div style={{ marginTop: "20px", marginBottom: "20px" }}>
                                                         <Card>
                                                             <div className="container">
                                                                 <Row style={{ marginTop: "10px" }} >
@@ -254,10 +382,10 @@ export default class employeeSalary extends Component {
                                                                         <p className="tbl-head">Emp ID</p>
                                                                     </Col>
                                                                     <Col xs="3" style={{ textAlign: "center" }}>
-                                                                        <p className="tbl-head">Debit</p>
+                                                                        <p className="tbl-head">Credit</p>
                                                                     </Col>
                                                                     <Col xs="3" style={{ textAlign: "center" }}>
-                                                                        <p className="tbl-head">Credit</p>
+                                                                        <p className="tbl-head">Debit</p>
                                                                     </Col>
                                                                     <Col xs="2" style={{ textAlign: "center" }}>
                                                                         <p className="tbl-head">Action</p>
@@ -265,23 +393,53 @@ export default class employeeSalary extends Component {
                                                                 </Row>
                                                             </div>
                                                             <div className="container">
-                                                                <Row>
-                                                                    <Col xs="2">
-                                                                        <p className="tbl-body">Date</p>
-                                                                    </Col>
-                                                                    <Col xs="2">
-                                                                        <p className="tbl-body">Employee ID</p>
-                                                                    </Col>
-                                                                    <Col xs="3" style={{ textAlign: "right" }}>
-                                                                        <p className="tbl-body">Employee ID</p>
-                                                                    </Col>
-                                                                    <Col xs="3" style={{ textAlign: "right" }}>
-                                                                        <p className="tbl-body">Amount</p>
-                                                                    </Col>
-                                                                    <Col xs="2" style={{ textAlign: "center" }}>
-                                                                        <DeleteForeverIcon className="del-btn" onClick={() => this.onLoanDelete()} />
-                                                                    </Col>
-                                                                </Row>
+                                                                {this.state.employeeLoan.map(data => {
+
+                                                                    if (data.type === 'credit') {
+                                                                        return (
+                                                                            <Row key={data._id}>
+                                                                                <Col xs="2">
+                                                                                    <p className="tbl-body">{data.date}</p>
+                                                                                </Col>
+                                                                                <Col xs="2">
+                                                                                    <p className="tbl-body">{data.empId}</p>
+                                                                                </Col>
+                                                                                <Col xs="3" style={{ textAlign: "right" }}>
+                                                                                    <p className="tbl-body">{data.amount}</p>
+                                                                                </Col>
+                                                                                <Col xs="3" style={{ textAlign: "right" }}>
+                                                                                    <p className="tbl-body">-</p>
+                                                                                </Col>
+                                                                                <Col xs="2" style={{ textAlign: "center" }}>
+                                                                                    <DeleteForeverIcon className="del-btn" onClick={() => this.onLoanDelete(data._id)} />
+                                                                                </Col>
+                                                                            </Row>
+                                                                        )
+                                                                    }
+                                                                    else {
+                                                                        return (
+                                                                            <Row key={data._id}>
+                                                                                <Col xs="2">
+                                                                                    <p className="tbl-body">{data.date}</p>
+                                                                                </Col>
+                                                                                <Col xs="2">
+                                                                                    <p className="tbl-body">{data.empId}</p>
+                                                                                </Col>
+                                                                                <Col xs="3" style={{ textAlign: "right" }}>
+                                                                                    <p className="tbl-body">-</p>
+                                                                                </Col>
+                                                                                <Col xs="3" style={{ textAlign: "right" }}>
+                                                                                    <p className="tbl-body">{data.amount}</p>
+                                                                                </Col>
+                                                                                <Col xs="2" style={{ textAlign: "center" }}>
+                                                                                    <DeleteForeverIcon className="del-btn" onClick={() => this.onLoanDelete(data._id)} />
+                                                                                </Col>
+                                                                            </Row>
+                                                                        )
+                                                                    }
+
+                                                                })}
+
                                                             </div>
                                                         </Card>
                                                     </div>
