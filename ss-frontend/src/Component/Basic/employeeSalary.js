@@ -11,7 +11,6 @@ import '../../Css/Basic/employeeSalary.css'
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
 import { getFromStorage } from "../../utils/storage";
-import DatePicker from "react-datepicker";
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 
 
@@ -38,6 +37,10 @@ export default class employeeSalary extends Component {
             employeeSalary: [],
             employeeLoan: [],
             credit: '',
+
+            pumpersData: [],
+            lastMonthProfit: [],
+            thisMonthProfit : [],
         }
         this.onChangeSalInput = this.onChangeSalInput.bind(this)
         this.addSalary = this.addSalary.bind(this)
@@ -59,20 +62,49 @@ export default class employeeSalary extends Component {
         this.setState({ authState: authState })
         if (!authState) this.props.history.push('/login');
 
+        //get employess salary
         axios.get('http://localhost:4000/employeeSalary/get')
             .then(res => {
                 this.setState({
                     employeeSalary: res.data.data
                 })
-                console.log(res.data.data);
             })
+
+        //get employees loans
         axios.get('http://localhost:4000/employeeLoan/get')
             .then(res => {
                 this.setState({
                     employeeLoan: res.data.data
                 })
-                console.log(res.data.data);
             })
+
+        //get  pumperIds  data
+        axios.get('http://localhost:4000/users/getPumpers')
+            .then(res => {
+                this.setState({
+                    pumpersData: res.data.data
+                })
+            })
+
+        //get pumpers this month profits
+        axios.get('http://localhost:4000/pumpersCalculations/getThisMonth')
+            .then(res => {
+                console.log(res);
+                this.setState({
+                    thisMonthProfit: res.data.data
+                })
+            })
+
+        //get pumpers last month profits
+        axios.get('http://localhost:4000/pumpersCalculations/getLastMonth')
+            .then(res => {
+                console.log(res);
+                this.setState({
+                    lastMonthProfit: res.data.data
+                })
+            })
+
+
     }
     /*********************************************************** */
     onChangeSalInput = (e) => {
@@ -405,7 +437,7 @@ export default class employeeSalary extends Component {
                                                                                     <p className="tbl-body">{data.empId}</p>
                                                                                 </Col>
                                                                                 <Col xs="3" style={{ textAlign: "right" }}>
-                                                                                    <p className="tbl-body">{data.amount}</p>
+                                                                                    <p className="tbl-body colorGreen">{data.amount}</p>
                                                                                 </Col>
                                                                                 <Col xs="3" style={{ textAlign: "right" }}>
                                                                                     <p className="tbl-body">-</p>
@@ -429,7 +461,7 @@ export default class employeeSalary extends Component {
                                                                                     <p className="tbl-body">-</p>
                                                                                 </Col>
                                                                                 <Col xs="3" style={{ textAlign: "right" }}>
-                                                                                    <p className="tbl-body">{data.amount}</p>
+                                                                                    <p className="tbl-body colorRed">{data.amount}</p>
                                                                                 </Col>
                                                                                 <Col xs="2" style={{ textAlign: "center" }}>
                                                                                     <DeleteForeverIcon className="del-btn" onClick={() => this.onLoanDelete(data._id)} />

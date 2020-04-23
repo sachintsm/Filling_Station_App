@@ -1,8 +1,4 @@
 import React, { Component } from 'react';
-import { verifyAuth } from '../../utils/authentication'
-import { MDBInput } from "mdbreact";
-import { Button } from 'reactstrap';
-import Card from '@material-ui/core/Card';
 import Sidebar from '../Auth/sidebar'
 // import { getFromStorage } from '../../utils/storage';
 import '../../Css/Basic/salesStocks.css'

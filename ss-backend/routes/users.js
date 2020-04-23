@@ -62,7 +62,8 @@ router.post('/register', function (req, res) {
             etf: req.body.etf,
             address: req.body.address,
             other: req.body.other,
-            path: fullPath
+            path: fullPath,
+            activeState : true,
         })
 
         bcrypt.genSalt(10, async function (err, salt) {
@@ -87,8 +88,7 @@ router.post('/register', function (req, res) {
     })
 })
 
-//get data from backend
-
+//get all users details
 router.get('/get', function (req, res) {
 
     User.find()
@@ -103,7 +103,6 @@ router.get('/get', function (req, res) {
 
 //get data for a particular id
 router.get('/get/:id', function (req, res) {
-
     let id = req.params.id;
     User.find({ userId: id })
         .exec()
@@ -115,7 +114,7 @@ router.get('/get/:id', function (req, res) {
         })
 });
 
-//update notification 
+//update user data
 router.post('/updateuser/:userId', async function (req, res) {
     console.log(req.body);
     const userId = req.params.userId;
@@ -128,7 +127,6 @@ router.post('/updateuser/:userId', async function (req, res) {
     const address = req.body.address;
     const other = req.body.other;
 
-
     await User
         .update({ userId: userId },
             {
@@ -140,7 +138,6 @@ router.post('/updateuser/:userId', async function (req, res) {
                     etf: etf,
                     address: address,
                     other: other
-
                 }
             })    //update user data with correspond to userid
         .exec()
@@ -183,6 +180,7 @@ router.post('/account/login', async function (req, res) {
 
 })
 
+//verify user login token
 router.get('/verify', verify, function (req, res, next) {
     res.send({ loginState: true, msg: 'Login Successful..!' })
 })

@@ -16,7 +16,8 @@ var userSchema = mongoose.Schema({
     address: {type: String},
     other: {type: String},
     path: { type: String },
-    isDeleted:{type:String}
+    isDeleted:{type:String},
+    activeState: {type:String}
 });
 
 const Users = module.exports = mongoose.model("Users", userSchema);

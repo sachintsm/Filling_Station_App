@@ -15,7 +15,7 @@ router.post('/add', verify, function (req, res) {
 
     const date = convertToday(req.body.date)
     var dt = Date.parse(req.body.date)
-    
+
     const data = new PumpersCalculation({
         setNumber: req.body.setNumber,
         date: date,
@@ -26,7 +26,7 @@ router.post('/add', verify, function (req, res) {
         saleAmount: req.body.saleAmount,
         receivedAmount: req.body.receivedAmount,
         profit: req.body.profit,
-        timeStamp: dt/1000
+        timeStamp: dt / 1000
     })
 
     data.save()
@@ -55,5 +55,51 @@ router.post('/get', async function (req, res) {
         })
 })
 
+//get this month data
+router.get('/getThisMonth', async (req, res) => {
+    var today = new Date
+    var dt = Date.parse(today)
+    const date = (dt - (1000 * 60 * 60 * 24 * 30)) / 1000
 
+    PumpersCalculation
+        .find({
+            "timeStamp":
+            {
+                $gte: date,
+            }
+        })
+        .select('date pumperId profit timeStamp')
+        .sort({ timeStamp: 1 })
+        .then(data => {
+            res.send({ state: true, msg: "Data Transefer Done..!", data: data })
+        })
+        .catch(err => {
+            res.send({ state: false, msg: "Data Transfer Unsuccessful..!" })
+        })
+})
+
+//get last month data
+router.get('/getLastMonth', async (req, res) => {
+    var today = new Date
+    var dt = Date.parse(today)
+    const date1 = (dt - (1000 * 60 * 60 * 24 * 30)) / 1000
+    const date2 = (dt - (1000 * 60 * 60 * 24 * 30 * 2)) / 1000
+
+    PumpersCalculation
+        .find({
+            "timeStamp":
+            {
+                $gte: date2,
+                $lte: date1
+            }
+        })
+        .select('date pumperId profit timeStamp')
+        .sort({ timeStamp: 1 })
+        .then(data => {
+            res.send({ state: true, msg: "Data Transefer Done..!", data: data })
+        })
+        .catch(err => {
+            res.send({ state: false, msg: "Data Transfer Unsuccessful..!" })
+        })
+})
 module.exports = router
