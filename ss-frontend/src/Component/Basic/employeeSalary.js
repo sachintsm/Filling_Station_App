@@ -12,6 +12,7 @@ import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
 import { getFromStorage } from "../../utils/storage";
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
+import DatePicker from "react-datepicker";
 
 
 export default class employeeSalary extends Component {
@@ -39,8 +40,12 @@ export default class employeeSalary extends Component {
             credit: '',
 
             pumpersData: [],
-            lastMonthProfit: [],
-            thisMonthProfit : [],
+            thisMonthProfit: [],
+
+            dataDiv: false,
+            userId: '',
+
+
         }
         this.onChangeSalInput = this.onChangeSalInput.bind(this)
         this.addSalary = this.addSalary.bind(this)
@@ -52,11 +57,22 @@ export default class employeeSalary extends Component {
         this.onChangeLoanSearch = this.onChangeLoanSearch.bind(this)
         this.onLoanDelete = this.onLoanDelete.bind(this)
 
+        this.onChangeUserId = this.onChangeUserId.bind(this)
+        this.onSetBlur = this.onSetBlur.bind(this)
     }
     snackbarClose = (event) => {
         this.setState({ snackbaropen: false })
     }
+    onChangeUserId(e) {
+        this.setState({
+            userId: e.target.value
+        })
+    }
+    onSetBlur = async () => {
+        console.log(this.state.userId)
+        this.setState({ dataDiv: true });
 
+    }
     componentDidMount = async () => {
         const authState = await verifyAuth();
         this.setState({ authState: authState })
@@ -81,6 +97,8 @@ export default class employeeSalary extends Component {
         //get  pumperIds  data
         axios.get('http://localhost:4000/users/getPumpers')
             .then(res => {
+                console.log(res.data.data);
+
                 this.setState({
                     pumpersData: res.data.data
                 })
@@ -94,17 +112,6 @@ export default class employeeSalary extends Component {
                     thisMonthProfit: res.data.data
                 })
             })
-
-        //get pumpers last month profits
-        axios.get('http://localhost:4000/pumpersCalculations/getLastMonth')
-            .then(res => {
-                console.log(res);
-                this.setState({
-                    lastMonthProfit: res.data.data
-                })
-            })
-
-
     }
     /*********************************************************** */
     onChangeSalInput = (e) => {
@@ -264,6 +271,15 @@ export default class employeeSalary extends Component {
     }
 
     render() {
+        const { pumpersData } = this.state;
+        const { dataDiv } = this.state;
+
+        let pumpSetList = pumpersData.length > 0
+            && pumpersData.map((item, i) => {
+                return (
+                    <option key={i} value={item.userId}>{item.userId} - {item.fullName}</option>
+                )
+            }, this)
         return (
             <React.Fragment>
                 <div className="container-fluid">
@@ -287,7 +303,7 @@ export default class employeeSalary extends Component {
                         </div>
                         <div className="col-md-10" style={{ backgroundColor: "#f5f5f5" }}>
                             <div className="container">
-                                <Tabs defaultActiveKey="loan" id="uncontrolled-tab-example" style={{ marginTop: "20px" }}>
+                                <Tabs defaultActiveKey="profit" id="uncontrolled-tab-example" style={{ marginTop: "20px" }}>
                                     <Tab eventKey="salary" title="Salary">
                                         <div>
                                             <Row>
@@ -363,10 +379,10 @@ export default class employeeSalary extends Component {
                                         </div>
 
                                     </Tab>
-                                    <Tab eventKey="loan" title="Profits / Loans">
+                                    <Tab eventKey="loan" title="Loans">
                                         <div>
                                             <Row>
-                                                <Col xs="8">
+                                                <Col xs="12">
                                                     <Card style={{ marginTop: "18px" }}>
                                                         <div className="container">
                                                             <Row>
@@ -476,26 +492,127 @@ export default class employeeSalary extends Component {
                                                         </Card>
                                                     </div>
                                                 </Col>
-                                                <Col xs="4">
-                                                    <Card style={{ marginTop: "18px" }}>
-                                                        <div className="container">
-                                                            <Row>
-                                                                <Col xs="12" style={{ textAlign: 'center' }}>
-                                                                    <p className="tbl-head">Sachin Muthumala</p>
-                                                                </Col>
-                                                            </Row>
-                                                            <Row>
-                                                                <Col xs="12" style={{ textAlign: 'center', marginTop: "-10px" }}>
-                                                                    <p className="tbl-body">2049.00</p>
-                                                                </Col>
-                                                            </Row>
-                                                        </div>
-                                                    </Card>
-                                                </Col>
+
                                             </Row>
                                         </div>
 
 
+                                    </Tab>
+                                    <Tab eventKey="profit" title="Profits">
+                                        <div className="container" style={{ marginTop: "20px", marginBottom: "20px" }}>
+                                            <Card >
+                                                <div className="container" style={{ padding: "40px", }} >
+                                                    <Row>
+                                                        <select className="form-control" onChange={this.onChangeUserId} onClick={this.onSetBlur}>
+                                                            <option >Select Pumper</option>
+                                                            {pumpSetList}
+                                                        </select>
+                                                    </Row>
+                                                </div>
+
+                                            </Card>
+
+                                            {/* {dataDiv && ( */}
+                                            <Row style={{ marginTop: "20px" }}>
+                                                <Col xs="5">
+                                                    <Card>
+                                                        <div className="container">
+                                                            <Row>
+                                                                <Col xs="6">
+                                                                    <p className="tbl-head">Date</p>
+                                                                </Col>
+                                                                <Col xs="6">
+                                                                    <p className="tbl-head">Profit</p>
+                                                                </Col>
+
+                                                            </Row>
+                                                        </div>
+                                                        <Row>
+                                                            <div className="container">
+                                                                <Row>
+                                                                    <Col xs="6">
+                                                                        <p className="tbl-head">Date</p>
+                                                                    </Col>
+                                                                    <Col xs="6">
+                                                                        <p className="tbl-head">Profit</p>
+                                                                    </Col>
+
+                                                                </Row>
+                                                            </div>
+                                                        </Row>
+                                                    </Card>
+                                                </Col>
+
+                                                <Col xs="7">
+                                                    <Card>
+                                                        <div className="container" style={{ marginTop: "20px" }}>
+                                                            <Row>
+                                                                <Col xs="6">
+                                                                    <p className="tbl-body">Start Date</p>
+                                                                </Col>
+                                                                <Col xs="6">
+                                                                    <p className="tbl-body">End Date</p>
+                                                                </Col>
+                                                            </Row>
+                                                            <Row>
+                                                                <Col xs="6">
+                                                                    <div className="form-group">
+                                                                        <DatePicker
+                                                                            className="form-control"
+                                                                            selected={this.state.startDate}
+                                                                            onChange={this.onChangeDate}
+                                                                            dateFormat="yyyy-MM-dd"
+                                                                        />
+                                                                    </div>
+                                                                </Col>
+                                                                <Col xs="6">
+                                                                    <div className="form-group">
+                                                                        <DatePicker
+                                                                            className="form-control"
+                                                                            selected={this.state.startDate}
+                                                                            onChange={this.onChangeDate}
+                                                                            dateFormat="yyyy-MM-dd"
+                                                                        />
+                                                                    </div>
+                                                                </Col>
+                                                            </Row>
+                                                        </div>
+
+                                                        <div className="container" style={{ marginTop: "-10px" }}>
+                                                            <Row style={{ textAlign: "center" }}>
+                                                                <Col xs="6" >
+                                                                    <MDBInput style={{ width: "72%" }} outline label="Pumper ID" type="text" name="pumperId" onChange={this.onChangepumperID} />
+                                                                </Col>
+                                                                <Col xs="6">
+                                                                    <MDBInput outline label="Amount" style={{ width: "72%" }} type="text" name="pumperId" onChange={this.onChangepumperID} />
+                                                                </Col>
+                                                                <Col>
+                                                                    <button style={{ width: "50%" }} className="btn btn-primary sub-btn" onClick={this.getData}>Get Data</button>
+                                                                </Col>
+                                                            </Row>
+                                                        </div>
+                                                        <hr></hr>
+                                                        <div className="container" style={{ marginTop: "20px" }}>
+                                                            <Row>
+                                                                <Col xs="4">
+                                                                    <p className="tbl-body">Start Date</p>
+                                                                </Col>
+                                                                <Col xs="4">
+                                                                    <p className="tbl-body">End Date</p>
+                                                                </Col>
+                                                                <Col xs="4">
+                                                                    <p className="tbl-body">Amount</p>
+                                                                </Col>
+                                                            </Row>
+
+                                                        </div>
+
+                                                    </Card>
+                                                </Col>
+                                            </Row>
+                                            {/* )} */}
+
+                                        </div>
                                     </Tab>
                                 </Tabs>
                             </div>
