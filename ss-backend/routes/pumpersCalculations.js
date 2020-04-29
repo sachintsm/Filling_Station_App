@@ -56,17 +56,19 @@ router.post('/get', async function (req, res) {
 })
 
 //get this month data
-router.get('/getThisMonth', async (req, res) => {
+router.get('/getThisMonth/:id', async (req, res) => {
     var today = new Date
     var dt = Date.parse(today)
     const date = (dt - (1000 * 60 * 60 * 24 * 30 * 3)) / 1000
 
+    const id = req.params.id
     PumpersCalculation
         .find({
             "timeStamp":
             {
                 $gte: date,
-            }
+            },
+            pumperId : id
         })
         .select('date pumperId profit')
         .sort({ timeStamp: 1 })

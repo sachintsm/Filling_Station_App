@@ -44,7 +44,11 @@ export default class employeeSalary extends Component {
 
             dataDiv: false,
             userId: '',
-
+            startDate: new Date(),
+            endDate: new Date(),
+            profitPumperId: '',
+            profitAmount: '',
+            profitType : '',
 
         }
         this.onChangeSalInput = this.onChangeSalInput.bind(this)
@@ -59,6 +63,22 @@ export default class employeeSalary extends Component {
 
         this.onChangeUserId = this.onChangeUserId.bind(this)
         this.onSetBlur = this.onSetBlur.bind(this)
+        this.onChangeStartDate = this.onChangeStartDate.bind(this)
+        this.onChangeEndDate = this.onChangeEndDate.bind(this)
+        this.onChangeProfit = this.onChangeProfit.bind(this)
+        this.addProfit = this.addProfit.bind(this)
+        this.onChangeProfitType = this.onChangeProfitType.bind(this)
+    }
+
+    onChangeStartDate = date => {
+        this.setState(prevState => ({
+            startDate: date
+        }))
+    }
+    onChangeEndDate = date => {
+        this.setState(prevState => ({
+            endDate: date
+        }))
     }
     snackbarClose = (event) => {
         this.setState({ snackbaropen: false })
@@ -68,8 +88,76 @@ export default class employeeSalary extends Component {
             userId: e.target.value
         })
     }
+
+    addProfit() {
+        const obj = getFromStorage('auth-token');
+
+
+        if (this.state.profitPumperId === '' || this.state.profitAmount === '' || this.state.profitType === '') {
+            this.setState({
+                snackbaropen: true,
+                snackbarmsg: "Please Fill the Data ..!"
+            })
+        }
+        else {
+            const data = {
+                startDate: this.state.startDate,
+                endDate: this.state.endDate,
+                pumperId: this.state.profitPumperId,
+                amount: this.state.profitAmount,
+                type : this.state.profitType
+            }
+            console.log(data)
+
+            fetch('http://localhost:4000/pumperProfitPayment/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'auth-token': obj.token
+                },
+                body: JSON.stringify(data),
+            })
+                .then(res => res.json())
+                .then(json => {
+                    // alert(json.msg)
+                    this.setState({
+                        snackbaropen: true,
+                        snackbarmsg: json.msg
+                    })
+                    // window.location.reload();
+                })
+                .catch(err => {
+                    this.setState({
+                        snackbaropen: true,
+                        snackbarmsg: err
+                    })
+                    console.log(err)
+                })
+        }
+    }
+
+    onChangeProfit = (e) => {
+        e.persist = () => { };
+        let store = this.state;
+        store[e.target.name] = e.target.value
+        this.setState(store);
+    }
+    onChangeProfitType(e){
+        this.setState({
+            profitType: e.target.value
+        })
+    }
+
     onSetBlur = async () => {
-        console.log(this.state.userId)
+        var id = this.state.userId
+        //get pumpers this month profits
+        axios.get('http://localhost:4000/pumpersCalculations/getThisMonth/' + id)
+            .then(res => {
+                console.log(res);
+                this.setState({
+                    thisMonthProfit: res.data.data
+                })
+            })
         this.setState({ dataDiv: true });
 
     }
@@ -104,14 +192,7 @@ export default class employeeSalary extends Component {
                 })
             })
 
-        //get pumpers this month profits
-        axios.get('http://localhost:4000/pumpersCalculations/getThisMonth')
-            .then(res => {
-                console.log(res);
-                this.setState({
-                    thisMonthProfit: res.data.data
-                })
-            })
+
     }
     /*********************************************************** */
     onChangeSalInput = (e) => {
@@ -514,85 +595,98 @@ export default class employeeSalary extends Component {
 
                                             {/* {dataDiv && ( */}
                                             <Row style={{ marginTop: "20px" }}>
-                                                <Col xs="5">
+                                                <Col xs="4">
                                                     <Card>
                                                         <div className="container">
                                                             <Row>
                                                                 <Col xs="6">
                                                                     <p className="tbl-head">Date</p>
                                                                 </Col>
-                                                                <Col xs="6">
+                                                                <Col xs="6" style={{ textAlign: "center" }}>
                                                                     <p className="tbl-head">Profit</p>
                                                                 </Col>
 
                                                             </Row>
                                                         </div>
-                                                        <Row>
-                                                            <div className="container">
-                                                                <Row>
-                                                                    <Col xs="6">
-                                                                        <p className="tbl-head">Date</p>
-                                                                    </Col>
-                                                                    <Col xs="6">
-                                                                        <p className="tbl-head">Profit</p>
-                                                                    </Col>
+                                                        {this.state.thisMonthProfit.map((data) => {
+                                                            return (
 
-                                                                </Row>
-                                                            </div>
-                                                        </Row>
+                                                                <div className="container" key={data._id}>
+                                                                    <Row>
+                                                                        <Col xs="6">
+                                                                            <p className="tbl-body">{data.date}</p>
+                                                                        </Col>
+                                                                        <Col xs="6" style={{ textAlign: "right" }}>
+                                                                            <p className="tbl-body">{data.profit}</p>
+                                                                        </Col>
+
+                                                                    </Row>
+                                                                </div>
+
+                                                            )
+                                                        })}
                                                     </Card>
                                                 </Col>
 
-                                                <Col xs="7">
-                                                    <Card>
+                                                <Col xs="8">
+                                                    <Card className="profitCard" style={{ minHeight: "400px" }}>
                                                         <div className="container" style={{ marginTop: "20px" }}>
                                                             <Row>
-                                                                <Col xs="6">
-                                                                    <p className="tbl-body">Start Date</p>
+                                                                <Col xs="8">
+                                                                    <Row>
+                                                                        <Col xs="6">
+                                                                            <p className="tbl-body">Start Date</p>
+                                                                        </Col>
+                                                                        <Col xs="6">
+                                                                            <p className="tbl-body">End Date</p>
+                                                                        </Col>
+                                                                    </Row>
+                                                                    <Row>
+                                                                        <Col xs="6">
+                                                                            <div className="form-group">
+                                                                                <DatePicker
+                                                                                    className="form-control"
+                                                                                    selected={this.state.startDate}
+                                                                                    onChange={this.onChangeStartDate}
+                                                                                    dateFormat="yyyy-MM-dd"
+                                                                                />
+                                                                            </div>
+                                                                        </Col>
+                                                                        <Col xs="6">
+                                                                            <div className="form-group">
+                                                                                <DatePicker
+                                                                                    className="form-control"
+                                                                                    selected={this.state.endDate}
+                                                                                    onChange={this.onChangeEndDate}
+                                                                                    dateFormat="yyyy-MM-dd"
+                                                                                />
+                                                                            </div>
+                                                                        </Col>
+                                                                    </Row>
+                                                                    <Row style={{ textAlign: "center", marginTop: "-20px" }}>
+                                                                        <Col xs="6" >
+                                                                            <MDBInput outline style={{ width: "96%" }} label="Pumper ID" type="text" name="profitPumperId" onChange={this.onChangeProfit} />
+                                                                        </Col>
+                                                                        <Col xs="6">
+                                                                            <MDBInput outline style={{ width: "96%" }} label="Amount" type="text" name="profitAmount" onChange={this.onChangeProfit} />
+                                                                        </Col>
+                                                                    </Row>
                                                                 </Col>
-                                                                <Col xs="6">
-                                                                    <p className="tbl-body">End Date</p>
+                                                                <Col xs="4" style={{ marginTop: "38px" }}>
+                                                                    <select className="form-control" style={{ marginTop:"5px"}} onChange={this.onChangeProfitType}>
+                                                                        <option>Select Type</option>
+                                                                        <option value="credit">To Employee</option>
+                                                                        <option value="debit">From Employee</option>
+                                                                    </select>
+                                                                    <button style={{ height: "40px", marginTop: "20px", marginLeft: "0px" }} className="btn btn-primary sub-btn" onClick={this.addProfit}>submit</button>
                                                                 </Col>
                                                             </Row>
-                                                            <Row>
-                                                                <Col xs="6">
-                                                                    <div className="form-group">
-                                                                        <DatePicker
-                                                                            className="form-control"
-                                                                            selected={this.state.startDate}
-                                                                            onChange={this.onChangeDate}
-                                                                            dateFormat="yyyy-MM-dd"
-                                                                        />
-                                                                    </div>
-                                                                </Col>
-                                                                <Col xs="6">
-                                                                    <div className="form-group">
-                                                                        <DatePicker
-                                                                            className="form-control"
-                                                                            selected={this.state.startDate}
-                                                                            onChange={this.onChangeDate}
-                                                                            dateFormat="yyyy-MM-dd"
-                                                                        />
-                                                                    </div>
-                                                                </Col>
-                                                            </Row>
+
                                                         </div>
 
-                                                        <div className="container" style={{ marginTop: "-10px" }}>
-                                                            <Row style={{ textAlign: "center" }}>
-                                                                <Col xs="6" >
-                                                                    <MDBInput style={{ width: "72%" }} outline label="Pumper ID" type="text" name="pumperId" onChange={this.onChangepumperID} />
-                                                                </Col>
-                                                                <Col xs="6">
-                                                                    <MDBInput outline label="Amount" style={{ width: "72%" }} type="text" name="pumperId" onChange={this.onChangepumperID} />
-                                                                </Col>
-                                                                <Col>
-                                                                    <button style={{ width: "50%" }} className="btn btn-primary sub-btn" onClick={this.getData}>Get Data</button>
-                                                                </Col>
-                                                            </Row>
-                                                        </div>
-                                                        <hr></hr>
+
                                                         <div className="container" style={{ marginTop: "20px" }}>
+                                                            <hr style={{ marginLeft: "0px" }}></hr>
                                                             <Row>
                                                                 <Col xs="4">
                                                                     <p className="tbl-body">Start Date</p>
