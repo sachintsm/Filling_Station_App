@@ -17,7 +17,7 @@ router.post('/add', verify, function (req, res) {
     const endDate = convertToday(req.body.endDate)
 
     var dt = Date.parse(req.body.startDate)
-    console.log (req.body)
+    console.log(req.body)
     console.log(dt)
     const data = new PumpersProfitPayment({
         startDate: startDate,
@@ -37,46 +37,43 @@ router.post('/add', verify, function (req, res) {
         })
 })
 
-//get data by date and pumper id for earlier data
-// router.post('/get', async function (req, res) {
-//     var date = convertToday(req.body.el_date)
-//     var pumperId = req.body.el_pumperId
-//     //checking if the userId is already in the database
-//     const userIdExist = await PumpersCalculation.findOne({ pumperId: pumperId })
-//     if (!userIdExist) return res.json({ state: false, msg: "This pumperId does not exists..!" })
+// get data by date and pumper id for earlier data
+router.delete('/delete/:id', function (req, res) {
+    var id = req.params.id
 
-//     PumpersCalculation.find({ date: date, pumperId: pumperId })
-//         .then(data => {
-//             res.send({ state: true, msg: "Data Transefer Done..!", data: data })
-//         })
-//         .catch(err => {
-//             res.send({ state: false, msg: "data Tranfr Unsuccessful..!" })
-//         })
-// })
+    PumpersProfitPayment
+        .remove({ _id: id })
+        .then(data => {
+            res.send({ state: true, msg: "Successfully Deleted..!"})
+        })
+        .catch(err => {
+            res.send({ state: false, msg: "Recored does not delete..!" })
+        })
+})
 
-//get this month data
-// router.get('/getThisMonth/:id', async (req, res) => {
-//     var today = new Date
-//     var dt = Date.parse(today)
-//     const date = (dt - (1000 * 60 * 60 * 24 * 30 * 3)) / 1000
+// get this month data
+router.get('/getThisYear/:id', async (req, res) => {
+    var today = new Date
+    var dt = Date.parse(today)
+    const date = (dt - (1000 * 60 * 60 * 24 * 30 * 12 * 3)) / 1000
 
-//     const id = req.params.id
-//     PumpersCalculation
-//         .find({
-//             "timeStamp":
-//             {
-//                 $gte: date,
-//             },
-//             pumperId : id
-//         })
-//         .select('date pumperId profit')
-//         .sort({ timeStamp: 1 })
-//         .then(data => {
-//             res.send({ state: true, msg: "Data Transefer Done..!", data: data })
-//         })
-//         .catch(err => {
-//             res.send({ state: false, msg: "Data Transfer Unsuccessful..!" })
-//         })
-// })
+    const id = req.params.id
+    PumpersProfitPayment
+        .find({
+            "timeStamp":
+            {
+                $gte: date,
+            },
+            pumperId: id
+        })
+        .select('startDate endDate amount type')
+        .sort({ timeStamp: 1 })
+        .then(data => {
+            res.send({ state: true, msg: "Data Transefer Done..!", data: data })
+        })
+        .catch(err => {
+            res.send({ state: false, msg: "Data Transfer Unsuccessful..!" })
+        })
+})
 
 module.exports = router

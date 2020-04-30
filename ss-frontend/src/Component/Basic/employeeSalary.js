@@ -48,8 +48,9 @@ export default class employeeSalary extends Component {
             endDate: new Date(),
             profitPumperId: '',
             profitAmount: '',
-            profitType : '',
+            profitType: '',
 
+            profitPayment: [],
         }
         this.onChangeSalInput = this.onChangeSalInput.bind(this)
         this.addSalary = this.addSalary.bind(this)
@@ -105,7 +106,7 @@ export default class employeeSalary extends Component {
                 endDate: this.state.endDate,
                 pumperId: this.state.profitPumperId,
                 amount: this.state.profitAmount,
-                type : this.state.profitType
+                type: this.state.profitType
             }
             console.log(data)
 
@@ -142,7 +143,7 @@ export default class employeeSalary extends Component {
         store[e.target.name] = e.target.value
         this.setState(store);
     }
-    onChangeProfitType(e){
+    onChangeProfitType(e) {
         this.setState({
             profitType: e.target.value
         })
@@ -153,13 +154,27 @@ export default class employeeSalary extends Component {
         //get pumpers this month profits
         axios.get('http://localhost:4000/pumpersCalculations/getThisMonth/' + id)
             .then(res => {
-                console.log(res);
+                // console.log(res);
                 this.setState({
                     thisMonthProfit: res.data.data
                 })
+                this.setState({ dataDiv: true });
             })
-        this.setState({ dataDiv: true });
+            .catch(err => {
 
+                console.log(err)
+            })
+        axios.get('http://localhost:4000/pumperProfitPayment/getThisYear/' + id)
+            .then(res => {
+                console.log(res.data.data);
+                this.setState({
+                    profitPayment: res.data.data
+                })
+                this.setState({ dataDiv: true });
+            })
+            .catch(err => {
+                console.log(err)
+            })
     }
     componentDidMount = async () => {
         const authState = await verifyAuth();
@@ -351,6 +366,24 @@ export default class employeeSalary extends Component {
             })
     }
 
+    onProfitDelete = (data) => {
+        axios.delete('http://localhost:4000/pumperProfitPayment/delete/' + data)
+            .then((res) => {
+                console.log(res);
+                this.setState({
+                    snackbaropen: true,
+                    snackbarmsg: res.data.message
+                })
+                window.location.reload();
+            })
+            .catch(err => {
+                console.log(err);
+                this.setState({
+                    snackbaropen: true,
+                    snackbarmsg: err
+                })
+            })
+    }
     render() {
         const { pumpersData } = this.state;
         const { dataDiv } = this.state;
@@ -384,7 +417,7 @@ export default class employeeSalary extends Component {
                         </div>
                         <div className="col-md-10" style={{ backgroundColor: "#f5f5f5" }}>
                             <div className="container">
-                                <Tabs defaultActiveKey="profit" id="uncontrolled-tab-example" style={{ marginTop: "20px" }}>
+                                <Tabs defaultActiveKey="salary" id="uncontrolled-tab-example" style={{ marginTop: "20px" }}>
                                     <Tab eventKey="salary" title="Salary">
                                         <div>
                                             <Row>
@@ -437,23 +470,47 @@ export default class employeeSalary extends Component {
                                                     </Row>
                                                 </div>
                                                 <div className="container">
+
                                                     {this.state.employeeSalary.map(data => {
-                                                        return (
-                                                            <Row key={data._id}>
-                                                                <Col xs="3">
-                                                                    <p className="tbl-body">{data.date}</p>
-                                                                </Col>
-                                                                <Col xs="3">
-                                                                    <p className="tbl-body">{data.empId}</p>
-                                                                </Col>
-                                                                <Col xs="3">
-                                                                    <p className="tbl-body">{data.amount}</p>
-                                                                </Col>
-                                                                <Col xs="3">
-                                                                    <DeleteForeverIcon className="del-btn" onClick={() => this.onSalaryDelete(data._id)} />
-                                                                </Col>
-                                                            </Row>
-                                                        )
+                                                        if (this.state.empIdSearch === null || this.state.empIdSearch === '') {
+                                                            return (
+                                                                <Row key={data._id}>
+                                                                    <Col xs="3">
+                                                                        <p className="tbl-body">{data.date}</p>
+                                                                    </Col>
+                                                                    <Col xs="3">
+                                                                        <p className="tbl-body">{data.empId}</p>
+                                                                    </Col>
+                                                                    <Col xs="3">
+                                                                        <p className="tbl-body">{data.amount}</p>
+                                                                    </Col>
+                                                                    <Col xs="3">
+                                                                        <DeleteForeverIcon className="del-btn" onClick={() => this.onSalaryDelete(data._id)} />
+                                                                    </Col>
+                                                                </Row>
+                                                            )
+                                                        }
+                                                        else {
+                                                            if (this.state.empIdSearch === data.empId) {
+
+                                                                return (
+                                                                    <Row key={data._id}>
+                                                                        <Col xs="3">
+                                                                            <p className="tbl-body">{data.date}</p>
+                                                                        </Col>
+                                                                        <Col xs="3">
+                                                                            <p className="tbl-body">{data.empId}</p>
+                                                                        </Col>
+                                                                        <Col xs="3">
+                                                                            <p className="tbl-body">{data.amount}</p>
+                                                                        </Col>
+                                                                        <Col xs="3">
+                                                                            <DeleteForeverIcon className="del-btn" onClick={() => this.onSalaryDelete(data._id)} />
+                                                                        </Col>
+                                                                    </Row>
+                                                                )
+                                                            }
+                                                        }
                                                     })}
                                                 </div>
                                             </Card>
@@ -499,7 +556,7 @@ export default class employeeSalary extends Component {
                                                                     </Col>
                                                                 </Row>
                                                             </div>
-                                                            <div className="container" style={{ marginTop: "-10px" }}>
+                                                            <div className="container" style={{ marginTop: "-10px" }}>``
                                                                 <hr style={{ marginLeft: "-3px" }}></hr>
                                                             </div>
                                                             <div className="container">
@@ -523,49 +580,98 @@ export default class employeeSalary extends Component {
                                                             </div>
                                                             <div className="container">
                                                                 {this.state.employeeLoan.map(data => {
-
-                                                                    if (data.type === 'credit') {
-                                                                        return (
-                                                                            <Row key={data._id}>
-                                                                                <Col xs="2">
-                                                                                    <p className="tbl-body">{data.date}</p>
-                                                                                </Col>
-                                                                                <Col xs="2">
-                                                                                    <p className="tbl-body">{data.empId}</p>
-                                                                                </Col>
-                                                                                <Col xs="3" style={{ textAlign: "right" }}>
-                                                                                    <p className="tbl-body colorGreen">{data.amount}</p>
-                                                                                </Col>
-                                                                                <Col xs="3" style={{ textAlign: "right" }}>
-                                                                                    <p className="tbl-body">-</p>
-                                                                                </Col>
-                                                                                <Col xs="2" style={{ textAlign: "center" }}>
-                                                                                    <DeleteForeverIcon className="del-btn" onClick={() => this.onLoanDelete(data._id)} />
-                                                                                </Col>
-                                                                            </Row>
-                                                                        )
+                                                                    if (this.state.loanSearch === null || this.state.loanSearch === '') {
+                                                                        if (data.type === 'credit') {
+                                                                            return (
+                                                                                <Row key={data._id}>
+                                                                                    <Col xs="2">
+                                                                                        <p className="tbl-body">{data.date}</p>
+                                                                                    </Col>
+                                                                                    <Col xs="2">
+                                                                                        <p className="tbl-body">{data.empId}</p>
+                                                                                    </Col>
+                                                                                    <Col xs="3" style={{ textAlign: "right" }}>
+                                                                                        <p className="tbl-body colorGreen">{data.amount}</p>
+                                                                                    </Col>
+                                                                                    <Col xs="3" style={{ textAlign: "right" }}>
+                                                                                        <p className="tbl-body">-</p>
+                                                                                    </Col>
+                                                                                    <Col xs="2" style={{ textAlign: "center" }}>
+                                                                                        <DeleteForeverIcon className="del-btn" onClick={() => this.onLoanDelete(data._id)} />
+                                                                                    </Col>
+                                                                                </Row>
+                                                                            )
+                                                                        }
+                                                                        else {
+                                                                            return (
+                                                                                <Row key={data._id}>
+                                                                                    <Col xs="2">
+                                                                                        <p className="tbl-body">{data.date}</p>
+                                                                                    </Col>
+                                                                                    <Col xs="2">
+                                                                                        <p className="tbl-body">{data.empId}</p>
+                                                                                    </Col>
+                                                                                    <Col xs="3" style={{ textAlign: "right" }}>
+                                                                                        <p className="tbl-body">-</p>
+                                                                                    </Col>
+                                                                                    <Col xs="3" style={{ textAlign: "right" }}>
+                                                                                        <p className="tbl-body colorRed">{data.amount}</p>
+                                                                                    </Col>
+                                                                                    <Col xs="2" style={{ textAlign: "center" }}>
+                                                                                        <DeleteForeverIcon className="del-btn" onClick={() => this.onLoanDelete(data._id)} />
+                                                                                    </Col>
+                                                                                </Row>
+                                                                            )
+                                                                        }
                                                                     }
                                                                     else {
-                                                                        return (
-                                                                            <Row key={data._id}>
-                                                                                <Col xs="2">
-                                                                                    <p className="tbl-body">{data.date}</p>
-                                                                                </Col>
-                                                                                <Col xs="2">
-                                                                                    <p className="tbl-body">{data.empId}</p>
-                                                                                </Col>
-                                                                                <Col xs="3" style={{ textAlign: "right" }}>
-                                                                                    <p className="tbl-body">-</p>
-                                                                                </Col>
-                                                                                <Col xs="3" style={{ textAlign: "right" }}>
-                                                                                    <p className="tbl-body colorRed">{data.amount}</p>
-                                                                                </Col>
-                                                                                <Col xs="2" style={{ textAlign: "center" }}>
-                                                                                    <DeleteForeverIcon className="del-btn" onClick={() => this.onLoanDelete(data._id)} />
-                                                                                </Col>
-                                                                            </Row>
-                                                                        )
+                                                                        if(this.state.loanSearch === data.empId){
+
+                                                                            if (data.type === 'credit') {
+                                                                                return (
+                                                                                    <Row key={data._id}>
+                                                                                        <Col xs="2">
+                                                                                            <p className="tbl-body">{data.date}</p>
+                                                                                        </Col>
+                                                                                        <Col xs="2">
+                                                                                            <p className="tbl-body">{data.empId}</p>
+                                                                                        </Col>
+                                                                                        <Col xs="3" style={{ textAlign: "right" }}>
+                                                                                            <p className="tbl-body colorGreen">{data.amount}</p>
+                                                                                        </Col>
+                                                                                        <Col xs="3" style={{ textAlign: "right" }}>
+                                                                                            <p className="tbl-body">-</p>
+                                                                                        </Col>
+                                                                                        <Col xs="2" style={{ textAlign: "center" }}>
+                                                                                            <DeleteForeverIcon className="del-btn" onClick={() => this.onLoanDelete(data._id)} />
+                                                                                        </Col>
+                                                                                    </Row>
+                                                                                )
+                                                                            }
+                                                                            else {
+                                                                                return (
+                                                                                    <Row key={data._id}>
+                                                                                        <Col xs="2">
+                                                                                            <p className="tbl-body">{data.date}</p>
+                                                                                        </Col>
+                                                                                        <Col xs="2">
+                                                                                            <p className="tbl-body">{data.empId}</p>
+                                                                                        </Col>
+                                                                                        <Col xs="3" style={{ textAlign: "right" }}>
+                                                                                            <p className="tbl-body">-</p>
+                                                                                        </Col>
+                                                                                        <Col xs="3" style={{ textAlign: "right" }}>
+                                                                                            <p className="tbl-body colorRed">{data.amount}</p>
+                                                                                        </Col>
+                                                                                        <Col xs="2" style={{ textAlign: "center" }}>
+                                                                                            <DeleteForeverIcon className="del-btn" onClick={() => this.onLoanDelete(data._id)} />
+                                                                                        </Col>
+                                                                                    </Row>
+                                                                                )
+                                                                            }
+                                                                        }
                                                                     }
+
 
                                                                 })}
 
@@ -593,118 +699,172 @@ export default class employeeSalary extends Component {
 
                                             </Card>
 
-                                            {/* {dataDiv && ( */}
-                                            <Row style={{ marginTop: "20px" }}>
-                                                <Col xs="4">
-                                                    <Card>
-                                                        <div className="container">
-                                                            <Row>
-                                                                <Col xs="6">
-                                                                    <p className="tbl-head">Date</p>
-                                                                </Col>
-                                                                <Col xs="6" style={{ textAlign: "center" }}>
-                                                                    <p className="tbl-head">Profit</p>
-                                                                </Col>
+                                            {dataDiv && (
+                                                <Row style={{ marginTop: "20px" }}>
+                                                    <Col xs="4">
+                                                        <Card>
+                                                            <div className="container">
+                                                                <Row>
+                                                                    <Col xs="6">
+                                                                        <p className="tbl-head">Date</p>
+                                                                    </Col>
+                                                                    <Col xs="6" style={{ textAlign: "center" }}>
+                                                                        <p className="tbl-head">Profit</p>
+                                                                    </Col>
 
-                                                            </Row>
-                                                        </div>
-                                                        {this.state.thisMonthProfit.map((data) => {
-                                                            return (
+                                                                </Row>
+                                                            </div>
+                                                            {this.state.thisMonthProfit.map((data) => {
+                                                                return (
 
-                                                                <div className="container" key={data._id}>
-                                                                    <Row>
-                                                                        <Col xs="6">
-                                                                            <p className="tbl-body">{data.date}</p>
-                                                                        </Col>
-                                                                        <Col xs="6" style={{ textAlign: "right" }}>
-                                                                            <p className="tbl-body">{data.profit}</p>
-                                                                        </Col>
+                                                                    <div className="container" key={data._id}>
+                                                                        <Row>
+                                                                            <Col xs="6">
+                                                                                <p className="tbl-body">{data.date}</p>
+                                                                            </Col>
+                                                                            <Col xs="6" style={{ textAlign: "right" }}>
+                                                                                <p className="tbl-body">{data.profit}</p>
+                                                                            </Col>
 
-                                                                    </Row>
-                                                                </div>
+                                                                        </Row>
+                                                                    </div>
 
-                                                            )
-                                                        })}
-                                                    </Card>
-                                                </Col>
+                                                                )
+                                                            })}
+                                                        </Card>
+                                                    </Col>
 
-                                                <Col xs="8">
-                                                    <Card className="profitCard" style={{ minHeight: "400px" }}>
-                                                        <div className="container" style={{ marginTop: "20px" }}>
-                                                            <Row>
-                                                                <Col xs="8">
-                                                                    <Row>
-                                                                        <Col xs="6">
-                                                                            <p className="tbl-body">Start Date</p>
-                                                                        </Col>
-                                                                        <Col xs="6">
-                                                                            <p className="tbl-body">End Date</p>
-                                                                        </Col>
-                                                                    </Row>
-                                                                    <Row>
-                                                                        <Col xs="6">
-                                                                            <div className="form-group">
-                                                                                <DatePicker
-                                                                                    className="form-control"
-                                                                                    selected={this.state.startDate}
-                                                                                    onChange={this.onChangeStartDate}
-                                                                                    dateFormat="yyyy-MM-dd"
-                                                                                />
-                                                                            </div>
-                                                                        </Col>
-                                                                        <Col xs="6">
-                                                                            <div className="form-group">
-                                                                                <DatePicker
-                                                                                    className="form-control"
-                                                                                    selected={this.state.endDate}
-                                                                                    onChange={this.onChangeEndDate}
-                                                                                    dateFormat="yyyy-MM-dd"
-                                                                                />
-                                                                            </div>
-                                                                        </Col>
-                                                                    </Row>
-                                                                    <Row style={{ textAlign: "center", marginTop: "-20px" }}>
-                                                                        <Col xs="6" >
-                                                                            <MDBInput outline style={{ width: "96%" }} label="Pumper ID" type="text" name="profitPumperId" onChange={this.onChangeProfit} />
-                                                                        </Col>
-                                                                        <Col xs="6">
-                                                                            <MDBInput outline style={{ width: "96%" }} label="Amount" type="text" name="profitAmount" onChange={this.onChangeProfit} />
-                                                                        </Col>
-                                                                    </Row>
-                                                                </Col>
-                                                                <Col xs="4" style={{ marginTop: "38px" }}>
-                                                                    <select className="form-control" style={{ marginTop:"5px"}} onChange={this.onChangeProfitType}>
-                                                                        <option>Select Type</option>
-                                                                        <option value="credit">To Employee</option>
-                                                                        <option value="debit">From Employee</option>
-                                                                    </select>
-                                                                    <button style={{ height: "40px", marginTop: "20px", marginLeft: "0px" }} className="btn btn-primary sub-btn" onClick={this.addProfit}>submit</button>
-                                                                </Col>
-                                                            </Row>
+                                                    <Col xs="8">
+                                                        <Card className="profitCard" style={{ minHeight: "400px" }}>
+                                                            <div className="container" style={{ marginTop: "20px" }}>
+                                                                <Row>
+                                                                    <Col xs="8">
+                                                                        <Row>
+                                                                            <Col xs="6">
+                                                                                <p className="tbl-body">Start Date</p>
+                                                                            </Col>
+                                                                            <Col xs="6">
+                                                                                <p className="tbl-body">End Date</p>
+                                                                            </Col>
+                                                                        </Row>
+                                                                        <Row>
+                                                                            <Col xs="6">
+                                                                                <div className="form-group">
+                                                                                    <DatePicker
+                                                                                        className="form-control"
+                                                                                        selected={this.state.startDate}
+                                                                                        onChange={this.onChangeStartDate}
+                                                                                        dateFormat="yyyy-MM-dd"
+                                                                                    />
+                                                                                </div>
+                                                                            </Col>
+                                                                            <Col xs="6">
+                                                                                <div className="form-group">
+                                                                                    <DatePicker
+                                                                                        className="form-control"
+                                                                                        selected={this.state.endDate}
+                                                                                        onChange={this.onChangeEndDate}
+                                                                                        dateFormat="yyyy-MM-dd"
+                                                                                    />
+                                                                                </div>
+                                                                            </Col>
+                                                                        </Row>
+                                                                        <Row style={{ textAlign: "center", marginTop: "-20px" }}>
+                                                                            <Col xs="6" >
+                                                                                <MDBInput outline style={{ width: "96%" }} label="Pumper ID" type="text" name="profitPumperId" onChange={this.onChangeProfit} />
+                                                                            </Col>
+                                                                            <Col xs="6">
+                                                                                <MDBInput outline style={{ width: "96%" }} label="Amount" type="text" name="profitAmount" onChange={this.onChangeProfit} />
+                                                                            </Col>
+                                                                        </Row>
+                                                                    </Col>
+                                                                    <Col xs="4" style={{ marginTop: "38px" }}>
+                                                                        <select className="form-control" style={{ marginTop: "5px" }} onChange={this.onChangeProfitType}>
+                                                                            <option>Select Type</option>
+                                                                            <option value="credit">To Employee</option>
+                                                                            <option value="debit">From Employee</option>
+                                                                        </select>
+                                                                        <button style={{ height: "40px", marginTop: "20px", marginLeft: "0px" }} className="btn btn-primary sub-btn" onClick={this.addProfit}>submit</button>
+                                                                    </Col>
+                                                                </Row>
 
-                                                        </div>
+                                                            </div>
 
 
-                                                        <div className="container" style={{ marginTop: "20px" }}>
-                                                            <hr style={{ marginLeft: "0px" }}></hr>
-                                                            <Row>
-                                                                <Col xs="4">
-                                                                    <p className="tbl-body">Start Date</p>
-                                                                </Col>
-                                                                <Col xs="4">
-                                                                    <p className="tbl-body">End Date</p>
-                                                                </Col>
-                                                                <Col xs="4">
-                                                                    <p className="tbl-body">Amount</p>
-                                                                </Col>
-                                                            </Row>
+                                                            <div className="container" style={{ marginTop: "20px" }}>
+                                                                <hr style={{ marginLeft: "0px" }}></hr>
+                                                                <Row>
+                                                                    <Col xs="3">
+                                                                        <p className="tbl-body">Start Date</p>
+                                                                    </Col>
+                                                                    <Col xs="3">
+                                                                        <p className="tbl-body">End Date</p>
+                                                                    </Col>
 
-                                                        </div>
+                                                                    <Col xs="2">
+                                                                        <p className="tbl-body">From</p>
+                                                                    </Col>
+                                                                    <Col xs="2">
+                                                                        <p className="tbl-body">To</p>
+                                                                    </Col>
 
-                                                    </Card>
-                                                </Col>
-                                            </Row>
-                                            {/* )} */}
+                                                                </Row>
+                                                            </div>
+                                                            <div className="container">
+
+                                                                {this.state.profitPayment.map(data => {
+
+                                                                    if (data.type === 'credit') {
+                                                                        return (
+                                                                            <Row key={data._id}>
+                                                                                <Col xs="3">
+                                                                                    <p className="tbl-body">{data.startDate}</p>
+                                                                                </Col>
+                                                                                <Col xs="3">
+                                                                                    <p className="tbl-body">{data.endDate}</p>
+                                                                                </Col>
+                                                                                <Col xs="2">
+                                                                                    <p className="tbl-body">-</p>
+                                                                                </Col>
+                                                                                <Col xs="2">
+                                                                                    <p className="tbl-body colorGreen">{data.amount}</p>
+                                                                                </Col>
+                                                                                <Col xs="2" style={{ textAlign: "center" }}>
+                                                                                    <DeleteForeverIcon className="del-btn" onClick={() => this.onProfitDelete(data._id)} />
+                                                                                </Col>
+                                                                            </Row>
+                                                                        )
+                                                                    }
+                                                                    else {
+                                                                        return (
+                                                                            <Row key={data._id}>
+                                                                                <Col xs="3">
+                                                                                    <p className="tbl-body">{data.startDate}</p>
+                                                                                </Col>
+                                                                                <Col xs="3">
+                                                                                    <p className="tbl-body">{data.endDate}</p>
+                                                                                </Col>
+                                                                                <Col xs="2">
+                                                                                    <p className="tbl-body colorRed">{data.amount}</p>
+                                                                                </Col>
+                                                                                <Col xs="2">
+                                                                                    <p className="tbl-body">-</p>
+                                                                                </Col>
+                                                                                <Col xs="2" style={{ textAlign: "center" }}>
+                                                                                    <DeleteForeverIcon className="del-btn" onClick={() => this.onProfitDelete(data._id)} />
+                                                                                </Col>
+                                                                            </Row>
+                                                                        )
+                                                                    }
+
+                                                                })}
+                                                            </div>
+
+
+                                                        </Card>
+                                                    </Col>
+                                                </Row>
+                                            )}
 
                                         </div>
                                     </Tab>
