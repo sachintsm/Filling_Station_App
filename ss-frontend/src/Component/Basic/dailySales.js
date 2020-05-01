@@ -401,6 +401,32 @@ export default class dailyPumperCalculations extends Component {
                 console.log(err)
             })
 
+        const stkData = {
+            pId: this.state.newDProductId,
+            qty: this.state.newDQty,
+        }
+        await fetch('http://localhost:4000/fuelLubricantPrice/salesUpdate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'auth-token': obj.token
+            },
+            body: JSON.stringify(stkData),
+        })
+            .then(res => res.json())
+            .then(json => {
+                this.setState({
+                    snackbaropen: true,
+                    snackbarmsg: json.msg
+                })
+            })
+            .catch(err => {
+                console.log(err)
+                this.setState({
+                    snackbaropen: true,
+                    snackbarmsg: err
+                })
+            })
     }
     onMachineSubmit(data) {
         const obj = {
@@ -577,6 +603,33 @@ export default class dailyPumperCalculations extends Component {
             })
             .catch(err => {
                 console.log(err)
+            })
+
+        const stkData = {
+            pId: this.state.salesPId,
+            qty: this.state.salesQty,
+        }
+        await fetch('http://localhost:4000/fuelLubricantPrice/salesUpdate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'auth-token': obj.token
+            },
+            body: JSON.stringify(stkData),
+        })
+            .then(res => res.json())
+            .then(json => {
+                this.setState({
+                    snackbaropen: true,
+                    snackbarmsg: json.msg
+                })
+            })
+            .catch(err => {
+                console.log(err)
+                this.setState({
+                    snackbaropen: true,
+                    snackbarmsg: err
+                })
             })
     }
 
@@ -876,7 +929,7 @@ export default class dailyPumperCalculations extends Component {
                                                     <p className="first-topic" style={{ marginTop: "20px" }}>Debitors</p>
                                                     <Card style={{ height: "543px" }}>
                                                         <Row className="container" style={{ marginTop: "20px" }}>
-                                                            <Col xs="3" style={{textAlign:"left"}}>
+                                                            <Col xs="3" style={{ textAlign: "left" }}>
                                                                 <p className="debtHead">Cust.ID</p>
                                                             </Col>
                                                             <Col xs="9">
@@ -885,7 +938,7 @@ export default class dailyPumperCalculations extends Component {
                                                         </Row>
                                                         {this.state.debitorsData.map((data) => {
                                                             return (
-                                                                <Row className="container" style={{ marginTop: "0px" }}  key={data.debtorId}>
+                                                                <Row className="container" style={{ marginTop: "0px" }} key={data.debtorId}>
                                                                     <Col xs="3">
                                                                         <p className="debitor-tbl-body"> {data.debtorId}</p>
                                                                     </Col>
@@ -931,7 +984,7 @@ export default class dailyPumperCalculations extends Component {
                                                     <Col xs="1">
                                                         <p className="debtHead">Pump ID</p>
                                                     </Col>
-                                                    <Col xs="1"  style={{textAlign: "left" }}>
+                                                    <Col xs="1" style={{ textAlign: "left" }}>
                                                         <p className="debtHead">Action</p>
                                                     </Col>
                                                 </Row>
@@ -1036,7 +1089,7 @@ export default class dailyPumperCalculations extends Component {
                                                 <Row style={{ marginTop: "10px" }}>
                                                     <Col xs="7">
                                                     </Col>
-                                                    <Col xs="2" style={{ textAlign: "right"}}>
+                                                    <Col xs="2" style={{ textAlign: "right" }}>
                                                         <p className="debtHead">{this.state.otherDebit}</p>
                                                     </Col>
                                                     <Col xs="2" style={{ textAlign: "right" }}>

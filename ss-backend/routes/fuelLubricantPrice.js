@@ -17,7 +17,7 @@ router.post('/add', verify, async function (req, res, next) {
         buyPrice: req.body.buyPrice,
         sellPrice: req.body.sellPrice,
         pType: req.body.pType,
-        availStock : 0
+        availStock: 0
     });
     data.save()
         .then(result => {
@@ -69,8 +69,39 @@ router.post('/updateProductPrice', async function (req, res) {
         })
 })
 
+//delete product
+router.delete('/deleteProduct/:id', function (req, res) {
+    const _id = req.params.id
+
+    FuelLubPrice.remove({ _id: _id })
+        .exec()
+        .then(result => {
+            res.status(200).json({
+                message: 'Deleted Successfully'
+            });
+        })
+        .catch(error => {
+            console.log(error);
+            res.status(500).json({
+                error: error
+            });
+        });
+})
+
+router.get('/getFuelPrice', function (req, res) {
+    FuelLubPrice.find({ pType: 'Fuel' })
+        .select('pId sellPrice')
+        .exec()
+        .then(result => {
+            res.json({ state: true, msg: "Data Transfer Successfully..!", data: result });
+        })
+        .catch(error => {
+            res.json({ state: false, msg: "Data Transfering Unsuccessfull..!" });
+        })
+})
+
 //update available stock data
-router.post('/updateAvailableStock', verify,async function (req, res) {
+router.post('/updateAvailableStock', verify, async function (req, res) {
     console.log(req.body);
     const pId = req.body.pId;
     const availStock = req.body.updatedStock;
@@ -94,34 +125,30 @@ router.post('/updateAvailableStock', verify,async function (req, res) {
         })
 })
 
-//delete product
-router.delete('/deleteProduct/:id', function (req, res) {
-    const _id = req.params.id
+//update daily sales page stocks redusions
+router.post('/salesUpdate', async (req, res) => {
 
-    FuelLubPrice.remove({ _id: _id })
+    // checking if the pId is already in the database
+    const product = await FuelLubPrice.findOne({ pId: req.body.pId })
+    if (!product) return res.json({ state: false, msg: "This Product Not Available..!" })
+    const newStock = product.availStock - req.body.qty
+
+    await FuelLubPrice
+        .update({ pId: req.body.pId },
+            {
+                $set: {
+                    availStock: newStock,
+                }
+            })    //update user data with correspond to userid
         .exec()
-        .then(result => {
-            res.status(200).json({
-                message: 'Deleted Successfully'
-            });
+        .then(data => {
+            console.log("Data Update Success..!")
+            res.json({ state: true, msg: "Data Update Success..!" });
+
         })
         .catch(error => {
-            console.log(error);
-            res.status(500).json({
-                error: error
-            });
-        });
-})
-
-router.get('/getFuelPrice', function (req, res) {
-    FuelLubPrice.find({pType : 'Fuel'})
-        .select('pId sellPrice')
-        .exec()
-        .then(result => {
-            res.json({ state: true, msg: "Data Transfer Successfully..!", data: result });
-        })
-        .catch(error => {
-            res.json({ state: false, msg: "Data Transfering Unsuccessfull..!" });
+            console.log("Data Updating Unsuccessfull..!")
+            res.json({ state: false, msg: "Data Updating Unsuccessfull..!" });
         })
 })
 module.exports = router;

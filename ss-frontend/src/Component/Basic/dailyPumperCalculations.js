@@ -28,7 +28,8 @@ class totDebit {
     }
 }
 class finalBlock {
-    constructor(pumpId, fuelType, yesterday, today, sale, debit, gross, amount) {
+    constructor(productId, pumpId, fuelType, yesterday, today, sale, debit, gross, amount) {
+        this.productId = productId;
         this.pumpId = pumpId;
         this.fuelType = fuelType;
         this.yesterday = yesterday;
@@ -181,24 +182,26 @@ export default class dailyPumperCalculations extends Component {
                                 var gross = (sale - this.state.distinctDebit[l].debit).toFixed(3)    //get gross size spesific pump
                                 var block = new meterBlock(this.state.pumpsNames[i].machineNumber, this.state.pumpsNames[i].fuelType, this.state.yesReading[j].meterReading, this.state.todayReading[k].meterReading, sale, this.state.distinctDebit[l].debit, gross, this.state.pumpsNames[i].productId);
                                 this.state.meterBlock.push(block)
-                                console.log(block);
-                                
+
                             }
                         }
                     }
                 }
             }
-            
+
             for (var m = 0; m < this.state.meterBlock.length; m++) {
                 for (var n = 0; n < this.state.products.length; n++) {
                     if (this.state.meterBlock[m].productId === this.state.products[n].pId) {
                         // console.log(this.state.meterBlock[m].productId +','+ this.state.meterBlock[m].fuelType)
                         var amount = (this.state.meterBlock[m].gross * this.state.products[n].sellPrice).toFixed(2)
-                        var block2 = new finalBlock(this.state.meterBlock[m].pumpId, this.state.meterBlock[m].fuelType, this.state.meterBlock[m].yesterday, this.state.meterBlock[m].today, this.state.meterBlock[m].sale, this.state.meterBlock[m].debit, this.state.meterBlock[m].gross, amount)
+                        var block2 = new finalBlock(this.state.meterBlock[m].productId, this.state.meterBlock[m].pumpId, this.state.meterBlock[m].fuelType, this.state.meterBlock[m].yesterday, this.state.meterBlock[m].today, this.state.meterBlock[m].sale, this.state.meterBlock[m].debit, this.state.meterBlock[m].gross, amount)
                         this.state.finalBlock.push(block2);
+                        // console.log(block2);
                     }
                 }
             }
+
+
             this.setState({ dataDiv: true });
         }
     }
@@ -296,11 +299,9 @@ export default class dailyPumperCalculations extends Component {
         this.setState({
             totalProfit: (totCash - totSaleAmt).toFixed(2)
         })
-
-
     }
 
-    submitNow() {
+    async submitNow() {
         const obj = getFromStorage('auth-token');
 
         const data = {
@@ -329,8 +330,7 @@ export default class dailyPumperCalculations extends Component {
                     snackbaropen: true,
                     snackbarmsg: json.msg
                 })
-
-                // window.location.reload();
+                window.location.reload();
             })
             .catch(err => {
                 console.log(err)
@@ -339,6 +339,37 @@ export default class dailyPumperCalculations extends Component {
                     snackbarmsg: err
                 })
             })
+        for (var i = 0; i < this.state.finalBlock.length; i++) {
+            console.log(this.state.finalBlock[i].productId + " " + this.state.finalBlock[i].gross)
+            const stkData = {
+                pId: this.state.finalBlock[i].productId,
+                qty: this.state.finalBlock[i].gross,
+            }
+            await fetch('http://localhost:4000/fuelLubricantPrice/salesUpdate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'auth-token': obj.token
+                },
+                body: JSON.stringify(stkData),
+            })
+                .then(res => res.json())
+                .then(json => {
+                    console.log(json)
+                    this.setState({
+                        snackbaropen: true,
+                        snackbarmsg: json.msg
+                    })
+                })
+                .catch(err => {
+                    console.log(err)
+                    this.setState({
+                        snackbaropen: true,
+                        snackbarmsg: err
+                    })
+                })
+        }
+
     }
 
     render() {

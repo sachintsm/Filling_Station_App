@@ -127,7 +127,7 @@ class salesStocks extends Component {
                         <td>{props.pId}</td>
                         <td>{props.pName}</td>
                         <td className="txtAlignCenter">{props.sellPrice}</td>
-                        <td className="txtAlignCenter">{props.availStock}</td>
+                        <td className="txtAlignCenter">{parseFloat(props.availStock).toFixed(3)}</td>
                         <td>
                             <input type="number" className="form-control" name="newStock" placeholder="0" onChange={this.onChange} />
                         </td>
@@ -147,7 +147,7 @@ class salesStocks extends Component {
                         <td>{props.pId}</td>
                         <td>{props.pName}</td>
                         <td className="txtAlignCenter">{props.sellPrice}</td>
-                        <td className="txtAlignCenter">{props.availStock}</td>
+                        <td className="txtAlignCenter">{parseFloat(props.availStock).toFixed(1)}</td>
                         <td>
                             <input type="number" className="form-control" name="newStock" placeholder="0" onChange={this.onChange} />
                         </td>
@@ -168,7 +168,7 @@ class salesStocks extends Component {
                         <td>{props.pId}</td>
                         <td>{props.pName}</td>
                         <td className="txtAlignCenter">{props.sellPrice}</td>
-                        <td className="txtAlignCenter">{props.availStock}</td>
+                        <td className="txtAlignCenter">{parseFloat(props.availStock).toFixed(2)}</td>
                         <td>
                             <input type="number" className="form-control" name="newStock" placeholder="0" onChange={this.onChange} />
                         </td>
@@ -189,7 +189,7 @@ class salesStocks extends Component {
                         <td>{props.pId}</td>
                         <td>{props.pName}</td>
                         <td className="txtAlignCenter">{props.sellPrice}</td>
-                        <td className="txtAlignCenter">{props.availStock}</td>
+                        <td className="txtAlignCenter">{parseFloat(props.availStock).toFixed(2)}</td>
                         <td>
                             <input type="number" className="form-control" name="newStock" placeholder="0" onChange={this.onChange} />
                         </td>
