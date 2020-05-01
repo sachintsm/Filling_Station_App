@@ -70,10 +70,10 @@ router.post('/updateProductPrice', async function (req, res) {
 })
 
 //update available stock data
-router.post('/updateAvailableStock', async function (req, res) {
+router.post('/updateAvailableStock', verify,async function (req, res) {
     console.log(req.body);
     const pId = req.body.pId;
-    const availStock = req.body.availStock;
+    const availStock = req.body.updatedStock;
 
     await FuelLubPrice
         .update({ pId: pId },

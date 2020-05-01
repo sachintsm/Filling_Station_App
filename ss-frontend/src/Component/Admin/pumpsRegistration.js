@@ -281,7 +281,7 @@ export default class pumpsRegistration extends Component {
                         <div className="col-md-2" style={{ backgroundColor: "#1c2431" }}>
                             <Sidebar />
                         </div>
-                        <div className="col-md-10" style={{ backgroundColor: "#f8f9fd", height: "1000px" }}>
+                        <div className="col-md-10" style={{ backgroundColor: "#f8f9fd", minHeight: "1000px" }}>
                             <div className="container" >
                                 <div className="row" style={{ marginTop: "20px" }}>
                                     <div className="col-md-4">
@@ -405,7 +405,7 @@ export default class pumpsRegistration extends Component {
                                 </Card>
                                 <p className="tpic">Pump Sets</p>
 
-                                <Card>
+                                <Card style={{marginBottom:"20px"}}>
                                     <form>
                                         <div className="container">
 

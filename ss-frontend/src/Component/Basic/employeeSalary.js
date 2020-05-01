@@ -511,7 +511,9 @@ export default class employeeSalary extends Component {
                                                                 )
                                                             }
                                                         }
-                                                    })}
+                                                        return null
+                                                    }
+                                                    )}
                                                 </div>
                                             </Card>
                                         </div>
@@ -671,8 +673,7 @@ export default class employeeSalary extends Component {
                                                                             }
                                                                         }
                                                                     }
-
-
+                                                                    return null
                                                                 })}
 
                                                             </div>
