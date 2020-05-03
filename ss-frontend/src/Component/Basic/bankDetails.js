@@ -12,6 +12,7 @@ import Tabs from 'react-bootstrap/Tabs';
 import { getFromStorage } from "../../utils/storage";
 import DatePicker from "react-datepicker";
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
+import { Animated } from "react-animated-css";
 
 export default class bankDetails extends Component {
     constructor(props) {
@@ -414,6 +415,7 @@ export default class bankDetails extends Component {
                                             </Col>
                                         </Row>
                                         {dataDiv && (
+                                    <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true} animationInDuration={1200}>
 
                                             <div style={{ backgroundColor: "#ffffff", marginTop: "10px", borderRadius: "4px", marginBottom: "20px" }}>
                                                 <div className="container">
@@ -453,6 +455,7 @@ export default class bankDetails extends Component {
                                                     })}
                                                 </div>
                                             </div>
+                                            </Animated>
                                         )}
                                     </Tab>
                                 </Tabs>

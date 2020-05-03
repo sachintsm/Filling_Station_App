@@ -13,7 +13,7 @@ import Tabs from 'react-bootstrap/Tabs';
 import { getFromStorage } from "../../utils/storage";
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import DatePicker from "react-datepicker";
-
+import { Animated } from "react-animated-css";
 
 export default class employeeSalary extends Component {
     constructor(props) {
@@ -701,6 +701,8 @@ export default class employeeSalary extends Component {
                                             </Card>
 
                                             {dataDiv && (
+                                    <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true} animationInDuration={1200}>
+
                                                 <Row style={{ marginTop: "20px" }}>
                                                     <Col xs="4">
                                                         <Card>
@@ -865,6 +867,7 @@ export default class employeeSalary extends Component {
                                                         </Card>
                                                     </Col>
                                                 </Row>
+                                                </Animated>
                                             )}
 
                                         </div>

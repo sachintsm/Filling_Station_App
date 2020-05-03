@@ -1,18 +1,79 @@
 .home-div {
-  background:linear-gradient(rgba(0, 162, 255, 0.11), rgba(0, 38, 255, 0.055)), url("../../Assets/backgrounds/froet-gas-195389_1920.jpg");
+  background: linear-gradient(rgba(0, 162, 255, 0), rgba(0, 38, 255, 0.055)),
+    url("../../Assets/backgrounds/jean-christophe-gougeon-t8bDFvkhNQY-unsplash.jpg");
   height: 740px;
   width: 100%;
   background-size: cover;
   background-repeat: no-repeat;
-  /* background-attachment: fixed; */
   background-position: center;
+  background-attachment: fixed;
 }
 
-.login-btn{
-    width: 50%;
-    margin-left: 20px;
+.login-btn {
+  width: 50%;
+  margin-left: 20px;
 }
 
-.logn-card-div{
-    background-color: rgb(215, 219, 223);
+.logn-card-div {
+  background-color: rgb(215, 219, 223);
+}
+
+.company-name {
+  height: 100px;
+  background-color: #232f3f96;
+}
+
+.company {
+  color: #ffffff;
+  font-size: 60px;
+  text-align: center;
+  font-family: "Times New Roman", Times, serif;
+}
+
+.icon {
+  color: #ffffff;
+  width: 50%;
+  margin-left: -3px;
+}
+
+.icon-div {
+  border-bottom-left-radius: 4px;
+  border-top-left-radius: 4px;
+  height: 50px;
+  background-color: #13263f;
+}
+.text {
+  color: #ffffff;
+  font-size: 20px;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-;
+}
+
+.text-div {
+  height: 50px;
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
+  background-color: #232f3f96;
+}
+.text-div-middle {
+  height: 50px;
+  background-color: #232f3f96;
+}
+.one-link {
+  margin-top: 20px;
+  height: 50px;
+  padding-left: 20px;
+}
+
+.one-link:hover {
+  cursor: pointer;
+  margin-left: 10px;
+  margin-right: -10px;
+  transition: 0.5s;
+}
+
+.arrow {
+  color: #ffffff;
+  font-size: 30px;
+  margin-left: -20px;
+  margin-top: 5px;
 }

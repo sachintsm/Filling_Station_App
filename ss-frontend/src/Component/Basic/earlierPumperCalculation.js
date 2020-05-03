@@ -7,6 +7,7 @@ import axios from 'axios'
 import { MDBInput } from "mdbreact";
 import Snackbar from '@material-ui/core/Snackbar'
 import IconButton from '@material-ui/core/IconButton'
+import { Animated } from "react-animated-css";
 
 class finalBlock {
     constructor(pumpId, fuelType, yesterday, today, sale, debit, gross) {
@@ -263,6 +264,8 @@ export default class dailyPumperCalculations extends Component {
                                     </div>
                                 </div>
                                 {dataDiv && (
+                                    <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true} animationInDuration={1200}>
+
                                     <div className="container second-div" style={{ marginTop: "20px" }}>
                                         <div className="container">
                                             <div className="row">
@@ -438,6 +441,7 @@ export default class dailyPumperCalculations extends Component {
                                             </div>
                                         </div>
                                     </div>
+                                    </Animated>
                                 )}
                             </div>
                         </div>

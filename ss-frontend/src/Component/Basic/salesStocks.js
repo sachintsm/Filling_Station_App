@@ -179,7 +179,6 @@ class salesStocks extends Component {
                 )
             }
             return null
-
         }, this);
         let otherList = products.length > 0 && products.map((props, i) => {
             if (props.pType === 'Other') {
