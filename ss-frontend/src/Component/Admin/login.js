@@ -9,6 +9,7 @@ import { setInStorage } from '../../utils/storage';
 import { MDBInput, MDBBtn } from "mdbreact";
 import ParticlesBg from 'particles-bg'
 
+const backend_URI = require('../Auth/Backend_URI')
 export default class login extends Component {
 
     constructor(props) {
@@ -22,7 +23,7 @@ export default class login extends Component {
             userId: '',
             password: '',
             name: "React"
-            
+
         };
 
         this.onSignIn = this.onSignIn.bind(this);
@@ -49,7 +50,7 @@ export default class login extends Component {
         } = this.state;
 
 
-        fetch('http://localhost:4000/users/account/login', {
+        fetch(backend_URI.url + '/users/account/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

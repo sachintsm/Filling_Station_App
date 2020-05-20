@@ -10,6 +10,7 @@ import AddBoxIcon from '@material-ui/icons/AddBox';
 import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
 import ErrorIcon from '@material-ui/icons/Error';
 import NotInterestedIcon from '@material-ui/icons/NotInterested';
+const backend_URI = require('../Auth/Backend_URI')
 
 class salesStocks extends Component {
 
@@ -34,7 +35,7 @@ class salesStocks extends Component {
     }
 
     componentDidMount() {
-        axios.get('http://localhost:4000/fuelLubricantPrice/get')
+        axios.get(backend_URI.url + '/fuelLubricantPrice/get')
             .then(response => {
                 this.setState({ products: response.data.data });
             })
@@ -67,7 +68,7 @@ class salesStocks extends Component {
                 pId: pId,
                 updatedStock: updatedStock
             }
-            fetch('http://localhost:4000/fuelLubricantPrice/updateAvailableStock', {
+            fetch(backend_URI.url + '/fuelLubricantPrice/updateAvailableStock', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

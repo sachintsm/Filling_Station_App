@@ -13,6 +13,7 @@ import Sidebar from '../Auth/sidebar';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import { Button, Col, Row } from 'react-bootstrap';
 
+const backend_URI = require('../Auth/Backend_URI')
 
 export default class dailyPumperCalculations extends Component {
 
@@ -101,7 +102,7 @@ export default class dailyPumperCalculations extends Component {
             chequeNo: this.state.newCChequeNo,
             creditAmount: parseFloat(this.state.newCAmount).toFixed(2),
         }
-        fetch('http://localhost:4000/debitorsAccount/addCredit', {
+        fetch(backend_URI.url  + '/debitorsAccount/addCredit', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -138,7 +139,7 @@ export default class dailyPumperCalculations extends Component {
             newCOname: this.state.newCOname,
             newCOamount: parseFloat(this.state.newCOamount).toFixed(2),
         }
-        fetch('http://localhost:4000/debitorsAccount/addOtherCredit', {
+        fetch(backend_URI.url  + '/debitorsAccount/addOtherCredit', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -175,7 +176,7 @@ export default class dailyPumperCalculations extends Component {
             newDOname: this.state.newDOname,
             newDOamount: parseFloat(this.state.newDOamount).toFixed(2),
         }
-        fetch('http://localhost:4000/debitorsAccount/addOther', {
+        fetch(backend_URI.url  + '/debitorsAccount/addOther', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -205,7 +206,7 @@ export default class dailyPumperCalculations extends Component {
         if (!authState) this.props.history.push('/login');
 
         //get dailty sales data
-        await axios.get('http://localhost:4000/dailySales/get')
+        await axios.get(backend_URI.url  + '/dailySales/get')
             .then(res => {
                 this.setState({
                     sales: res.data.data
@@ -219,7 +220,7 @@ export default class dailyPumperCalculations extends Component {
             })
 
         //get locker data
-        await axios.get('http://localhost:4000/lockerState/get')
+        await axios.get(backend_URI.url  + '/lockerState/get')
             .then(res => {
                 this.setState({
                     locker: res.data.data
@@ -233,14 +234,14 @@ export default class dailyPumperCalculations extends Component {
             })
 
         //get yesterday merter reading
-        await axios.get('http://localhost:4000/machinesData/getYesterday')
+        await axios.get(backend_URI.url  + '/machinesData/getYesterday')
             .then(res => {
                 this.setState({
                     morningReading: res.data.data
                 })
             })
         //load today meter reading
-        await axios.get('http://localhost:4000/machinesData/getToday')
+        await axios.get(backend_URI.url  + '/machinesData/getToday')
             .then(res => {
                 this.setState({
                     endReadingArray: res.data.data
@@ -248,7 +249,7 @@ export default class dailyPumperCalculations extends Component {
             })
 
         // load debidtor id and names
-        await axios.get('http://localhost:4000/debtors/getNameId')
+        await axios.get(backend_URI.url  + '/debtors/getNameId')
             .then(res => {
                 this.setState({
                     debitorsData: res.data.data
@@ -256,7 +257,7 @@ export default class dailyPumperCalculations extends Component {
             })
 
         //get today petroleum debit data
-        await axios.get('http://localhost:4000/debitorsAccount/get')
+        await axios.get(backend_URI.url  + '/debitorsAccount/get')
             .then(res => {
                 this.setState({
                     todayPetroleumDebit: res.data.data
@@ -279,7 +280,7 @@ export default class dailyPumperCalculations extends Component {
                 })
             })
         //get today other debits
-        await axios.get('http://localhost:4000/debitorsAccount/getOther')
+        await axios.get(backend_URI.url  + '/debitorsAccount/getOther')
             .then(res => {
                 this.setState({
                     todayOtherDebit: res.data.data
@@ -322,7 +323,7 @@ export default class dailyPumperCalculations extends Component {
         })
     }
     deleteDebit(data) {
-        axios.delete('http://localhost:4000/debitorsAccount/delete/' + data)
+        axios.delete(backend_URI.url  + '/debitorsAccount/delete/' + data)
             .then(res => {
                 console.log(res);
                 this.setState({
@@ -347,7 +348,7 @@ export default class dailyPumperCalculations extends Component {
                 snackbarmsg: "Please Fill the Missing Fields ..!"
             })
         }
-        await axios.get('http://localhost:4000/fuelLubricantPrice/get')
+        await axios.get(backend_URI.url  + '/fuelLubricantPrice/get')
             .then(res => {
                 console.log(res);
                 this.setState({
@@ -371,7 +372,7 @@ export default class dailyPumperCalculations extends Component {
                             amount: parseFloat(amount).toFixed(2),
                             pumpId: this.state.newDPumpId,
                         }
-                        fetch('http://localhost:4000/debitorsAccount/add', {
+                        fetch(backend_URI.url  + '/debitorsAccount/add', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -405,7 +406,7 @@ export default class dailyPumperCalculations extends Component {
             pId: this.state.newDProductId,
             qty: this.state.newDQty,
         }
-        await fetch('http://localhost:4000/fuelLubricantPrice/salesUpdate', {
+        await fetch(backend_URI.url  + '/fuelLubricantPrice/salesUpdate', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -439,7 +440,7 @@ export default class dailyPumperCalculations extends Component {
                 snackbarmsg: "Please Fill the Amount ..!"
             })
         }
-        fetch('http://localhost:4000/machinesData/add', {
+        fetch(backend_URI.url  + '/machinesData/add', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -463,7 +464,7 @@ export default class dailyPumperCalculations extends Component {
 
     }
     machineDelete(data) {
-        axios.delete('http://localhost:4000/machinesData/delete/' + data)
+        axios.delete(backend_URI.url  + '/machinesData/delete/' + data)
             .then(res => {
                 console.log(res);
                 this.setState({
@@ -495,7 +496,7 @@ export default class dailyPumperCalculations extends Component {
     }
 
     lockerDelete(data) {
-        axios.delete('http://localhost:4000/lockerState/delete/' + data)
+        axios.delete(backend_URI.url  + '/lockerState/delete/' + data)
             .then(res => {
                 console.log(res);
                 this.setState({
@@ -526,7 +527,7 @@ export default class dailyPumperCalculations extends Component {
                 snackbarmsg: "Please Fill the Amount ..!"
             })
         }
-        await fetch('http://localhost:4000/lockerState/add', {
+        await fetch(backend_URI.url  + '/lockerState/add', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -559,7 +560,7 @@ export default class dailyPumperCalculations extends Component {
                 snackbarmsg: "Please Fill the product ID ..!"
             })
         }
-        await axios.get('http://localhost:4000/fuelLubricantPrice/get')
+        await axios.get(backend_URI.url  + '/fuelLubricantPrice/get')
             .then(res => {
                 this.setState({
                     products: res.data.data
@@ -575,7 +576,7 @@ export default class dailyPumperCalculations extends Component {
                             qty: this.state.salesQty,
                             price: this.state.salesPrice,
                         }
-                        fetch('http://localhost:4000/dailySales/add', {
+                        fetch(backend_URI.url  + '/dailySales/add', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -609,7 +610,7 @@ export default class dailyPumperCalculations extends Component {
             pId: this.state.salesPId,
             qty: this.state.salesQty,
         }
-        await fetch('http://localhost:4000/fuelLubricantPrice/salesUpdate', {
+        await fetch(backend_URI.url  + '/fuelLubricantPrice/salesUpdate', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

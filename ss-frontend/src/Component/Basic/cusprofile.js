@@ -20,6 +20,8 @@ const Debt = React.memo(props => (
     </tr>
 ));
 
+const backend_URI = require('../Auth/Backend_URI')
+
 export default class profile extends Component {
     constructor(props) {
         super(props);
@@ -48,7 +50,7 @@ export default class profile extends Component {
         this.setState({ snackbaropen: false })
     }
     componentDidMount() {
-        axios.get('http://localhost:4000/debtors/get')
+        axios.get(backend_URI.url  + '/debtors/get')
             .then(response => {
                 this.setState({ users: response.data.data });
             })
@@ -88,7 +90,7 @@ export default class profile extends Component {
     }
 
     deleteDebtor(data) {
-        axios.delete('http://localhost:4000/debtors/deleteDebtor/' + data)
+        axios.delete(backend_URI+'/debtors/deleteDebtor/' + data)
             .then(res => {
                 console.log(res);
                 this.setState({
@@ -118,7 +120,7 @@ export default class profile extends Component {
             other: this.state.other,
         };
 
-        axios.post('http://localhost:4000/debtors/register', obj)
+        axios.post(backend_URI.url  + '/debtors/register', obj)
             .then(res => console.log(res.data));
     }
 

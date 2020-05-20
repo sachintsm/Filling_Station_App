@@ -8,8 +8,9 @@ import { MDBInput } from "mdbreact";
 import Snackbar from '@material-ui/core/Snackbar'
 import IconButton from '@material-ui/core/IconButton'
 import { getFromStorage } from '../../utils/storage';
-
 import { Animated } from "react-animated-css";
+
+const backend_URI = require('../Auth/Backend_URI')
 
 class meterBlock {
     constructor(pumpId, fuelType, yesterday, today, sale, debit, gross, productId) {
@@ -135,7 +136,7 @@ export default class dailyPumperCalculations extends Component {
             this.state.distinctDebit = [];
 
             //get Pumps Names
-            await axios.get('http://localhost:4000/pumpsRegistration/getSet/' + this.state.pumpSet)
+            await axios.get(backend_URI + '/pumpsRegistration/getSet/' + this.state.pumpSet)
                 .then(res => {
                     this.setState({
                         pumpsNames: res.data.data
@@ -143,21 +144,21 @@ export default class dailyPumperCalculations extends Component {
                 })
 
             //get yesterday meter reading
-            await axios.get('http://localhost:4000/machinesData/getYes/' + this.state.startDate)
+            await axios.get(backend_URI+'/machinesData/getYes/' + this.state.startDate)
                 .then(res => {
                     this.setState({
                         yesReading: res.data.data
                     })
                 })
             //get today meter reading
-            await axios.get('http://localhost:4000/machinesData/getToday/' + this.state.startDate)
+            await axios.get(backend_URI +'/machinesData/getToday/' + this.state.startDate)
                 .then(res => {
                     this.setState({
                         todayReading: res.data.data
                     })
                 })
             //get debiters data
-            await axios.get('http://localhost:4000/debitorsAccount/get/' + this.state.startDate)
+            await axios.get(backend_URI +'/debitorsAccount/get/' + this.state.startDate)
                 .then(res => {
                     this.setState({
                         debits: res.data.data
@@ -214,7 +215,7 @@ export default class dailyPumperCalculations extends Component {
         if (!authState) this.props.history.push('/login');
 
         //get pump sets
-        await axios.get('http://localhost:4000/pumpSetRegistration/get')
+        await axios.get(backend_URI + '/pumpSetRegistration/get')
             .then(res => {
                 this.setState({
                     pumpSetData: res.data.data
@@ -225,7 +226,7 @@ export default class dailyPumperCalculations extends Component {
             })
 
         //get pumps details
-        await axios.get('http://localhost:4000/pumpsRegistration/get')
+        await axios.get(backend_URI+ '/pumpsRegistration/get')
             .then(res => {
                 this.setState({
                     pumpNames: res.data.data
@@ -233,7 +234,7 @@ export default class dailyPumperCalculations extends Component {
             })
 
         //get fuel pridse and data
-        await axios.get('http://localhost:4000/fuelLubricantPrice/getFuelPrice')
+        await axios.get(backend_URI+ '/fuelLubricantPrice/getFuelPrice')
             .then(res => {
                 this.setState({
                     products: res.data.data
@@ -284,7 +285,7 @@ export default class dailyPumperCalculations extends Component {
             set: this.state.pumpSet
         }
         //get pumpers Cash
-        await axios.post('http://localhost:4000/pumpersCash/getByDateSet/', data)
+        await axios.post(backend_URI.url  +'/pumpersCash/getByDateSet/', data)
             .then(res => {
                 this.setState({
                     pumperCash: res.data.data
@@ -318,7 +319,7 @@ export default class dailyPumperCalculations extends Component {
             profit: this.state.totalProfit
         }
 
-        fetch('http://localhost:4000/pumpersCalculations/add', {
+        fetch(backend_URI.url  + '/pumpersCalculations/add', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -347,7 +348,7 @@ export default class dailyPumperCalculations extends Component {
                 pId: this.state.finalBlock[i].productId,
                 qty: this.state.finalBlock[i].gross,
             }
-            await fetch('http://localhost:4000/fuelLubricantPrice/salesUpdate', {
+            await fetch(backend_URI.url  + '/fuelLubricantPrice/salesUpdate', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

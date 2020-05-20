@@ -10,6 +10,8 @@ import { getFromStorage } from '../../utils/storage';
 import Snackbar from '@material-ui/core/Snackbar'
 import IconButton from '@material-ui/core/IconButton'
 
+const backend_URI = require('../Auth/Backend_URI')
+
 export default class dailyPumperCalculations extends Component {
 
     constructor(props) {
@@ -60,7 +62,7 @@ export default class dailyPumperCalculations extends Component {
         console.log(this.state.setId);
         this.state.pumpersCash = [];
         this.state.totAmount = 0.00
-        await axios.get('http://localhost:4000/pumpersCash/get/' + this.state.setId)
+        await axios.get(backend_URI.url  + '/pumpersCash/get/' + this.state.setId)
             .then(res => {
                 this.setState({
                     pumpersCash: res.data.data
@@ -74,7 +76,7 @@ export default class dailyPumperCalculations extends Component {
         }
         this.setState({ cashDiv: true });
         if (this.state.pumpersCash[0] != null) {
-            await axios.get('http://localhost:4000/users/get/' + this.state.pumpersCash[0].pumperId)
+            await axios.get(backend_URI.url  +'/users/get/' + this.state.pumpersCash[0].pumperId)
                 .then(res => {
                     this.setState({
                         pumperNameRes: res.data.data[0].fullName
@@ -98,14 +100,14 @@ export default class dailyPumperCalculations extends Component {
         this.setState({ authState: authState })
         if (!authState) this.props.history.push('/login');
 
-        axios.get('http://localhost:4000/pumpSetRegistration/get')
+        axios.get(backend_URI.url  + '/pumpSetRegistration/get')
             .then(res => {
                 this.setState({
                     pumpSets: res.data.data
                 })
             })
 
-        axios.get('http://localhost:4000/users/getPumpers')
+        axios.get(backend_URI.url  + '/users/getPumpers')
             .then(res => {
                 this.setState({
                     pumperIds: res.data.data
@@ -144,7 +146,7 @@ export default class dailyPumperCalculations extends Component {
                 amount: this.state.amount
             }
 
-            fetch('http://localhost:4000/pumpersCash/add', {
+            fetch(backend_URI.url  + '/pumpersCash/add', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -14,6 +14,7 @@ import { getFromStorage } from "../../utils/storage";
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import DatePicker from "react-datepicker";
 import { Animated } from "react-animated-css";
+const backend_URI = require('../Auth/Backend_URI')
 
 export default class employeeSalary extends Component {
     constructor(props) {
@@ -110,7 +111,7 @@ export default class employeeSalary extends Component {
             }
             console.log(data)
 
-            fetch('http://localhost:4000/pumperProfitPayment/add', {
+            fetch(backend_URI.url + '/pumperProfitPayment/add', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -152,7 +153,7 @@ export default class employeeSalary extends Component {
     onSetBlur = async () => {
         var id = this.state.userId
         //get pumpers this month profits
-        axios.get('http://localhost:4000/pumpersCalculations/getThisMonth/' + id)
+        axios.get(backend_URI.url + '/pumpersCalculations/getThisMonth/' + id)
             .then(res => {
                 // console.log(res);
                 this.setState({
@@ -164,7 +165,7 @@ export default class employeeSalary extends Component {
 
                 console.log(err)
             })
-        axios.get('http://localhost:4000/pumperProfitPayment/getThisYear/' + id)
+        axios.get(backend_URI.url + '/pumperProfitPayment/getThisYear/' + id)
             .then(res => {
                 console.log(res.data.data);
                 this.setState({
@@ -182,7 +183,7 @@ export default class employeeSalary extends Component {
         if (!authState) this.props.history.push('/login');
 
         //get employess salary
-        axios.get('http://localhost:4000/employeeSalary/get')
+        axios.get(backend_URI.url + '/employeeSalary/get')
             .then(res => {
                 this.setState({
                     employeeSalary: res.data.data
@@ -190,7 +191,7 @@ export default class employeeSalary extends Component {
             })
 
         //get employees loans
-        axios.get('http://localhost:4000/employeeLoan/get')
+        axios.get(backend_URI.url + '/employeeLoan/get')
             .then(res => {
                 this.setState({
                     employeeLoan: res.data.data
@@ -198,7 +199,7 @@ export default class employeeSalary extends Component {
             })
 
         //get  pumperIds  data
-        axios.get('http://localhost:4000/users/getPumpers')
+        axios.get(backend_URI.url + '/users/getPumpers')
             .then(res => {
                 console.log(res.data.data);
 
@@ -233,7 +234,7 @@ export default class employeeSalary extends Component {
                 amount: this.state.empAmount
             }
 
-            fetch('http://localhost:4000/employeeSalary/add', {
+            fetch(backend_URI.url + '/employeeSalary/add', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -268,7 +269,7 @@ export default class employeeSalary extends Component {
     }
 
     onSalaryDelete = (data) => {
-        axios.delete('http://localhost:4000/employeeSalary/delete/' + data)
+        axios.delete(backend_URI.url + '/employeeSalary/delete/' + data)
             .then((res) => {
                 console.log(res);
                 this.setState({
@@ -320,7 +321,7 @@ export default class employeeSalary extends Component {
                 type: this.state.loanType
             }
 
-            fetch('http://localhost:4000/employeeLoan/add', {
+            fetch(backend_URI.url + '/employeeLoan/add', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -348,7 +349,7 @@ export default class employeeSalary extends Component {
     }
 
     onLoanDelete = (data) => {
-        axios.delete('http://localhost:4000/employeeLoan/delete/' + data)
+        axios.delete(backend_URI.url + '/employeeLoan/delete/' + data)
             .then((res) => {
                 console.log(res);
                 this.setState({
@@ -367,7 +368,7 @@ export default class employeeSalary extends Component {
     }
 
     onProfitDelete = (data) => {
-        axios.delete('http://localhost:4000/pumperProfitPayment/delete/' + data)
+        axios.delete(backend_URI.url + '/pumperProfitPayment/delete/' + data)
             .then((res) => {
                 console.log(res);
                 this.setState({

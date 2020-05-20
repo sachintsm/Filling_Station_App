@@ -13,6 +13,7 @@ import IconButton from '@material-ui/core/IconButton'
 
 // import AddImage from "../../Components/AddServiceImage.component";
 // import Delete from "../../Components/Delete.component";
+const backend_URI = require('../Auth/Backend_URI')
 
 export default class profile extends Component {
     constructor(props) {
@@ -49,7 +50,7 @@ export default class profile extends Component {
         const userData = getFromStorage('auth-user')
         console.log(userData.userId)
 
-        axios.get('http://localhost:4000/users/get/' + userData.userId)
+        axios.get(backend_URI.url + '/users/get/' + userData.userId)
             .then(response => {
                 console.log(response);
 
@@ -94,7 +95,7 @@ export default class profile extends Component {
             signup_completed: this.state.signup_completed
         };
 
-        axios.post('http://localhost:4000/users/updateuser/' + userData.userId, obj)
+        axios.post(backend_URI.url + '/users/updateuser/' + userData.userId, obj)
             .then(res => console.log(res.data));
 
         // const obj2 = {
@@ -102,7 +103,7 @@ export default class profile extends Component {
         //     signup_completed: this.state.signup_completed
         // };
         // if (this.state.signup_password) {
-        //     axios.post('http://localhost:4000/mazzevents/updatepassword/' + this.props.id, obj2)
+        //     axios.post('/mazzevents/updatepassword/' + this.props.id, obj2)
         //         .then(res => console.log(res.data));
         // }
         //this.props.history.push('/customer/photo');
@@ -147,7 +148,7 @@ export default class profile extends Component {
 
                                             <Card style={{ width: '18rem' }} key={data.userId}>
                                                 <div className="overflow">
-                                                    <Card.Img variant="top" src={!('http://localhost:4000/users/profileImage/' + data.path) ? normal : ('http://localhost:4000/users/profileImage/' + data.path)} />
+                                                    <Card.Img variant="top" src={!(backend_URI.url + '/users/profileImage/' + data.path) ? normal : (backend_URI.url + '/users/profileImage/' + data.path)} />
                                                 </div>
                                                 <Card.Body>
                                                     <Card.Title><center>{data.fullName} </center></Card.Title>

@@ -9,6 +9,7 @@ import { getFromStorage } from '../../utils/storage';
 import axios from 'axios'
 import Snackbar from '@material-ui/core/Snackbar'
 import IconButton from '@material-ui/core/IconButton'
+const backend_URI = require('../Auth/Backend_URI')
 
 export default class fuelLubricantPrice extends Component {
     constructor(props) {
@@ -65,7 +66,7 @@ export default class fuelLubricantPrice extends Component {
         this.setState({ authState: authState })
         if (!authState) this.props.history.push('/login');
 
-        axios.get('http://localhost:4000/fuelLubricantPrice/get')
+        axios.get(backend_URI.url + '/fuelLubricantPrice/get')
             .then(res => {
                 this.setState({
                     products: res.data.data
@@ -116,7 +117,7 @@ export default class fuelLubricantPrice extends Component {
             })
         }
         else {
-            fetch('http://localhost:4000/fuelLubricantPrice/add', {
+            fetch(backend_URI.url + '/fuelLubricantPrice/add', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -170,7 +171,7 @@ export default class fuelLubricantPrice extends Component {
             redirect: 'follow'
         };
 
-        fetch("http://localhost:4000/fuelLubricantPrice/updateProductPrice", requestOptions)
+        fetch(backend_URI.url + "/fuelLubricantPrice/updateProductPrice", requestOptions)
             .then(response => response.json())
             .then(result => {
                 console.log(result)
@@ -193,7 +194,7 @@ export default class fuelLubricantPrice extends Component {
             redirect: 'follow'
         };
 
-        fetch("http://localhost:4000/fuelLubricantPrice/updateProductPrice", requestOptions)
+        fetch(backend_URI.url + "/fuelLubricantPrice/updateProductPrice", requestOptions)
             .then(response => response.json())
             .then(result => console.log(result))
             .catch(error => console.log('error', error));
@@ -204,7 +205,7 @@ export default class fuelLubricantPrice extends Component {
     }
 
     deleteProduct(data) {
-        axios.delete('http://localhost:4000/fuelLubricantPrice/deleteProduct/' + data)
+        axios.delete(backend_URI.url + '/fuelLubricantPrice/deleteProduct/' + data)
             .then(res => {
                 console.log(res);
                 this.setState({

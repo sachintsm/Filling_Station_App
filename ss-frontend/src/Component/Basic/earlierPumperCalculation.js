@@ -8,6 +8,7 @@ import { MDBInput } from "mdbreact";
 import Snackbar from '@material-ui/core/Snackbar'
 import IconButton from '@material-ui/core/IconButton'
 import { Animated } from "react-animated-css";
+const backend_URI = require('../Auth/Backend_URI')
 
 class finalBlock {
     constructor(pumpId, fuelType, yesterday, today, sale, debit, gross) {
@@ -94,7 +95,7 @@ export default class dailyPumperCalculations extends Component {
             this.state.el_dataArray = [];
 
             //get data from pumpersCalculations
-            await axios.post('http://localhost:4000/pumpersCalculations/get', data)
+            await axios.post(backend_URI.url + '/pumpersCalculations/get', data)
                 .then(res => {
                     if (res.data.state === false) {
                         this.setState({
@@ -114,7 +115,7 @@ export default class dailyPumperCalculations extends Component {
                     })
                 })
 
-            await axios.get('http://localhost:4000/users/getPumperName/' + this.state.el_pumperId)
+            await axios.get(backend_URI.url + '/users/getPumperName/' + this.state.el_pumperId)
                 .then(res => {
                     if (res.data.state === false) {
                         this.setState({
@@ -136,14 +137,14 @@ export default class dailyPumperCalculations extends Component {
                 })
 
             //get yesterday meter reading
-            await axios.get('http://localhost:4000/machinesData/getYes/' + this.state.startDate)
+            await axios.get(backend_URI.url + '/machinesData/getYes/' + this.state.startDate)
                 .then(res => {
                     this.setState({
                         el_yesterday: res.data.data
                     })
                 })
             //get today meter reading
-            await axios.get('http://localhost:4000/machinesData/getToday/' + this.state.startDate)
+            await axios.get(backend_URI.url + '/machinesData/getToday/' + this.state.startDate)
                 .then(res => {
                     this.setState({
                         el_today: res.data.data
@@ -158,7 +159,7 @@ export default class dailyPumperCalculations extends Component {
                 })
             }
             else {
-                await axios.get('http://localhost:4000/pumpsRegistration/getSet/' + this.state.el_dataArray.setNumber)
+                await axios.get(backend_URI.url + '/pumpsRegistration/getSet/' + this.state.el_dataArray.setNumber)
                     .then(res => {
                         this.setState({
                             el_pumpsNames: res.data.data
@@ -166,7 +167,7 @@ export default class dailyPumperCalculations extends Component {
                     })
 
                 //get debiters data
-                await axios.get('http://localhost:4000/debitorsAccount/get/' + this.state.startDate)
+                await axios.get(backend_URI.url + '/debitorsAccount/get/' + this.state.startDate)
                     .then(res => {
                         this.setState({
                             debits: res.data.data

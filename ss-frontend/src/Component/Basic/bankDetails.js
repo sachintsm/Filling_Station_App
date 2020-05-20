@@ -14,6 +14,8 @@ import DatePicker from "react-datepicker";
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import { Animated } from "react-animated-css";
 
+const backend_URI = require('../Auth/Backend_URI')
+
 export default class bankDetails extends Component {
     constructor(props) {
         super(props)
@@ -38,7 +40,7 @@ export default class bankDetails extends Component {
             date1_date: new Date(),
             date2_date: new Date(),
 
-            dataDiv : false,
+            dataDiv: false,
         }
 
         this.onChangeReg = this.onChangeReg.bind(this)
@@ -77,14 +79,14 @@ export default class bankDetails extends Component {
         this.setState({ authState: authState })
         if (!authState) this.props.history.push('/login');
 
-        axios.get('http://localhost:4000/bankAccountRegistration/getAccountNames')
+        axios.get(backend_URI.url  + '/bankAccountRegistration/getAccountNames')
             .then(res => {
                 this.setState({
                     BankAccount: res.data.data
                 })
             })
 
-        axios.get('http://localhost:4000/bankAccountData/getLastSeven')
+        axios.get(backend_URI.url  + '/bankAccountData/getLastSeven')
             .then(res => {
                 this.setState({
                     lastSeven: res.data.data
@@ -117,7 +119,7 @@ export default class bankDetails extends Component {
                 accountNumber: this.state.accountNumber,
             }
 
-            fetch('http://localhost:4000/bankAccountRegistration/add', {
+            fetch(backend_URI.url  + '/bankAccountRegistration/add', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -183,7 +185,7 @@ export default class bankDetails extends Component {
             dip_date: this.state.dip_date,
         }
 
-        fetch('http://localhost:4000/bankAccountData/add', {
+        fetch(backend_URI.url  + '/bankAccountData/add', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -214,7 +216,7 @@ export default class bankDetails extends Component {
             date1: this.state.date1_date,
             date2: this.state.date2_date
         }
-        axios.post('http://localhost:4000/bankAccountData/getLastMonth', data)
+        axios.post(backend_URI.url  + '/bankAccountData/getLastMonth', data)
             .then(res => {
                 this.setState({
                     lastMonth: res.data.data
@@ -225,7 +227,7 @@ export default class bankDetails extends Component {
     }
 
     bankDelete(data) {
-        axios.delete('http://localhost:4000/bankAccountData/delete/' + data)
+        axios.delete(backend_URI.url  + '/bankAccountData/delete/' + data)
             .then(res => {
                 console.log(res);
                 this.setState({
@@ -415,46 +417,46 @@ export default class bankDetails extends Component {
                                             </Col>
                                         </Row>
                                         {dataDiv && (
-                                    <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true} animationInDuration={1200}>
+                                            <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true} animationInDuration={1200}>
 
-                                            <div style={{ backgroundColor: "#ffffff", marginTop: "10px", borderRadius: "4px", marginBottom: "20px" }}>
-                                                <div className="container">
-                                                    <div className="row">
-                                                        <Col xs="2">
-                                                            <p className="tbl-head">Date</p>
-                                                        </Col>
-                                                        <Col xs="4">
-                                                            <p className="tbl-head">Account Number</p>
-                                                        </Col>
-                                                        <Col xs="3">
-                                                            <p className="tbl-head">Cheque Number</p>
-                                                        </Col>
-                                                        <Col xs="3" style={{ textAlign: 'center' }}>
-                                                            <p className="tbl-head">Amount</p>
-                                                        </Col>
+                                                <div style={{ backgroundColor: "#ffffff", marginTop: "10px", borderRadius: "4px", marginBottom: "20px" }}>
+                                                    <div className="container">
+                                                        <div className="row">
+                                                            <Col xs="2">
+                                                                <p className="tbl-head">Date</p>
+                                                            </Col>
+                                                            <Col xs="4">
+                                                                <p className="tbl-head">Account Number</p>
+                                                            </Col>
+                                                            <Col xs="3">
+                                                                <p className="tbl-head">Cheque Number</p>
+                                                            </Col>
+                                                            <Col xs="3" style={{ textAlign: 'center' }}>
+                                                                <p className="tbl-head">Amount</p>
+                                                            </Col>
 
+                                                        </div>
+                                                        {this.state.lastMonth.map(data => {
+                                                            return (
+                                                                <div className="row" key={data._id}>
+                                                                    <Col xs="2">
+                                                                        <p className="tbl-body">{data.date}</p>
+                                                                    </Col>
+                                                                    <Col xs="4">
+                                                                        <p className="tbl-body">{data.accountNumber}</p>
+                                                                    </Col>
+                                                                    <Col xs="3">
+                                                                        <p className="tbl-body">{data.chequeNo}</p>
+                                                                    </Col>
+                                                                    <Col xs="3" style={{ textAlign: 'right' }}>
+                                                                        <p className="tbl-body">{data.amount}</p>
+                                                                    </Col>
+
+                                                                </div>
+                                                            )
+                                                        })}
                                                     </div>
-                                                    {this.state.lastMonth.map(data => {
-                                                        return (
-                                                            <div className="row" key={data._id}>
-                                                                <Col xs="2">
-                                                                    <p className="tbl-body">{data.date}</p>
-                                                                </Col>
-                                                                <Col xs="4">
-                                                                    <p className="tbl-body">{data.accountNumber}</p>
-                                                                </Col>
-                                                                <Col xs="3">
-                                                                    <p className="tbl-body">{data.chequeNo}</p>
-                                                                </Col>
-                                                                <Col xs="3" style={{ textAlign: 'right' }}>
-                                                                    <p className="tbl-body">{data.amount}</p>
-                                                                </Col>
-
-                                                            </div>
-                                                        )
-                                                    })}
                                                 </div>
-                                            </div>
                                             </Animated>
                                         )}
                                     </Tab>

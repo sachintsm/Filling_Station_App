@@ -9,6 +9,8 @@ import { verifyAuth } from '../../utils/authentication';
 import Snackbar from '@material-ui/core/Snackbar'
 import IconButton from '@material-ui/core/IconButton'
 
+const backend_URI = require('../Auth/Backend_URI')
+
 export default class registration extends Component {
 
     constructor(props) {
@@ -61,7 +63,7 @@ export default class registration extends Component {
         formData.append('address', this.state.form.address);
         formData.append('other', this.state.form.other);
 
-        axios.post("http://localhost:4000/users/register", formData, { // receive two parameter endpoint url ,form data 
+        axios.post(backend_URI.url  + "/users/register", formData, { // receive two parameter endpoint url ,form data 
         })
             .then(res => { // then print response status
                 console.log(res)

@@ -10,6 +10,7 @@ import axios from 'axios'
 import Snackbar from '@material-ui/core/Snackbar'
 import IconButton from '@material-ui/core/IconButton'
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
+const backend_URI = require('../Auth/Backend_URI')
 
 export default class pumpsRegistration extends Component {
 
@@ -78,14 +79,14 @@ export default class pumpsRegistration extends Component {
         this.setState({ authState: authState })
         if (!authState) this.props.history.push('/login');
 
-        axios.get('http://localhost:4000/pumpsRegistration/get')
+        axios.get(backend_URI+'/pumpsRegistration/get')
             .then(res => {
                 this.setState({ pumps: res.data.data })
             })
             .catch(function (err) {
                 console.log(err);
             })
-        axios.get('http://localhost:4000/pumpSetRegistration/get')
+        axios.get(backend_URI+'/pumpSetRegistration/get')
             .then(res => {
                 this.setState({
                     pumpSetData: res.data.data
@@ -109,7 +110,7 @@ export default class pumpsRegistration extends Component {
             const data = {
                 setNumber: this.state.setNumber,
             }
-            fetch('http://localhost:4000/pumpSetRegistration/add', {
+            fetch(backend_URI+'/pumpSetRegistration/add', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -152,7 +153,7 @@ export default class pumpsRegistration extends Component {
             })
         }
         else {
-            fetch('http://localhost:4000/pumpsRegistration/add', {
+            fetch(backend_URI+'/pumpsRegistration/add', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -197,7 +198,7 @@ export default class pumpsRegistration extends Component {
             redirect: 'follow'
         };
 
-        fetch("http://localhost:4000/pumpsRegistration/updatePumpSet", requestOptions)
+        fetch(backend_URI+"/pumpsRegistration/updatePumpSet", requestOptions)
             .then(response => response.text())
             .then(result => console.log(result))
             .catch(error => console.log('error', error));
@@ -209,7 +210,7 @@ export default class pumpsRegistration extends Component {
 
     deletePump(data) {
         console.log(data)
-        axios.delete('http://localhost:4000/pumpsRegistration/deletePump/' + data)
+        axios.delete(backend_URI.url  + '/pumpsRegistration/deletePump/' + data)
             .then(res => {
                 console.log(res);
                 this.setState({
@@ -228,7 +229,7 @@ export default class pumpsRegistration extends Component {
     }
     onDeleteSet(data) {
         console.log(data)
-        axios.delete('http://localhost:4000/pumpSetRegistration/delete/' + data)
+        axios.delete(backend_URI.url  + '/pumpSetRegistration/delete/' + data)
             .then(res => {
                 console.log(res);
                 this.setState({
