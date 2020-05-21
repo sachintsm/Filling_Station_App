@@ -1,5 +1,5 @@
 module.exports = {
-    "database" : "mongodb://localhost:27017/sands",
+    "database" : "mongodb+srv://sandspetroleumtraders:sands@sarath123@cluster0-mfzvg.mongodb.net/test?retryWrites=true&w=majority",
     "secret" : "deathstalkersecretkey",
 }
 

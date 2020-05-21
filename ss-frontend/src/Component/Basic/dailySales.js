@@ -1,6 +1,5 @@
 import Card from '@material-ui/core/Card';
 import IconButton from '@material-ui/core/IconButton';
-import Snackbar from '@material-ui/core/Snackbar';
 import axios from 'axios';
 import { MDBInput } from "mdbreact";
 import React, { Component } from 'react';
@@ -12,6 +11,9 @@ import { getFromStorage } from '../../utils/storage';
 import Sidebar from '../Auth/sidebar';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import { Button, Col, Row } from 'react-bootstrap';
+import Snackpop from "../Auth/Snackpop";
+import { confirmAlert } from 'react-confirm-alert';
+import 'react-confirm-alert/src/react-confirm-alert.css'
 
 const backend_URI = require('../Auth/Backend_URI')
 
@@ -22,8 +24,11 @@ export default class dailyPumperCalculations extends Component {
 
         this.state = {
             authState: '',
+
             snackbaropen: false,
             snackbarmsg: '',
+            snackbarcolor: '',
+            
             salesPId: '',
             salesQty: '',
             products: [],

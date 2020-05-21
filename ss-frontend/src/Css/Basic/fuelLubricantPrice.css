@@ -41,12 +41,18 @@
     font-weight: 400;
     color: rgb(85, 85, 85);
 }
-
 .delete-btn{
-    height: 40px;
-    width: 100%;
+    margin-top: 5px;
+}
+.delete-btn:hover{
+   color: red;
+   cursor: pointer;
 }
 
 .inputValue{
     text-align: right;
+}
+
+.des-product-row{
+    margin-bottom:5px;
 }

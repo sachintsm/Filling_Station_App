@@ -21,9 +21,6 @@ import ArrowRightIcon from '@material-ui/icons/ArrowRight';
 
 import { Animated } from "react-animated-css";
 
-const backend_URI = require('../Auth/Backend_URI');
-
-
 export default class Home extends Component {
 
     constructor(props) {

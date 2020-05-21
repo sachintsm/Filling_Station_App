@@ -10,12 +10,16 @@ router.post('/add', verify, async function (req, res, next) {
     const productIdExist = await FuelLubPrice.findOne({ pId: req.body.pId })
     if (productIdExist) return res.json({ state: false, msg: "This pId already in use..!" })
 
+    var size = req.body.size
+    var buyPrice = req.body.buyPrice
+    var sellPrice = req.body.sellPrice
+
     const data = new FuelLubPrice({
         pId: req.body.pId,
         pName: req.body.pName,
-        size: req.body.size,
-        buyPrice: req.body.buyPrice,
-        sellPrice: req.body.sellPrice,
+        size: parseFloat(size).toFixed(3),
+        buyPrice: parseFloat(buyPrice).toFixed(2),
+        sellPrice: parseFloat(sellPrice).toFixed(2),
         pType: req.body.pType,
         availStock: 0
     });

@@ -7,8 +7,11 @@ import Sidebar from '../Auth/sidebar'
 import { verifyAuth } from '../../utils/authentication';
 import { getFromStorage } from '../../utils/storage';
 import axios from 'axios'
-import Snackbar from '@material-ui/core/Snackbar'
-import IconButton from '@material-ui/core/IconButton'
+import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
+import Snackpop from "../Auth/Snackpop";
+import { confirmAlert } from 'react-confirm-alert';
+import 'react-confirm-alert/src/react-confirm-alert.css'
+
 const backend_URI = require('../Auth/Backend_URI')
 
 export default class fuelLubricantPrice extends Component {
@@ -16,6 +19,10 @@ export default class fuelLubricantPrice extends Component {
         super(props);
 
         this.state = {
+            snackbaropen: false,
+            snackbarmsg: '',
+            snackbarcolor: '',
+
             authState: '',
             pId: '',
             pName: '',
@@ -29,8 +36,7 @@ export default class fuelLubricantPrice extends Component {
             gas: [],
             others: [],
             pumpSet: '',
-            snackbaropen: false,
-            snackbarmsg: '',
+
         }
         this.onChange = this.onChange.bind(this);
         this.onChangeType = this.onChangeType.bind(this)
@@ -44,9 +50,9 @@ export default class fuelLubricantPrice extends Component {
 
     }
 
-    snackbarClose = (event) => {
-        this.setState({ snackbaropen: false })
-    }
+    closeAlert = () => {
+        this.setState({ snackbaropen: false });
+    };
 
     onChange = (e) => {
         e.persist = () => { };
@@ -110,37 +116,56 @@ export default class fuelLubricantPrice extends Component {
             pType: this.state.pType,
         }
 
-        if (this.state.pId === '') {
+        if (this.state.pId === '' || this.state.pName === '' || this.state.buyPrice === '' || this.state.sellPrice === '' || this.state.pType === '') {
             this.setState({
                 snackbaropen: true,
+                snackbarcolor: 'error',
                 snackbarmsg: "Please Fill the Data ..!"
             })
         }
         else {
-            fetch(backend_URI.url + '/fuelLubricantPrice/add', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'auth-token': obj.token
-                },
-                body: JSON.stringify(data),
+            confirmAlert({
+                title: 'Confirm to submit',
+                message: 'Are you sure to do this.',
+                buttons: [
+                    {
+                        label: 'Yes',
+                        onClick: async () => {
+
+                            fetch(backend_URI.url + '/fuelLubricantPrice/add', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'auth-token': obj.token
+                                },
+                                body: JSON.stringify(data),
+                            })
+                                .then(res => res.json())
+                                .then(json => {
+                                    this.setState({
+                                        snackbaropen: true,
+                                        snackbarmsg: json.msg,
+                                        snackbarcolor: 'success'
+                                    })
+                                    window.location.reload();
+                                })
+                                .catch(err => {
+                                    this.setState({
+                                        snackbaropen: true,
+                                        snackbarmsg: err,
+                                        snackbarcolor: 'error'
+                                    })
+                                    console.log(err)
+                                })
+                        }
+                    },
+                    {
+                        label: 'No',
+                        onClick: () => {
+                        }
+                    }
+                ]
             })
-                .then(res => res.json())
-                .then(json => {
-                    // alert(json.msg)
-                    this.setState({
-                        snackbaropen: true,
-                        snackbarmsg: json.msg
-                    })
-                    // window.location.reload();
-                })
-                .catch(err => {
-                    this.setState({
-                        snackbaropen: true,
-                        snackbarmsg: err
-                    })
-                    console.log(err)
-                })
         }
     }
     onBuyPriceChange(e) {
@@ -170,13 +195,44 @@ export default class fuelLubricantPrice extends Component {
             body: urlencoded,
             redirect: 'follow'
         };
+        confirmAlert({
+            title: 'Confirm to submit',
+            message: 'Are you sure to do this.',
+            buttons: [
+                {
+                    label: 'Yes',
+                    onClick: async () => {
 
-        fetch(backend_URI.url + "/fuelLubricantPrice/updateProductPrice", requestOptions)
-            .then(response => response.json())
-            .then(result => {
-                console.log(result)
-            })
-            .catch(error => console.log('error', error));
+                        fetch(backend_URI.url + "/fuelLubricantPrice/updateProductPrice", requestOptions)
+                            .then(response => response.json())
+                            .then(result => {
+                                if (result.state) {
+                                    this.setState({
+                                        snackbaropen: true,
+                                        snackbarmsg: result.msg,
+                                        snackbarcolor: 'success'
+                                    })
+                                    window.location.reload()
+                                }
+                                else {
+                                    this.setState({
+                                        snackbaropen: true,
+                                        snackbarmsg: result.msg,
+                                        snackbarcolor: 'error'
+                                    })
+                                }
+                            })
+                            .catch(error => console.log('error', error));
+                    }
+                },
+                {
+                    label: 'No',
+                    onClick: () => {
+                        window.location.reload()
+                    }
+                }
+            ]
+        })
     }
     async onSellPriceBlur(data) {
         var myHeaders = new Headers();
@@ -193,11 +249,45 @@ export default class fuelLubricantPrice extends Component {
             body: urlencoded,
             redirect: 'follow'
         };
+        confirmAlert({
+            title: 'Confirm to submit',
+            message: 'Are you sure to do this.',
+            buttons: [
+                {
+                    label: 'Yes',
+                    onClick: async () => {
 
-        fetch(backend_URI.url + "/fuelLubricantPrice/updateProductPrice", requestOptions)
-            .then(response => response.json())
-            .then(result => console.log(result))
-            .catch(error => console.log('error', error));
+
+                        fetch(backend_URI.url + "/fuelLubricantPrice/updateProductPrice", requestOptions)
+                            .then(response => response.json())
+                            .then(result => {
+                                if (result.state) {
+                                    this.setState({
+                                        snackbaropen: true,
+                                        snackbarmsg: result.msg,
+                                        snackbarcolor: 'success'
+                                    })
+                                    window.location.reload()
+                                }
+                                else {
+                                    this.setState({
+                                        snackbaropen: true,
+                                        snackbarmsg: result.msg,
+                                        snackbarcolor: 'error'
+                                    })
+                                }
+                            })
+                            .catch(error => console.log('error', error));
+                    }
+                },
+                {
+                    label: 'No',
+                    onClick: () => {
+                        window.location.reload()
+                    }
+                }
+            ]
+        })
     }
 
     onRefresh() {
@@ -205,22 +295,42 @@ export default class fuelLubricantPrice extends Component {
     }
 
     deleteProduct(data) {
-        axios.delete(backend_URI.url + '/fuelLubricantPrice/deleteProduct/' + data)
-            .then(res => {
-                console.log(res);
-                this.setState({
-                    snackbaropen: true,
-                    snackbarmsg: res.data.message
-                })
-                window.location.reload();
-            })
-            .catch(err => {
-                console.log(err);
-                this.setState({
-                    snackbaropen: true,
-                    snackbarmsg: err
-                })
-            })
+        confirmAlert({
+            title: 'Confirm to submit',
+            message: 'Are you sure to do this.',
+            buttons: [
+                {
+                    label: 'Yes',
+                    onClick: async () => {
+
+                        axios.delete(backend_URI.url + '/fuelLubricantPrice/deleteProduct/' + data)
+                            .then(res => {
+                                console.log(res);
+                                this.setState({
+                                    snackbaropen: true,
+                                    snackbarmsg: res.data.msg,
+                                    snackbarcolor: 'success'
+                                })
+                                window.location.reload();
+                            })
+                            .catch(err => {
+                                console.log(err);
+                                this.setState({
+                                    snackbaropen: true,
+                                    snackbarmsg: err,
+                                    snackbarcolor: 'error'
+                                })
+                            })
+                    }
+                },
+                {
+                    label: 'No',
+                    onClick: () => {
+
+                    }
+                }
+            ]
+        })
     }
 
     render() {
@@ -229,19 +339,12 @@ export default class fuelLubricantPrice extends Component {
             <React.Fragment>
 
                 <div className="container-fluid">
-                    <Snackbar
-                        open={this.state.snackbaropen}
-                        autoHideDuration={2000}
-                        onClose={this.snackbarClose}
-                        message={<span id="message-id">{this.state.snackbarmsg}</span>}
-                        action={[
-                            <IconButton
-                                key="close"
-                                aria-label="Close"
-                                color="secondary"
-                                onClick={this.snackbarClose}
-                            > x </IconButton>
-                        ]}
+                    <Snackpop
+                        msg={this.state.snackbarmsg}
+                        color={this.state.snackbarcolor}
+                        time={3000}
+                        status={this.state.snackbaropen}
+                        closeAlert={this.closeAlert}
                     />
 
                     <div className="row">
@@ -316,6 +419,7 @@ export default class fuelLubricantPrice extends Component {
                                                 <div className="col-md-5">
                                                     <div className="row">
                                                         <div className="col-md-4">
+                                                            <label className="topic-product"> Buying Price</label>
                                                         </div>
                                                         <div className="col-md-4">
                                                             <label className="topic-product" style={{ marginLeft: "10px" }}> Selling Price</label>
@@ -342,12 +446,13 @@ export default class fuelLubricantPrice extends Component {
                                                         <div className="col-md-5">
                                                             <div className="row">
                                                                 <div className="col-md-4">
+                                                                    <input className="form-control inputValue" defaultValue={data.buyPrice} onBlur={() => this.onBuyPriceBlur(data)} onChange={this.onBuyPriceChange} />
                                                                 </div>
                                                                 <div className="col-md-4">
                                                                     <input className="form-control inputValue" defaultValue={data.sellPrice} onBlur={() => this.onSellPriceBlur(data)} onChange={this.onSellPriceChange} />
                                                                 </div>
-                                                                <div className="col-md-4" >
-                                                                    <button style={{ marginTop: "-1px", marginLeft: "-4px" }} className="btn btn-danger delete-btn" onClick={() => this.deleteProduct(data._id)}>Delete</button>
+                                                                <div className="col-md-4" style={{ textAlign: 'center' }} >
+                                                                    <DeleteForeverIcon className="delete-btn" onClick={() => this.deleteProduct(data._id)}>Delete</DeleteForeverIcon>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -419,8 +524,8 @@ export default class fuelLubricantPrice extends Component {
                                                                 <div className="col-md-4">
                                                                     <input className="form-control inputValue" defaultValue={data.sellPrice} onBlur={() => this.onSellPriceBlur(data)} onChange={this.onSellPriceChange} />
                                                                 </div>
-                                                                <div className="col-md-4" >
-                                                                    <button style={{ marginTop: "-1px", marginLeft: "-4px" }} className="btn btn-danger delete-btn" onClick={() => this.deleteProduct(data._id)}>Delete</button>
+                                                                <div className="col-md-4" style={{ textAlign: 'center' }} >
+                                                                    <DeleteForeverIcon className="delete-btn" onClick={() => this.deleteProduct(data._id)}>Delete</DeleteForeverIcon>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -492,8 +597,8 @@ export default class fuelLubricantPrice extends Component {
                                                                 <div className="col-md-4">
                                                                     <input className="form-control inputValue" defaultValue={data.sellPrice} onBlur={() => this.onSellPriceBlur(data)} onChange={this.onSellPriceChange} />
                                                                 </div>
-                                                                <div className="col-md-4" >
-                                                                    <button style={{ marginTop: "-1px", marginLeft: "-4px" }} className="btn btn-danger delete-btn" onClick={() => this.deleteProduct(data._id)}>Delete</button>
+                                                                <div className="col-md-4" style={{ textAlign: 'center' }} >
+                                                                    <DeleteForeverIcon className="delete-btn" onClick={() => this.deleteProduct(data._id)}>Delete</DeleteForeverIcon>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -565,8 +670,8 @@ export default class fuelLubricantPrice extends Component {
                                                                 <div className="col-md-4">
                                                                     <input className="form-control inputValue" defaultValue={data.sellPrice} onBlur={() => this.onSellPriceBlur(data)} onChange={this.onSellPriceChange} />
                                                                 </div>
-                                                                <div className="col-md-4" >
-                                                                    <button style={{ marginTop: "-1px", marginLeft: "-4px" }} className="btn btn-danger delete-btn" onClick={() => this.deleteProduct(data._id)}>Delete</button>
+                                                                <div className="col-md-4" style={{ textAlign: 'center' }} >
+                                                                    <DeleteForeverIcon className="delete-btn" onClick={() => this.deleteProduct(data._id)}>Delete</DeleteForeverIcon>
                                                                 </div>
                                                             </div>
                                                         </div>

@@ -8,6 +8,7 @@ import '../../Css/Admin/login.css';
 import { setInStorage } from '../../utils/storage';
 import { MDBInput, MDBBtn } from "mdbreact";
 import ParticlesBg from 'particles-bg'
+import Snackpop from "../Auth/Snackpop";
 
 const backend_URI = require('../Auth/Backend_URI')
 export default class login extends Component {
@@ -16,6 +17,11 @@ export default class login extends Component {
         super(props);
 
         this.state = {
+            snackbaropen: false,
+            snackbarmsg: '',
+            snackbarcolor: '',
+
+
             token: '',
             signUpError: '',
             signInError: '',
@@ -30,6 +36,10 @@ export default class login extends Component {
         this.onChangeUserId = this.onChangeUserId.bind(this);
         this.onChangePassword = this.onChangePassword.bind(this);
     }
+    closeAlert = () => {
+        this.setState({ snackbaropen: false });
+    };
+
     onChangeUserId(e) {
         this.setState({
             userId: e.target.value
@@ -69,16 +79,22 @@ export default class login extends Component {
                         userType: json.data.userType
                     })
                     this.setState({
-                        signInError: json.msg,
                         password: '',
                         userId: '',
                         token: json.token
+                    })
+                    this.setState({
+                        snackbaropen: true,
+                        snackbarmsg: json.msg,
+                        snackbarcolor: 'success'
                     })
                     this.props.history.goBack();
                 }
                 else {
                     this.setState({
-                        signInError: json.msg,
+                        snackbaropen: true,
+                        snackbarmsg: json.msg,
+                        snackbarcolor: 'error'
                     })
                 }
             })
@@ -88,7 +104,6 @@ export default class login extends Component {
         const {
             userId,
             password,
-            signInError
         } = this.state;
 
         let config = {
@@ -125,17 +140,22 @@ export default class login extends Component {
         }
         return (
             <div className="container-fluid" style={{ minHeight: "700px" }}>
+
+                <Snackpop
+                    msg={this.state.snackbarmsg}
+                    color={this.state.snackbarcolor}
+                    time={3000}
+                    status={this.state.snackbaropen}
+                    closeAlert={this.closeAlert}
+                />
+
                 <ParticlesBg type="custom" config={config} bg={true} />
 
                 <div className="row">
                     <div className="container login-card-div" >
                         <Card className="login-card">
                             <Form >
-                                {
-                                    (signInError) ? (
-                                        <p>{signInError}</p>
-                                    ) : null
-                                }
+                                
                                 {/* eslint-disable-next-line */}
                                 <img src={require('../../Assets/logo/Logo_reg.png')} className="logo" />
                                 <CardContent style={{ marginLeft: "20px", marginRight: "20px" }}>
