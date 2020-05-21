@@ -5,12 +5,11 @@ const LockerState = require('../models/lockerState');
 const verify = require('../authentication');
 
 router.post('/add', verify, function (req, res) {
-    console.log(req.body);
 
     var today = new Date();
     var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
     var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-    var dt = Date.parse(req.body.dip_date)
+    var dt = Date.parse(today)
 
     const data = new LockerState({
         lockerAmount: parseFloat(req.body.lockerAmount).toFixed(2),

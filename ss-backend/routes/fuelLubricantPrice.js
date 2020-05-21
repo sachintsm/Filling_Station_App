@@ -155,4 +155,12 @@ router.post('/salesUpdate', async (req, res) => {
             res.json({ state: false, msg: "Data Updating Unsuccessfull..!" });
         })
 })
+
+//?check availibity of the production
+router.get("/checkId/:id", async (req, res) => {
+    // checking if the pId is already in the database
+    const product = await FuelLubPrice.findOne({ pId: req.params.id })
+    if (!product) return res.json({ state: false, msg: "This Product Not Available..!" })
+    else return res.json({ state: true})
+})
 module.exports = router;

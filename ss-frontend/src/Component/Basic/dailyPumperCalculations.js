@@ -9,6 +9,20 @@ import Snackbar from '@material-ui/core/Snackbar'
 import IconButton from '@material-ui/core/IconButton'
 import { getFromStorage } from '../../utils/storage';
 import { Animated } from "react-animated-css";
+import Snackpop from "../Auth/Snackpop";
+import { confirmAlert } from 'react-confirm-alert';
+import 'react-confirm-alert/src/react-confirm-alert.css';
+import { makeStyles } from '@material-ui/core/styles';
+import CircularProgress from '@material-ui/core/CircularProgress';
+
+const useStyles = makeStyles((theme) => ({
+    root: {
+        display: 'flex',
+        '& > * + *': {
+            marginLeft: theme.spacing(2),
+        },
+    },
+}));
 
 const backend_URI = require('../Auth/Backend_URI')
 
@@ -51,8 +65,11 @@ export default class dailyPumperCalculations extends Component {
         this.state = {
             authState: '',
             pumpSetData: [],    //load pumps sets names
+
             snackbaropen: false,
             snackbarmsg: '',
+            snackbarcolor: '',
+
             startDate: new Date(),
             pumperId: '',
             pumpSet: '',
@@ -80,6 +97,7 @@ export default class dailyPumperCalculations extends Component {
             totalProfit: 0.00.toFixed(2),
 
             dataDiv: false,
+            progressDiv: false,
         }
         this.onChangePumpSet = this.onChangePumpSet.bind(this)
         this.onChangeDate = this.onChangeDate.bind(this)
@@ -91,9 +109,9 @@ export default class dailyPumperCalculations extends Component {
 
     }
 
-    snackbarClose = (event) => {
-        this.setState({ snackbaropen: false })
-    }
+    closeAlert = () => {
+        this.setState({ snackbaropen: false });
+    };
 
     onChangeDate = date => {
         this.setState(prevState => ({
@@ -119,16 +137,19 @@ export default class dailyPumperCalculations extends Component {
     }
 
     async getData() {
+
         this.setState({
-            finalBlock: []
+            finalBlock: [],
         })
         if (this.state.pumperId === '') {
             this.setState({
                 snackbaropen: true,
-                snackbarmsg: "Please Fill the Pumper ID ..!"
+                snackbarmsg: "Please Fill the Pumper ID ..!",
+                snackbarcolor: 'error'
             })
         }
         else {
+            this.state.progressDiv = true
             this.state.yesReading = [];  // empty the meter block Array
             this.state.todayReading = [];  // empty the meter block Array
             this.state.debits = [];  // empty the meter block Array
@@ -136,7 +157,7 @@ export default class dailyPumperCalculations extends Component {
             this.state.distinctDebit = [];
 
             //get Pumps Names
-            await axios.get(backend_URI + '/pumpsRegistration/getSet/' + this.state.pumpSet)
+            await axios.get(backend_URI.url + '/pumpsRegistration/getSet/' + this.state.pumpSet)
                 .then(res => {
                     this.setState({
                         pumpsNames: res.data.data
@@ -144,21 +165,21 @@ export default class dailyPumperCalculations extends Component {
                 })
 
             //get yesterday meter reading
-            await axios.get(backend_URI+'/machinesData/getYes/' + this.state.startDate)
+            await axios.get(backend_URI.url + '/machinesData/getYes/' + this.state.startDate)
                 .then(res => {
                     this.setState({
                         yesReading: res.data.data
                     })
                 })
             //get today meter reading
-            await axios.get(backend_URI +'/machinesData/getToday/' + this.state.startDate)
+            await axios.get(backend_URI.url + '/machinesData/getToday/' + this.state.startDate)
                 .then(res => {
                     this.setState({
                         todayReading: res.data.data
                     })
                 })
             //get debiters data
-            await axios.get(backend_URI +'/debitorsAccount/get/' + this.state.startDate)
+            await axios.get(backend_URI.url + '/debitorsAccount/get/' + this.state.startDate)
                 .then(res => {
                     this.setState({
                         debits: res.data.data
@@ -205,7 +226,7 @@ export default class dailyPumperCalculations extends Component {
             }
 
 
-            this.setState({ dataDiv: true });
+            this.setState({ dataDiv: true, progressDiv: false });
         }
     }
 
@@ -215,7 +236,7 @@ export default class dailyPumperCalculations extends Component {
         if (!authState) this.props.history.push('/login');
 
         //get pump sets
-        await axios.get(backend_URI + '/pumpSetRegistration/get')
+        await axios.get(backend_URI.url + '/pumpSetRegistration/get')
             .then(res => {
                 this.setState({
                     pumpSetData: res.data.data
@@ -226,7 +247,7 @@ export default class dailyPumperCalculations extends Component {
             })
 
         //get pumps details
-        await axios.get(backend_URI+ '/pumpsRegistration/get')
+        await axios.get(backend_URI.url + '/pumpsRegistration/get')
             .then(res => {
                 this.setState({
                     pumpNames: res.data.data
@@ -234,7 +255,7 @@ export default class dailyPumperCalculations extends Component {
             })
 
         //get fuel pridse and data
-        await axios.get(backend_URI+ '/fuelLubricantPrice/getFuelPrice')
+        await axios.get(backend_URI.url + '/fuelLubricantPrice/getFuelPrice')
             .then(res => {
                 this.setState({
                     products: res.data.data
@@ -285,7 +306,7 @@ export default class dailyPumperCalculations extends Component {
             set: this.state.pumpSet
         }
         //get pumpers Cash
-        await axios.post(backend_URI.url  +'/pumpersCash/getByDateSet/', data)
+        await axios.post(backend_URI.url + '/pumpersCash/getByDateSet/', data)
             .then(res => {
                 this.setState({
                     pumperCash: res.data.data
@@ -318,67 +339,106 @@ export default class dailyPumperCalculations extends Component {
             receivedAmount: this.state.totalReceivedAmount,
             profit: this.state.totalProfit
         }
+        confirmAlert({
+            title: 'Confirm to submit',
+            message: 'Are you sure to do this.',
+            buttons: [
+                {
+                    label: 'Yes',
+                    onClick: async () => {
 
-        fetch(backend_URI.url  + '/pumpersCalculations/add', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'auth-token': obj.token
-            },
-            body: JSON.stringify(data),
-        })
-            .then(res => res.json())
-            .then(json => {
-                this.setState({
-                    snackbaropen: true,
-                    snackbarmsg: json.msg
-                })
-                window.location.reload();
-            })
-            .catch(err => {
-                console.log(err)
-                this.setState({
-                    snackbaropen: true,
-                    snackbarmsg: err
-                })
-            })
-        for (var i = 0; i < this.state.finalBlock.length; i++) {
-            console.log(this.state.finalBlock[i].productId + " " + this.state.finalBlock[i].gross)
-            const stkData = {
-                pId: this.state.finalBlock[i].productId,
-                qty: this.state.finalBlock[i].gross,
-            }
-            await fetch(backend_URI.url  + '/fuelLubricantPrice/salesUpdate', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'auth-token': obj.token
+                        fetch(backend_URI.url + '/pumpersCalculations/add', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'auth-token': obj.token
+                            },
+                            body: JSON.stringify(data),
+                        })
+                            .then(res => res.json())
+                            .then(json => {
+                                if (json.state) {
+                                    this.setState({
+                                        snackbaropen: true,
+                                        snackbarmsg: json.msg,
+                                        snackbarcolor: 'success'
+                                    })
+                                    window.location.reload()
+                                }
+                                else {
+                                    this.setState({
+                                        snackbaropen: true,
+                                        snackbarmsg: json.msg,
+                                        snackbarcolor: 'error'
+                                    })
+                                }
+
+                            })
+                            .catch(err => {
+                                console.log(err)
+                                this.setState({
+                                    snackbaropen: true,
+                                    snackbarmsg: err,
+                                    snackbarcolor: 'error'
+                                })
+                            })
+                        for (var i = 0; i < this.state.finalBlock.length; i++) {
+                            console.log(this.state.finalBlock[i].productId + " " + this.state.finalBlock[i].gross)
+                            const stkData = {
+                                pId: this.state.finalBlock[i].productId,
+                                qty: this.state.finalBlock[i].gross,
+                            }
+                            await fetch(backend_URI.url + '/fuelLubricantPrice/salesUpdate', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'auth-token': obj.token
+                                },
+                                body: JSON.stringify(stkData),
+                            })
+                                .then(res => res.json())
+                                .then(json => {
+                                    if (json.state) {
+                                        this.setState({
+                                            snackbaropen: true,
+                                            snackbarmsg: json.msg,
+                                            snackbarcolor: 'success'
+                                        })
+                                    }
+                                    else {
+                                        this.setState({
+                                            snackbaropen: true,
+                                            snackbarmsg: json.msg,
+                                            snackbarcolor: 'error'
+                                        })
+                                    }
+
+                                })
+                                .catch(err => {
+                                    console.log(err)
+                                    this.setState({
+                                        snackbaropen: true,
+                                        snackbarmsg: err,
+                                        snackbarcolor: 'error'
+                                    })
+                                })
+                        }
+                    }
                 },
-                body: JSON.stringify(stkData),
-            })
-                .then(res => res.json())
-                .then(json => {
-                    console.log(json)
-                    this.setState({
-                        snackbaropen: true,
-                        snackbarmsg: json.msg
-                    })
-                })
-                .catch(err => {
-                    console.log(err)
-                    this.setState({
-                        snackbaropen: true,
-                        snackbarmsg: err
-                    })
-                })
-        }
+                {
+                    label: 'No',
+                    onClick: () => {
+
+                    }
+                }
+            ]
+        })
 
     }
 
     render() {
-        const { dataDiv } = this.state;
+        const { dataDiv, progressDiv } = this.state;
         const { pumpSetData } = this.state;
-
         let pumpSetList = pumpSetData.length > 0
             && pumpSetData.map((item, i) => {
                 return (
@@ -389,19 +449,12 @@ export default class dailyPumperCalculations extends Component {
         return (
             <React.Fragment>
                 <div className="container-fluid">
-                    <Snackbar
-                        open={this.state.snackbaropen}
-                        autoHideDuration={2000}
-                        onClose={this.snackbarClose}
-                        message={<span id="message-id">{this.state.snackbarmsg}</span>}
-                        action={[
-                            <IconButton
-                                key="close"
-                                aria-label="Close"
-                                color="secondary"
-                                onClick={this.snackbarClose}
-                            > x </IconButton>
-                        ]}
+                    <Snackpop
+                        msg={this.state.snackbarmsg}
+                        color={this.state.snackbarcolor}
+                        time={3000}
+                        status={this.state.snackbaropen}
+                        closeAlert={this.closeAlert}
                     />
                     <div className="row">
                         <div className="col-md-2" style={{ backgroundColor: "#1c2431" }}>
@@ -446,6 +499,13 @@ export default class dailyPumperCalculations extends Component {
                                         </div>
                                     </div>
                                 </div>
+
+                                {progressDiv && (
+                                    <div style={{ textAlign: 'center', marginTop: "20px" }}>
+                                        <CircularProgress />
+                                    </div>
+                                )}
+
                                 {/******************************************************************************************/}
                                 {dataDiv && (
                                     <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true} animationInDuration={1200}>
@@ -545,113 +605,113 @@ export default class dailyPumperCalculations extends Component {
                                 {dataDiv && (
                                     <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true} animationInDuration={1200}>
 
-                                    <div className="container second-div">
-                                        <div className="container">
-                                            <div className="row">
-                                                <div className="col-md-6">
-                                                    <div className="row">
-                                                        <div className="col-md-3">
-                                                            <p className="tag-text">2 Stroke Oil </p>
-                                                        </div>
-                                                        <div className="col-md-4" style={{ marginTop: "-30px" }}>
-                                                            <MDBInput outline label="Unit Price (Rs.)" type="text" name="twostrokeUnit" onChange={this.onChangeOil} />
-                                                        </div>
-                                                        <div className="col-md-4" style={{ marginTop: "-30px" }}>
-                                                            <MDBInput outline label="Quentity (Ltr)" type="text" name="twostrokeQty" onChange={this.onChangeOil} />
-                                                        </div>
+                                        <div className="container second-div">
+                                            <div className="container">
+                                                <div className="row">
+                                                    <div className="col-md-6">
+                                                        <div className="row">
+                                                            <div className="col-md-3">
+                                                                <p className="tag-text">2 Stroke Oil </p>
+                                                            </div>
+                                                            <div className="col-md-4" style={{ marginTop: "-30px" }}>
+                                                                <MDBInput outline label="Unit Price (Rs.)" type="text" name="twostrokeUnit" onChange={this.onChangeOil} />
+                                                            </div>
+                                                            <div className="col-md-4" style={{ marginTop: "-30px" }}>
+                                                                <MDBInput outline label="Quentity (Ltr)" type="text" name="twostrokeQty" onChange={this.onChangeOil} />
+                                                            </div>
 
-                                                        <div className="col-md-3">
-                                                            <p className="tag-text">Engine Oil </p>
-                                                        </div>
-                                                        <div className="col-md-4" style={{ marginTop: "-30px" }}>
-                                                            <MDBInput outline label="Unit Price (Rs.)" type="text" name="engineUnit" onChange={this.onChangeOil} />
-                                                        </div>
-                                                        <div className="col-md-4" style={{ marginTop: "-30px" }}>
-                                                            <MDBInput outline label="Quentity (Ltr)" type="text" name="engineQty" onChange={this.onChangeOil} />
-                                                        </div>
-                                                        <div className="col-md-3">
-                                                            <p className="tag-text">Other Sales </p>
-                                                        </div>
-                                                        <div className="col-md-8" style={{ marginTop: "-30px" }}>
-                                                            <MDBInput outline label="Amount (Rs.)" type="text" name="otherSales" onChange={this.onChangeOil} />
-                                                        </div>
-                                                    </div>
-                                                    <hr></hr>
-                                                    <div className="row">
-                                                        <div className="col-md-4">
-                                                            <p className="tag-text">Total</p>
-                                                        </div>
-
-                                                        <div className="col-md-8" style={{ textAlign: "right", paddingRight: "50px" }}>
-                                                            <p className="tag-value">{this.state.totalOtherSales}</p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div className="col-md-6">
-                                                    <div className="row">
-                                                        <div className="col-md-6">
-                                                            <p className="tag-text">Fuel Sales Amount </p>
-                                                        </div>
-                                                        <div className="col-md-1">
-                                                            <p className="tag-value">-</p>
-                                                        </div>
-                                                        <div className="col-md-5">
-                                                            <p className="tag-value">{this.state.fuelSaleAmount}</p>
-                                                        </div>
-
-                                                        <div className="col-md-6" style={{ marginTop: "18px" }}>
-                                                            <p className="tag-text">Total  Sales Amount </p>
-                                                        </div>
-                                                        <div className="col-md-1" style={{ marginTop: "18px" }}>
-                                                            <p className="tag-value">-</p>
-                                                        </div>
-                                                        <div className="col-md-5" style={{ marginTop: "18px" }}>
-                                                            <p className="tag-value">{this.state.totalSaleAmount}</p>
-                                                        </div>
-
-                                                        <div className="col-md-6" style={{ marginTop: "18px" }}>
-                                                            <p className="tag-text">Total Received Amount </p>
-                                                        </div>
-                                                        <div className="col-md-1" style={{ marginTop: "18px" }}>
-                                                            <p className="tag-value">-</p>
-                                                        </div>
-                                                        <div className="col-md-5" style={{ marginTop: "18px" }}>
-                                                            <p className="tag-value">{this.state.totalReceivedAmount}</p>
-                                                        </div>
-                                                        <hr style={{ marginTop: "28px" }}></hr>
-                                                        <div className="col-md-6">
-                                                            <p className="tag-profit">Total Profit </p>
-                                                        </div>
-                                                        <div className="col-md-1">
-                                                            <p className="tag-value">-</p>
-                                                        </div>
-                                                        <div className="col-md-5">
-                                                            <p className="tag-profit-value">{this.state.totalProfit}</p>
+                                                            <div className="col-md-3">
+                                                                <p className="tag-text">Engine Oil </p>
+                                                            </div>
+                                                            <div className="col-md-4" style={{ marginTop: "-30px" }}>
+                                                                <MDBInput outline label="Unit Price (Rs.)" type="text" name="engineUnit" onChange={this.onChangeOil} />
+                                                            </div>
+                                                            <div className="col-md-4" style={{ marginTop: "-30px" }}>
+                                                                <MDBInput outline label="Quentity (Ltr)" type="text" name="engineQty" onChange={this.onChangeOil} />
+                                                            </div>
+                                                            <div className="col-md-3">
+                                                                <p className="tag-text">Other Sales </p>
+                                                            </div>
+                                                            <div className="col-md-8" style={{ marginTop: "-30px" }}>
+                                                                <MDBInput outline label="Amount (Rs.)" type="text" name="otherSales" onChange={this.onChangeOil} />
+                                                            </div>
                                                         </div>
                                                         <hr></hr>
-                                                        <hr style={{ marginTop: "-25px" }}></hr>
+                                                        <div className="row">
+                                                            <div className="col-md-4">
+                                                                <p className="tag-text">Total</p>
+                                                            </div>
 
+                                                            <div className="col-md-8" style={{ textAlign: "right", paddingRight: "50px" }}>
+                                                                <p className="tag-value">{this.state.totalOtherSales}</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="col-md-6">
+                                                        <div className="row">
+                                                            <div className="col-md-6">
+                                                                <p className="tag-text">Fuel Sales Amount </p>
+                                                            </div>
+                                                            <div className="col-md-1">
+                                                                <p className="tag-value">-</p>
+                                                            </div>
+                                                            <div className="col-md-5">
+                                                                <p className="tag-value">{this.state.fuelSaleAmount}</p>
+                                                            </div>
+
+                                                            <div className="col-md-6" style={{ marginTop: "18px" }}>
+                                                                <p className="tag-text">Total  Sales Amount </p>
+                                                            </div>
+                                                            <div className="col-md-1" style={{ marginTop: "18px" }}>
+                                                                <p className="tag-value">-</p>
+                                                            </div>
+                                                            <div className="col-md-5" style={{ marginTop: "18px" }}>
+                                                                <p className="tag-value">{this.state.totalSaleAmount}</p>
+                                                            </div>
+
+                                                            <div className="col-md-6" style={{ marginTop: "18px" }}>
+                                                                <p className="tag-text">Total Received Amount </p>
+                                                            </div>
+                                                            <div className="col-md-1" style={{ marginTop: "18px" }}>
+                                                                <p className="tag-value">-</p>
+                                                            </div>
+                                                            <div className="col-md-5" style={{ marginTop: "18px" }}>
+                                                                <p className="tag-value">{this.state.totalReceivedAmount}</p>
+                                                            </div>
+                                                            <hr style={{ marginTop: "28px" }}></hr>
+                                                            <div className="col-md-6">
+                                                                <p className="tag-profit">Total Profit </p>
+                                                            </div>
+                                                            <div className="col-md-1">
+                                                                <p className="tag-value">-</p>
+                                                            </div>
+                                                            <div className="col-md-5">
+                                                                <p className="tag-profit-value">{this.state.totalProfit}</p>
+                                                            </div>
+                                                            <hr></hr>
+                                                            <hr style={{ marginTop: "-25px" }}></hr>
+
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
 
 
-                                            <div className="row btn-div">
-                                                <div className="col-md-6">
-                                                </div>
-                                                <div className="col-md-3">
-                                                    <div className="form-group">
-                                                        <input type="submit" onClick={this.calculate} value="Calculate" className="btn btn-primary submit-btn"></input>
+                                                <div className="row btn-div">
+                                                    <div className="col-md-6">
                                                     </div>
-                                                </div>
-                                                <div className="col-md-3">
-                                                    <div className="form-group">
-                                                        <input type="submit" value="Submit Now" onClick={this.submitNow} className="btn btn-primary submit-btn"></input>
+                                                    <div className="col-md-3">
+                                                        <div className="form-group">
+                                                            <input type="submit" onClick={this.calculate} value="Calculate" className="btn btn-primary submit-btn"></input>
+                                                        </div>
+                                                    </div>
+                                                    <div className="col-md-3">
+                                                        <div className="form-group">
+                                                            <input type="submit" value="Submit Now" onClick={this.submitNow} className="btn btn-primary submit-btn"></input>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
                                     </Animated>
                                 )}
 

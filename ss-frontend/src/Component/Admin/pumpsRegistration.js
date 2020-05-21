@@ -7,9 +7,11 @@ import Sidebar from '../Auth/sidebar'
 import { verifyAuth } from '../../utils/authentication';
 import { getFromStorage } from '../../utils/storage';
 import axios from 'axios'
-import Snackbar from '@material-ui/core/Snackbar'
-import IconButton from '@material-ui/core/IconButton'
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
+import Snackpop from "../Auth/Snackpop";
+import { confirmAlert } from 'react-confirm-alert';
+import 'react-confirm-alert/src/react-confirm-alert.css'
+
 const backend_URI = require('../Auth/Backend_URI')
 
 export default class pumpsRegistration extends Component {
@@ -24,8 +26,11 @@ export default class pumpsRegistration extends Component {
             productId: '',
             pumps: [],
             pumpSet: '',
+
             snackbaropen: false,
             snackbarmsg: '',
+            snackbarcolor: '',
+
             showMe: false,
             setNumber: '',
             pumpSetData: [],
@@ -42,9 +47,9 @@ export default class pumpsRegistration extends Component {
         this.onAddPumpSet = this.onAddPumpSet.bind(this)
         this.onChangeSetNumber = this.onChangeSetNumber.bind(this)
     }
-    snackbarClose = (event) => {
-        this.setState({ snackbaropen: false })
-    }
+    closeAlert = () => {
+        this.setState({ snackbaropen: false });
+    };
 
     onChangeMachineNumber(e) {
         this.setState({
@@ -79,14 +84,14 @@ export default class pumpsRegistration extends Component {
         this.setState({ authState: authState })
         if (!authState) this.props.history.push('/login');
 
-        axios.get(backend_URI+'/pumpsRegistration/get')
+        axios.get(backend_URI.url + '/pumpsRegistration/get')
             .then(res => {
                 this.setState({ pumps: res.data.data })
             })
             .catch(function (err) {
                 console.log(err);
             })
-        axios.get(backend_URI+'/pumpSetRegistration/get')
+        axios.get(backend_URI.url + '/pumpSetRegistration/get')
             .then(res => {
                 this.setState({
                     pumpSetData: res.data.data
@@ -103,42 +108,63 @@ export default class pumpsRegistration extends Component {
         if (this.state.setNumber === '') {
             this.setState({
                 snackbaropen: true,
-                snackbarmsg: "Please Fill the Data ..!"
+                snackbarmsg: "Please Fill the Data ..!",
+                snackbarcolor: 'error'
             })
         }
         else {
-            const data = {
-                setNumber: this.state.setNumber,
-            }
-            fetch(backend_URI+'/pumpSetRegistration/add', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'auth-token': obj.token
-                },
-                body: JSON.stringify(data),
+            confirmAlert({
+                title: 'Confirm to submit',
+                message: 'Are you sure to do this.',
+                buttons: [
+                    {
+                        label: 'Yes',
+                        onClick: async () => {
+
+                            const data = {
+                                setNumber: this.state.setNumber,
+                            }
+                            fetch(backend_URI.url + '/pumpSetRegistration/add', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'auth-token': obj.token
+                                },
+                                body: JSON.stringify(data),
+                            })
+                                .then(res => res.json())
+                                .then(json => {
+                                    // alert(json.msg)
+                                    this.setState({
+                                        snackbaropen: true,
+                                        snackbarmsg: json.msg,
+                                        snackbarcolor: 'success'
+                                    })
+                                    window.location.reload();
+                                })
+                                .catch(err => {
+                                    this.setState({
+                                        snackbaropen: true,
+                                        snackbarmsg: err,
+                                        snackbarcolor: 'error'
+                                    })
+                                })
+                        }
+                    },
+                    {
+                        label: 'No',
+                        onClick: () => {
+
+                        }
+                    }
+                ]
             })
-                .then(res => res.json())
-                .then(json => {
-                    // alert(json.msg)
-                    this.setState({
-                        snackbaropen: true,
-                        snackbarmsg: json.msg
-                    })
-                    window.location.reload();
-                })
-                .catch(err => {
-                    this.setState({
-                        snackbaropen: true,
-                        snackbarmsg: err
-                    })
-                    console.log(err)
-                })
         }
 
 
     }
 
+    //? add new machine to  the system 
     onSubmit() {
         const obj = getFromStorage('auth-token');
         const data = {
@@ -146,105 +172,199 @@ export default class pumpsRegistration extends Component {
             fuelType: this.state.fuelType,
             productId: this.state.productId
         }
-        if (this.state.machineNumber === '') {
+        if (this.state.machineNumber === '' || this.state.fuelType === '' || this.state.productId === '') {
             this.setState({
                 snackbaropen: true,
-                snackbarmsg: "Please Fill the Data ..!"
+                snackbarmsg: "Please Fill the Data ..!",
+                snackbarcolor: 'error'
             })
         }
         else {
-            fetch(backend_URI+'/pumpsRegistration/add', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'auth-token': obj.token
-                },
-                body: JSON.stringify(data),
+            confirmAlert({
+                title: 'Confirm to submit',
+                message: 'Are you sure to do this.',
+                buttons: [
+                    {
+                        label: 'Yes',
+                        onClick: async () => {
+                            axios.get(backend_URI.url + '/fuelLubricantPrice/checkId/' + this.state.productId)
+                                .then(res => {
+                                    if (res.data.state === false) {
+                                        this.setState({
+                                            snackbaropen: true,
+                                            snackbarmsg: res.data.msg,
+                                            snackbarcolor: 'error'
+                                        })
+                                    }
+                                    else {
+                                        fetch(backend_URI.url + '/pumpsRegistration/add', {
+                                            method: 'POST',
+                                            headers: {
+                                                'Content-Type': 'application/json',
+                                                'auth-token': obj.token
+                                            },
+                                            body: JSON.stringify(data),
+                                        })
+                                            .then(res => res.json())
+                                            .then(json => {
+                                                if (json.state) {
+                                                    this.setState({
+                                                        snackbaropen: true,
+                                                        snackbarmsg: json.msg,
+                                                        snackbarcolor: 'success'
+                                                    })
+                                                    window.location.reload();
+                                                }
+                                                else {
+                                                    this.setState({
+                                                        snackbaropen: true,
+                                                        snackbarmsg: json.msg,
+                                                        snackbarcolor: 'error'
+                                                    })
+                                                }
+                                            })
+                                            .catch(err => {
+                                                this.setState({
+                                                    snackbaropen: true,
+                                                    snackbarmsg: err,
+                                                    snackbarcolor: 'error'
+                                                })
+                                            })
+                                    }
+                                })
+
+                        }
+                    },
+                    {
+                        label: 'No',
+                        onClick: () => {
+
+                        }
+                    }
+                ]
             })
-                .then(res => res.json())
-                .then(json => {
-                    // alert(json.msg)
-                    this.setState({
-                        snackbaropen: true,
-                        snackbarmsg: json.msg
-                    })
-                    window.location.reload();
-                })
-                .catch(err => {
-                    this.setState({
-                        snackbaropen: true,
-                        snackbarmsg: err
-                    })
-                    console.log(err)
-                })
         }
 
 
     }
 
+    //? update the machine to the ppmers set
     async onPumpsetBlur(data) {
+        confirmAlert({
+            title: 'Confirm to submit',
+            message: 'Are you sure to do this.',
+            buttons: [
+                {
+                    label: 'Yes',
+                    onClick: async () => {
+                        var myHeaders = new Headers();
+                        myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
 
-        var myHeaders = new Headers();
-        myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+                        var urlencoded = new URLSearchParams();
+                        urlencoded.append("machineNumber", data.machineNumber);
+                        urlencoded.append("pumpSet", this.state.pumpSet);
 
-        var urlencoded = new URLSearchParams();
-        urlencoded.append("machineNumber", data.machineNumber);
-        urlencoded.append("pumpSet", this.state.pumpSet);
+                        var requestOptions = {
+                            method: 'POST',
+                            headers: myHeaders,
+                            body: urlencoded,
+                            redirect: 'follow'
+                        };
 
-        var requestOptions = {
-            method: 'POST',
-            headers: myHeaders,
-            body: urlencoded,
-            redirect: 'follow'
-        };
-
-        fetch(backend_URI+"/pumpsRegistration/updatePumpSet", requestOptions)
-            .then(response => response.text())
-            .then(result => console.log(result))
-            .catch(error => console.log('error', error));
+                        fetch(backend_URI.url + "/pumpsRegistration/updatePumpSet", requestOptions)
+                            .then(response => response.text())
+                            .then(result => window.location.reload())
+                            .catch(error => console.log('error', error));
+                    }
+                },
+                {
+                    label: 'No',
+                    onClick: () => {
+                        window.location.reload();
+                    }
+                }
+            ]
+        })
     }
 
     onRefresh() {
         window.location.reload();
     }
 
+    //? delete machine
     deletePump(data) {
-        console.log(data)
-        axios.delete(backend_URI.url  + '/pumpsRegistration/deletePump/' + data)
-            .then(res => {
-                console.log(res);
-                this.setState({
-                    snackbaropen: true,
-                    snackbarmsg: res.data.message
-                })
-                window.location.reload();
-            })
-            .catch(err => {
-                console.log(err);
-                this.setState({
-                    snackbaropen: true,
-                    snackbarmsg: err
-                })
-            })
+        confirmAlert({
+            title: 'Confirm to submit',
+            message: 'Are you sure to do this.',
+            buttons: [
+                {
+                    label: 'Yes',
+                    onClick: async () => {
+                        axios.delete(backend_URI.url + '/pumpsRegistration/deletePump/' + data)
+                            .then(res => {
+                                console.log(res);
+                                this.setState({
+                                    snackbaropen: true,
+                                    snackbarmsg: res.data.message
+                                })
+                                window.location.reload();
+                            })
+                            .catch(err => {
+                                console.log(err);
+                                this.setState({
+                                    snackbaropen: true,
+                                    snackbarmsg: err
+                                })
+                            })
+
+                    }
+                },
+                {
+                    label: 'No',
+                    onClick: () => {
+
+                    }
+                }
+            ]
+        })
     }
+
+    //? delete the pupm set
     onDeleteSet(data) {
-        console.log(data)
-        axios.delete(backend_URI.url  + '/pumpSetRegistration/delete/' + data)
-            .then(res => {
-                console.log(res);
-                this.setState({
-                    snackbaropen: true,
-                    snackbarmsg: res.data.message
-                })
-                window.location.reload();
-            })
-            .catch(err => {
-                console.log(err);
-                this.setState({
-                    snackbaropen: true,
-                    snackbarmsg: err
-                })
-            })
+        confirmAlert({
+            title: 'Confirm to submit',
+            message: 'Are you sure to do this.',
+            buttons: [
+                {
+                    label: 'Yes',
+                    onClick: async () => {
+                        console.log(data)
+                        axios.delete(backend_URI.url + '/pumpSetRegistration/delete/' + data)
+                            .then(res => {
+                                console.log(res);
+                                this.setState({
+                                    snackbaropen: true,
+                                    snackbarmsg: res.data.message
+                                })
+                                window.location.reload();
+                            })
+                            .catch(err => {
+                                console.log(err);
+                                this.setState({
+                                    snackbaropen: true,
+                                    snackbarmsg: err
+                                })
+                            })
+                    }
+                },
+                {
+                    label: 'No',
+                    onClick: () => {
+
+                    }
+                }
+            ]
+        })
     }
 
     render() {
@@ -261,19 +381,12 @@ export default class pumpsRegistration extends Component {
             <React.Fragment>
 
                 <div className="container-fluid">
-                    <Snackbar
-                        open={this.state.snackbaropen}
-                        autoHideDuration={2000}
-                        onClose={this.snackbarClose}
-                        message={<span id="message-id">{this.state.snackbarmsg}</span>}
-                        action={[
-                            <IconButton
-                                key="close"
-                                aria-label="Close"
-                                color="secondary"
-                                onClick={this.snackbarClose}
-                            > x </IconButton>
-                        ]}
+                    <Snackpop
+                        msg={this.state.snackbarmsg}
+                        color={this.state.snackbarcolor}
+                        time={3000}
+                        status={this.state.snackbaropen}
+                        closeAlert={this.closeAlert}
                     />
 
 
@@ -361,7 +474,7 @@ export default class pumpsRegistration extends Component {
                                             <div className="col-md-3">
                                                 <label className="topic-pump"> Assumed Pumper</label>
                                             </div>
-                                            <div className="col-md-1" style={{textAlign:"left"}}>
+                                            <div className="col-md-1" style={{ textAlign: "left" }}>
                                                 <label className="topic-pump"> Actions</label>
                                             </div>
                                         </div>
@@ -386,7 +499,7 @@ export default class pumpsRegistration extends Component {
                                                             {countriesList}
                                                         </select>
                                                     </div>
-                                                    <div className="col-md-1" style={{ textAlign:"center"}}>
+                                                    <div className="col-md-1" style={{ textAlign: "center" }}>
                                                         <DeleteForeverIcon className="del-btn" onClick={() => this.deletePump(pump._id)} />
                                                     </div>
                                                 </div>
@@ -406,7 +519,7 @@ export default class pumpsRegistration extends Component {
                                 </Card>
                                 <p className="tpic">Pump Sets</p>
 
-                                <Card style={{marginBottom:"20px"}}>
+                                <Card style={{ marginBottom: "20px" }}>
                                     <form>
                                         <div className="container">
 

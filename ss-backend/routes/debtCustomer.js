@@ -11,27 +11,27 @@ const verify = require('../authentication');
 
 //User registration
 router.post('/register', function (req, res) {
-        //check fullName 
-        if (req.body.fullName == '') return res.json({ state: false, msg: "Name Empty..!" })
-        if (req.body.debtorId == '') return res.json({ state: false, msg: "Debtor ID Empty..!" })
-        console.log(req.body.debtorId);
-        if (req.body.damount == '') return res.json({ state: false, msg: "Amount Empty..!" })
-        // if (req.body.nic == '') return res.json({ state: false, msg: "NIC Empty..!" })
-        if (req.body.mobile == '') return res.json({ state: false, msg: "Mobile Number Empty..!" })
+    //check fullName 
+    if (req.body.fullName == '') return res.json({ state: false, msg: "Name Empty..!" })
+    if (req.body.debtorId == '') return res.json({ state: false, msg: "Debtor ID Empty..!" })
+    console.log(req.body.debtorId);
+    if (req.body.damount == '') return res.json({ state: false, msg: "Amount Empty..!" })
+    // if (req.body.nic == '') return res.json({ state: false, msg: "NIC Empty..!" })
+    if (req.body.mobile == '') return res.json({ state: false, msg: "Mobile Number Empty..!" })
 
-        //create a new user
-        const newDebtor = new Debtor({
-            fullName: req.body.fullName,
-            debtorId: req.body.debtorId,
-            damount: req.body.damount,
-            nic: req.body.nic,
-            mobile: req.body.mobile,
-            fax: req.body.fax,
-            address: req.body.address,
-            other: req.body.other,
-        })
+    //create a new user
+    const newDebtor = new Debtor({
+        fullName: req.body.fullName,
+        debtorId: req.body.debtorId,
+        damount: req.body.damount,
+        nic: req.body.nic,
+        mobile: req.body.mobile,
+        fax: req.body.fax,
+        address: req.body.address,
+        other: req.body.other,
+    })
 
-        newDebtor.save()
+    newDebtor.save()
         .then(req => {
             res.json({ state: true, msg: " Data Added Successfully..!" })
         })
@@ -83,5 +83,12 @@ router.get('/getNameId', function (req, res) {
         .catch(error => {
             res.json({ state: false, msg: "Data Transfering Unsuccessfull..!" });
         })
+})
+
+router.get("/checkId/:id", async (req, res) => {
+    // checking if the pId is already in the database
+    const product = await Debtor.findOne({ debtorId: req.params.id });
+    if (!product) return res.json({ state: false, msg: "Not available debitor Id..!" })
+    else return res.json({ state: true})
 })
 module.exports = router

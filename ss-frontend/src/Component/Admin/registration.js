@@ -6,8 +6,9 @@ import '../../Css/Admin/registration.css';
 import axios from 'axios';
 import Sidebar from '../Auth/sidebar';
 import { verifyAuth } from '../../utils/authentication';
-import Snackbar from '@material-ui/core/Snackbar'
-import IconButton from '@material-ui/core/IconButton'
+import Snackpop from "../Auth/Snackpop";
+import { confirmAlert } from 'react-confirm-alert';
+import 'react-confirm-alert/src/react-confirm-alert.css'
 
 const backend_URI = require('../Auth/Backend_URI')
 
@@ -36,41 +37,90 @@ export default class registration extends Component {
                 address: '',
                 other: '',
                 file: null,
+
                 snackbaropen: false,
                 snackbarmsg: '',
+                snackbarcolor: '',
             },
 
         }
     }
-    snackbarClose = (event) => {
-        this.setState({ snackbaropen: false })
-    }
+
+    closeAlert = () => {
+        this.setState({ snackbaropen: false });
+    };
+
     onSubmit(e) {
         e.preventDefault();
-        const formData = new FormData();
-        formData.append("profileImage", this.state.form.file);
-        formData.append('fullName', this.state.form.fullName);
-        formData.append('password', this.state.form.password);
-        formData.append('userId', this.state.form.userId);
-        formData.append('email', this.state.form.email);
-        formData.append('userType', this.state.form.userType);
-        formData.append('birthday', this.state.form.birthday);
-        formData.append('nic', this.state.form.nic);
-        formData.append('mobileOne', this.state.form.mobileOne);
-        formData.append('mobileTwo', this.state.form.mobileTwo);
-        formData.append('epf', this.state.form.epf);
-        formData.append('etf', this.state.form.etf);
-        formData.append('address', this.state.form.address);
-        formData.append('other', this.state.form.other);
 
-        axios.post(backend_URI.url  + "/users/register", formData, { // receive two parameter endpoint url ,form data 
-        })
-            .then(res => { // then print response status
-                console.log(res)
+        if (this.state.form.file === null) {
+            this.setState({
+                snackbaropen: true,
+                snackbarcolor: 'error',
+                snackbarmsg: 'Please Select the profile picture..!'
             })
-            .catch(err => {
-                console.log(err);
+
+        } else {
+            confirmAlert({
+                title: 'Confirm to submit',
+                message: 'Are you sure to do this.',
+                buttons: [
+                    {
+                        label: 'Yes',
+                        onClick: async () => {
+                            const formData = new FormData();
+                            formData.append("profileImage", this.state.form.file);
+                            formData.append('fullName', this.state.form.fullName);
+                            formData.append('password', this.state.form.password);
+                            formData.append('userId', this.state.form.userId);
+                            formData.append('email', this.state.form.email);
+                            formData.append('userType', this.state.form.userType);
+                            formData.append('birthday', this.state.form.birthday);
+                            formData.append('nic', this.state.form.nic);
+                            formData.append('mobileOne', this.state.form.mobileOne);
+                            formData.append('mobileTwo', this.state.form.mobileTwo);
+                            formData.append('epf', this.state.form.epf);
+                            formData.append('etf', this.state.form.etf);
+                            formData.append('address', this.state.form.address);
+                            formData.append('other', this.state.form.other);
+
+                            axios.post(backend_URI.url + "/users/register", formData, { // receive two parameter endpoint url ,form data 
+                            })
+                                .then(res => { // then print response status
+                                    console.log(res.data)
+                                    if (res.data.state === false) {
+                                        this.setState({
+                                            snackbaropen: true,
+                                            snackbarcolor: 'error',
+                                            snackbarmsg: res.data.msg
+                                        })
+                                    }
+                                    else {
+                                        this.setState({
+                                            snackbaropen: true,
+                                            snackbarcolor: 'success',
+                                            snackbarmsg: res.data.msg
+                                        })
+                                    }
+                                })
+                                .catch(err => {
+                                    this.setState({
+                                        snackbaropen: true,
+                                        snackbarcolor: 'error',
+                                        snackbarmsg: err
+                                    })
+                                })
+                        }
+                    },
+                    {
+                        label: 'No',
+                        onClick: () => {
+
+                        }
+                    }
+                ]
             })
+        }
     }
 
     async componentDidMount() {
@@ -129,19 +179,12 @@ export default class registration extends Component {
             <React.Fragment>
 
                 <div className="container-fluid">
-                    <Snackbar
-                        open={this.state.snackbaropen}
-                        autoHideDuration={2000}
-                        onClose={this.snackbarClose}
-                        message={<span id="message-id">{this.state.snackbarmsg}</span>}
-                        action={[
-                            <IconButton
-                                key="close"
-                                aria-label="Close"
-                                color="secondary"
-                                onClick={this.snackbarClose}
-                            > x </IconButton>
-                        ]}
+                    <Snackpop
+                        msg={this.state.snackbarmsg}
+                        color={this.state.snackbarcolor}
+                        time={3000}
+                        status={this.state.snackbaropen}
+                        closeAlert={this.closeAlert}
                     />
 
                     <div className="row">

@@ -1,5 +1,4 @@
 import Card from '@material-ui/core/Card';
-import IconButton from '@material-ui/core/IconButton';
 import axios from 'axios';
 import { MDBInput } from "mdbreact";
 import React, { Component } from 'react';
@@ -28,7 +27,7 @@ export default class dailyPumperCalculations extends Component {
             snackbaropen: false,
             snackbarmsg: '',
             snackbarcolor: '',
-            
+
             salesPId: '',
             salesQty: '',
             products: [],
@@ -89,120 +88,730 @@ export default class dailyPumperCalculations extends Component {
         this.onNewCreditSubmit = this.onNewCreditSubmit.bind(this)
         this.onNewOtherCeditSubmit = this.onNewOtherCeditSubmit.bind(this)
     }
-    snackbarClose = (event) => {
-        this.setState({ snackbaropen: false })
+
+    closeAlert = () => {
+        this.setState({ snackbaropen: false });
+    };
+
+    onMachineChange(e) {
+        e.persist = () => { };
+        let store = this.state;
+        store[e.target.name] = e.target.value
+        this.setState(store);
+    }
+    onDebitChange(e) {
+        e.persist = () => { };
+        let store = this.state;
+        store[e.target.name] = e.target.value
+        this.setState(store);
+    }
+    onChangeDebitType(e) {
+        this.setState({
+            newDType: e.target.value
+        })
+    }
+    onLocalChange(e) {
+        e.persist = () => { };
+        let store = this.state;
+        store[e.target.name] = e.target.value
+        this.setState(store);
+    }
+    onLockerChange(e) {
+        this.setState({
+            lockerAmount: e.target.value
+        })
     }
 
-    onNewCreditSubmit() {
+    //? add new daily sale btn function
+    async onLocalSubmit() {
+        console.log("sbmit")
         const obj = getFromStorage('auth-token');
-        if (this.state.newCDebitorId === '' || this.state.newCAmount === '') {
+
+        if (this.state.salesPId === '' || this.state.salesQty === '') {
             this.setState({
                 snackbaropen: true,
-                snackbarmsg: "Please Fill the Missing Fields ..!"
+                snackbarmsg: 'Please enter required fields..!',
+                snackbarcolor: 'error'
+            })
+        }
+        else {
+            confirmAlert({
+                title: 'Confirm to submit',
+                message: 'Are you sure to do this.',
+                buttons: [
+                    {
+                        label: 'Yes',
+                        onClick: async () => {
+                            await axios.get(backend_URI.url + '/fuelLubricantPrice/get')
+                                .then(res => {
+                                    this.setState({
+                                        products: res.data.data
+                                    })
+                                    for (var i = 0; i < this.state.products.length; i++) {
+                                        if (this.state.products[i].pId === this.state.salesPId) {
+                                            this.state.salesPrice = this.state.products[i].sellPrice * this.state.salesQty
+
+                                            const data = {
+                                                pId: this.state.salesPId,
+                                                pName: this.state.products[i].pName,
+                                                size: this.state.products[i].size,
+                                                qty: this.state.salesQty,
+                                                price: this.state.salesPrice,
+                                            }
+                                            fetch(backend_URI.url + '/dailySales/add', {
+                                                method: 'POST',
+                                                headers: {
+                                                    'Content-Type': 'application/json',
+                                                    'auth-token': obj.token
+                                                },
+                                                body: JSON.stringify(data),
+                                            })
+                                                .then(res => res.json())
+                                                .then(json => {
+                                                    console.log(res);
+                                                    this.setState({
+                                                        snackbaropen: true,
+                                                        snackbarmsg: json.msg
+                                                    })
+                                                })
+                                                .catch(err => {
+                                                    console.log(err)
+                                                    this.setState({
+                                                        snackbaropen: true,
+                                                        snackbarmsg: err
+                                                    })
+                                                })
+                                        }
+                                    }
+                                })
+                                .catch(err => {
+                                    console.log(err)
+                                })
+
+
+                            const stkData = {
+                                pId: this.state.salesPId,
+                                qty: this.state.salesQty,
+                            }
+                            await fetch(backend_URI.url + '/fuelLubricantPrice/salesUpdate', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'auth-token': obj.token
+                                },
+                                body: JSON.stringify(stkData),
+                            })
+                                .then(res => res.json())
+                                .then(json => {
+
+                                    this.setState({
+                                        snackbaropen: true,
+                                        snackbarmsg: json.msg
+                                    })
+                                })
+                                .catch(err => {
+                                    console.log(err)
+                                    this.setState({
+                                        snackbaropen: true,
+                                        snackbarmsg: err
+                                    })
+                                })
+                        }
+                    }
+                    , {
+                        label: 'No',
+                        onClick: () => {
+
+                        }
+                    }
+                ]
             })
         }
 
-        const data = {
-            debitorId: this.state.newCDebitorId,
-            chequeNo: this.state.newCChequeNo,
-            creditAmount: parseFloat(this.state.newCAmount).toFixed(2),
-        }
-        fetch(backend_URI.url  + '/debitorsAccount/addCredit', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'auth-token': obj.token
-            },
-            body: JSON.stringify(data),
-        })
-            .then(res => res.json())
-            .then(json => {
-                this.setState({
-                    snackbaropen: true,
-                    snackbarmsg: json.msg
-                })
-            })
-            .catch(err => {
-                console.log(err)
-                this.setState({
-                    snackbaropen: true,
-                    snackbarmsg: err
-                })
-            })
 
     }
-    onNewOtherCeditSubmit() {
+
+    // ?add new amount to locker 
+    async onLockerSubmit() {
         const obj = getFromStorage('auth-token');
-        if (this.state.newCOname === '' || this.state.newCOamount === '') {
+
+        const data = {
+            lockerAmount: this.state.lockerAmount
+        }
+
+        if (this.state.lockerAmount === '' || this.state.lockerAmount === undefined) {
             this.setState({
                 snackbaropen: true,
-                snackbarmsg: "Please Fill the Missing Fields ..!"
+                snackbarmsg: "Please Fill the Amount ..!",
+                snackbarcolor: 'error'
             })
         }
+        else {
 
-        const data = {
-            newCOname: this.state.newCOname,
-            newCOamount: parseFloat(this.state.newCOamount).toFixed(2),
+            confirmAlert({
+                title: 'Confirm to submit',
+                message: 'Are you sure to do this?',
+                buttons: [
+                    {
+                        label: 'Yes',
+                        onClick: async () => {
+                            await fetch(backend_URI.url + '/lockerState/add', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'auth-token': obj.token
+                                },
+                                body: JSON.stringify(data),
+                            })
+                                .then(res => res.json())
+                                .then(json => {
+                                    this.setState({
+                                        snackbaropen: true,
+                                        snackbarmsg: json.msg,
+                                        snackbarcolor: 'success'
+                                    })
+                                    window.location.reload()
+                                })
+                                .catch(err => {
+                                    console.log(err)
+                                    this.setState({
+                                        snackbaropen: true,
+                                        snackbarmsg: err,
+                                        snackbarcolor: 'error'
+                                    })
+                                })
+                        }
+                    },
+                    {
+                        label: 'No',
+                        onClick: () => {
+
+                        }
+                    }
+                ]
+            })
         }
-        fetch(backend_URI.url  + '/debitorsAccount/addOtherCredit', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'auth-token': obj.token
-            },
-            body: JSON.stringify(data),
-        })
-            .then(res => res.json())
-            .then(json => {
-                this.setState({
-                    snackbaropen: true,
-                    snackbarmsg: json.msg
-                })
-            })
-            .catch(err => {
-                console.log(err)
-                this.setState({
-                    snackbaropen: true,
-                    snackbarmsg: err
-                })
-            })
     }
 
+    //?delete locker item
+    lockerDelete(data) {
+        confirmAlert({
+            title: 'Confirm to submit',
+            message: 'Are you sure to do this.',
+            buttons: [
+                {
+                    label: 'Yes',
+                    onClick: async () => {
+
+                        axios.delete(backend_URI.url + '/lockerState/delete/' + data)
+                            .then(res => {
+                                console.log(res);
+                                this.setState({
+                                    snackbaropen: true,
+                                    snackbarmsg: res.data.message,
+                                    snackbarcolor: 'success'
+                                })
+                                window.location.reload();
+                            })
+                            .catch(err => {
+                                console.log(err);
+                                this.setState({
+                                    snackbaropen: true,
+                                    snackbarmsg: err,
+                                    snackbarcolor: 'error'
+                                })
+                            })
+                    }
+                },
+                {
+                    label: 'No',
+                    onClick: () => {
+
+                    }
+
+                }
+            ]
+        })
+    }
+
+    //? add new dail debit
+    async onNewDebitSubmit() {
+        const obj = getFromStorage('auth-token');
+        if (this.state.newDDebitorId === '' || this.state.newDProductId === '' || this.state.newDQty === '' || this.state.newDQty === '' || this.state.newDDebitorId === undefined || this.state.newDProductId === undefined || this.state.newDQty === undefined) {
+            this.setState({
+                snackbaropen: true,
+                snackbarmsg: "Please Fill the Missing Fields ..!",
+                snackbarcolor: 'error'
+            })
+        }
+        else {
+            confirmAlert({
+                title: 'Confirm to submit',
+                message: 'Are you sure to do this.',
+                buttons: [
+                    {
+                        label: 'Yes',
+                        onClick: async () => {
+                            await axios.get(backend_URI.url + '/debtors/checkId/' + this.state.newDDebitorId)
+                                .then(async res => {
+                                    if (res.data.state === false) {
+                                        this.setState({
+                                            snackbaropen: true,
+                                            snackbarmsg: res.data.msg,
+                                            snackbarcolor: 'error'
+                                        })
+                                    }
+                                    else {
+                                        console.log("hi")
+                                        await axios.get(backend_URI.url + '/fuelLubricantPrice/get')
+                                            .then(res => {
+                                                console.log(res)
+                                                this.setState({
+                                                    products: res.data.data
+                                                })
+                                                var amount = 0;
+
+                                                for (var i = 0; i < this.state.products.length; i++) {
+                                                    if (this.state.products[i].pId === this.state.newDProductId) {
+                                                        amount = this.state.products[i].sellPrice * this.state.newDQty
+
+                                                        const data = {
+                                                            debitorId: this.state.newDDebitorId,
+                                                            billNo: this.state.newDBillNo,
+                                                            invoiceNo: this.state.newDInvoiceNo,
+                                                            vehicleNo: this.state.newDVehicleNo,
+                                                            productId: this.state.newDProductId,
+                                                            productName: this.state.products[i].pName,
+                                                            qty: this.state.newDQty,
+                                                            size: this.state.products[i].size,
+                                                            amount: parseFloat(amount).toFixed(2),
+                                                            pumpId: this.state.newDPumpId,
+                                                        }
+                                                        fetch(backend_URI.url + '/debitorsAccount/add', {
+                                                            method: 'POST',
+                                                            headers: {
+                                                                'Content-Type': 'application/json',
+                                                                'auth-token': obj.token
+                                                            },
+                                                            body: JSON.stringify(data),
+                                                        })
+                                                            .then(res => res.json())
+                                                            .then(json => {
+                                                                this.setState({
+                                                                    snackbaropen: true,
+                                                                    snackbarmsg: json.msg,
+                                                                    snackbarcolor: 'success'
+                                                                })
+                                                            })
+                                                            .catch(err => {
+                                                                console.log(err)
+                                                                this.setState({
+                                                                    snackbaropen: true,
+                                                                    snackbarmsg: err,
+                                                                    snackbarcolor: 'error'
+                                                                })
+                                                            })
+                                                    }
+                                                }
+                                            })
+
+
+                                        const stkData = {
+                                            pId: this.state.newDProductId,
+                                            qty: this.state.newDQty,
+                                        }
+                                        await fetch(backend_URI.url + '/fuelLubricantPrice/salesUpdate', {
+                                            method: 'POST',
+                                            headers: {
+                                                'Content-Type': 'application/json',
+                                                'auth-token': obj.token
+                                            },
+                                            body: JSON.stringify(stkData),
+                                        })
+                                            .then(res => res.json())
+                                            .then(json => {
+                                                if (json.state) {
+                                                    this.setState({
+                                                        snackbaropen: true,
+                                                        snackbarmsg: json.msg,
+                                                        snackbarcolor: 'success'
+                                                    })
+                                                }
+                                                else {
+                                                    this.setState({
+                                                        snackbaropen: true,
+                                                        snackbarmsg: json.msg,
+                                                        snackbarcolor: 'error'
+                                                    })
+                                                }
+
+                                            })
+                                            .catch(err => {
+                                                console.log(err)
+                                                this.setState({
+                                                    snackbaropen: true,
+                                                    snackbarmsg: err,
+                                                    snackbarcolor: 'error'
+                                                })
+                                            })
+                                    }
+                                })
+
+                        }
+                    },
+                    {
+                        label: 'No',
+                        onClick: () => {
+
+                        }
+                    }
+                ]
+            })
+        }
+    }
+
+    //? add new other debit
     onNewOtherDebitSubmit() {
         const obj = getFromStorage('auth-token');
-        if (this.state.newDOname === '' || this.state.newDOamount === '') {
+        if (this.state.newDOname === '' || this.state.newDOamount === '' || this.state.newDOname === undefined || this.state.newDOamount === undefined) {
             this.setState({
                 snackbaropen: true,
-                snackbarmsg: "Please Fill the Missing Fields ..!"
+                snackbarmsg: "Please Fill the Missing Fields ..!",
+                snackbarcolor: 'error',
+            })
+        }
+        else {
+            confirmAlert({
+                title: 'Confirm to submit',
+                message: 'Are you sure to do this.',
+                buttons: [
+                    {
+                        label: 'Yes',
+                        onClick: async () => {
+
+                            const data = {
+                                newDOname: this.state.newDOname,
+                                newDOamount: parseFloat(this.state.newDOamount).toFixed(2),
+                            }
+                            fetch(backend_URI.url + '/debitorsAccount/addOther', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'auth-token': obj.token
+                                },
+                                body: JSON.stringify(data),
+                            })
+                                .then(res => res.json())
+                                .then(json => {
+                                    this.setState({
+                                        snackbaropen: true,
+                                        snackbarmsg: json.msg,
+                                        snackbarcolor: 'success'
+                                    })
+                                })
+                                .catch(err => {
+                                    console.log(err)
+                                    this.setState({
+                                        snackbaropen: true,
+                                        snackbarmsg: err,
+                                        snackbarcolor: 'error'
+                                    })
+                                })
+                        }
+                    },
+                    {
+                        label: 'No',
+                        onClick: () => {
+
+                        }
+                    }
+                ]
+            })
+        }
+    }
+
+    //?add new credit 
+    onNewCreditSubmit() {
+        const obj = getFromStorage('auth-token');
+        if (this.state.newCDebitorId === '' || this.state.newCAmount === '' || this.state.newCDebitorId === undefined || this.state.newCAmount === undefined) {
+            this.setState({
+                snackbaropen: true,
+                snackbarmsg: "Please Fill the Missing Fields ..!",
+                snackbarcolor: 'error'
             })
         }
 
-        const data = {
-            newDOname: this.state.newDOname,
-            newDOamount: parseFloat(this.state.newDOamount).toFixed(2),
+        else {
+            confirmAlert({
+                title: 'Confirm to submit',
+                message: 'Are you sure to do this.',
+                buttons: [
+                    {
+                        label: 'Yes',
+                        onClick: async () => {
+                            await axios.get(backend_URI.url + '/debtors/checkId/' + this.state.newCDebitorId)
+                                .then(async res => {
+                                    if (res.data.state === false) {
+                                        this.setState({
+                                            snackbaropen: true,
+                                            snackbarmsg: res.data.msg,
+                                            snackbarcolor: 'error'
+                                        })
+                                    }
+                                    else {
+
+                                        const data = {
+                                            debitorId: this.state.newCDebitorId,
+                                            chequeNo: this.state.newCChequeNo,
+                                            creditAmount: parseFloat(this.state.newCAmount).toFixed(2),
+                                        }
+                                        fetch(backend_URI.url + '/debitorsAccount/addCredit', {
+                                            method: 'POST',
+                                            headers: {
+                                                'Content-Type': 'application/json',
+                                                'auth-token': obj.token
+                                            },
+                                            body: JSON.stringify(data),
+                                        })
+                                            .then(res => res.json())
+                                            .then(json => {
+                                                this.setState({
+                                                    snackbaropen: true,
+                                                    snackbarmsg: json.msg,
+                                                    snackbarcolor: 'success'
+                                                })
+                                            })
+                                            .catch(err => {
+                                                console.log(err)
+                                                this.setState({
+                                                    snackbaropen: true,
+                                                    snackbarmsg: err,
+                                                    snackbarcolor: 'error'
+                                                })
+                                            })
+
+                                    }
+                                })
+                        }
+                    },
+                    {
+                        label: 'No',
+                        onClick: () => {
+
+                        }
+                    }
+                ]
+            })
         }
-        fetch(backend_URI.url  + '/debitorsAccount/addOther', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'auth-token': obj.token
-            },
-            body: JSON.stringify(data),
+
+    }
+
+    //? add new other credit
+    onNewOtherCeditSubmit() {
+        const obj = getFromStorage('auth-token');
+        if (this.state.newCOname === '' || this.state.newCOamount === '' || this.state.newCOname === undefined || this.state.newCOamount === undefined) {
+            this.setState({
+                snackbaropen: true,
+                snackbarmsg: "Please Fill the Missing Fields ..!",
+                snackbarcolor: 'error'
+            })
+        }
+        else {
+            confirmAlert({
+                title: 'Confirm to submit',
+                message: 'Are you sure to do this.',
+                buttons: [
+                    {
+                        label: 'Yes',
+                        onClick: async () => {
+                            const data = {
+                                newCOname: this.state.newCOname,
+                                newCOamount: parseFloat(this.state.newCOamount).toFixed(2),
+                            }
+                            fetch(backend_URI.url + '/debitorsAccount/addOtherCredit', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'auth-token': obj.token
+                                },
+                                body: JSON.stringify(data),
+                            })
+                                .then(res => res.json())
+                                .then(json => {
+                                    this.setState({
+                                        snackbaropen: true,
+                                        snackbarmsg: json.msg,
+                                        snackbarcolor: 'success'
+                                    })
+                                })
+                                .catch(err => {
+                                    console.log(err)
+                                    this.setState({
+                                        snackbaropen: true,
+                                        snackbarmsg: err,
+                                        snackbarcolor: 'error'
+                                    })
+                                })
+                        }
+                    },
+                    {
+                        label: 'No',
+                        onClick: () => {
+
+                        }
+                    }
+                ]
+            })
+        }
+
+    }
+
+    //!delete debit items
+    deleteDebit(data) {
+        confirmAlert({
+            title: 'Confirm to submit',
+            message: 'Are you sure to do this.',
+            buttons: [
+                {
+                    label: 'Yes',
+                    onClick: async () => {
+
+                        axios.delete(backend_URI.url + '/debitorsAccount/delete/' + data)
+                            .then(res => {
+                                console.log(res);
+                                this.setState({
+                                    snackbaropen: true,
+                                    snackbarmsg: res.data.message
+                                })
+                                window.location.reload();
+                            })
+                            .catch(err => {
+                                console.log(err);
+                                this.setState({
+                                    snackbaropen: true,
+                                    snackbarmsg: err
+                                })
+                            })
+                    }
+                },
+                {
+                    label: 'No',
+                    onClick: () => {
+
+                    }
+                }
+            ]
         })
-            .then(res => res.json())
-            .then(json => {
-                this.setState({
-                    snackbaropen: true,
-                    snackbarmsg: json.msg
-                })
+    }
+
+    //? add new meter reading
+    onMachineSubmit(data) {
+        const obj = {
+            machineNumber: this.state.machineNumber,
+            meterReading: this.state.endReading
+        }
+        if (this.state.endReading === '' || this.state.machineNumber === '' || this.state.endReading === undefined || this.state.machineNumber === undefined) {
+            this.setState({
+                snackbaropen: true,
+                snackbarmsg: "Please Fill the Amount ..!",
+                snackbarcolor: 'error'
             })
-            .catch(err => {
-                console.log(err)
-                this.setState({
-                    snackbaropen: true,
-                    snackbarmsg: err
-                })
+        }
+        else {
+            confirmAlert({
+                title: 'Confirm to submit',
+                message: 'Are you sure to do this.',
+                buttons: [
+                    {
+                        label: 'Yes',
+                        onClick: async () => {
+
+                            await axios.get(backend_URI.url + '/pumpsRegistration/checkId/' + this.state.machineNumber)
+                                .then(async res => {
+                                    if (res.data.state === false) {
+                                        this.setState({
+                                            snackbaropen: true,
+                                            snackbarmsg: res.data.msg,
+                                            snackbarcolor: 'error'
+                                        })
+                                    }
+                                    else {
+                                        await fetch(backend_URI.url + '/machinesData/add', {
+                                            method: 'POST',
+                                            headers: {
+                                                'Content-Type': 'application/json',
+                                            },
+                                            body: JSON.stringify(obj),
+                                        })
+                                            .then(res => res.json())
+                                            .then(json => {
+                                                this.setState({
+                                                    snackbaropen: true,
+                                                    snackbarmsg: json.msg,
+                                                    snackbarcolor: 'success'
+                                                })
+                                            })
+                                            .catch(err => {
+                                                console.log(err)
+                                                this.setState({
+                                                    snackbaropen: true,
+                                                    snackbarmsg: err,
+                                                    snackbarcolor: 'error'
+                                                })
+                                            })
+                                    }
+                                })
+
+
+                        }
+                    },
+                    {
+                        label: 'No',
+                        onClick: () => {
+
+                        }
+                    }
+                ]
             })
+        }
+    }
+    //! delete meter reading
+    machineDelete(data) {
+        confirmAlert({
+            title: 'Confirm to submit',
+            message: 'Are you sure to do this.',
+            buttons: [
+                {
+                    label: 'Yes',
+                    onClick: async () => {
+                        axios.delete(backend_URI.url + '/machinesData/delete/' + data)
+                            .then(res => {
+                                console.log(res);
+                                this.setState({
+                                    snackbaropen: true,
+                                    snackbarmsg: res.data.message,
+                                    snackbarcolor: 'success'
+                                })
+                                window.location.reload();
+                            })
+                            .catch(err => {
+                                console.log(err);
+                                this.setState({
+                                    snackbaropen: true,
+                                    snackbarmsg: err,
+                                    snackbarcolor: 'error'
+                                })
+                            })
+                    }
+                },
+                {
+                    label: 'No',
+                    onClick: () => {
+
+                    }
+                }
+            ]
+        })
     }
 
     componentDidMount = async () => {
@@ -211,7 +820,7 @@ export default class dailyPumperCalculations extends Component {
         if (!authState) this.props.history.push('/login');
 
         //get dailty sales data
-        await axios.get(backend_URI.url  + '/dailySales/get')
+        await axios.get(backend_URI.url + '/dailySales/get')
             .then(res => {
                 this.setState({
                     sales: res.data.data
@@ -225,7 +834,7 @@ export default class dailyPumperCalculations extends Component {
             })
 
         //get locker data
-        await axios.get(backend_URI.url  + '/lockerState/get')
+        await axios.get(backend_URI.url + '/lockerState/get')
             .then(res => {
                 this.setState({
                     locker: res.data.data
@@ -239,14 +848,14 @@ export default class dailyPumperCalculations extends Component {
             })
 
         //get yesterday merter reading
-        await axios.get(backend_URI.url  + '/machinesData/getYesterday')
+        await axios.get(backend_URI.url + '/machinesData/getYesterday')
             .then(res => {
                 this.setState({
                     morningReading: res.data.data
                 })
             })
         //load today meter reading
-        await axios.get(backend_URI.url  + '/machinesData/getToday')
+        await axios.get(backend_URI.url + '/machinesData/getToday')
             .then(res => {
                 this.setState({
                     endReadingArray: res.data.data
@@ -254,7 +863,7 @@ export default class dailyPumperCalculations extends Component {
             })
 
         // load debidtor id and names
-        await axios.get(backend_URI.url  + '/debtors/getNameId')
+        await axios.get(backend_URI.url + '/debtors/getNameId')
             .then(res => {
                 this.setState({
                     debitorsData: res.data.data
@@ -262,7 +871,7 @@ export default class dailyPumperCalculations extends Component {
             })
 
         //get today petroleum debit data
-        await axios.get(backend_URI.url  + '/debitorsAccount/get')
+        await axios.get(backend_URI.url + '/debitorsAccount/get')
             .then(res => {
                 this.setState({
                     todayPetroleumDebit: res.data.data
@@ -285,7 +894,7 @@ export default class dailyPumperCalculations extends Component {
                 })
             })
         //get today other debits
-        await axios.get(backend_URI.url  + '/debitorsAccount/getOther')
+        await axios.get(backend_URI.url + '/debitorsAccount/getOther')
             .then(res => {
                 this.setState({
                     todayOtherDebit: res.data.data
@@ -310,352 +919,17 @@ export default class dailyPumperCalculations extends Component {
             })
     }
 
-    onMachineChange(e) {
-        e.persist = () => { };
-        let store = this.state;
-        store[e.target.name] = e.target.value
-        this.setState(store);
-    }
-    onDebitChange(e) {
-        e.persist = () => { };
-        let store = this.state;
-        store[e.target.name] = e.target.value
-        this.setState(store);
-    }
-    onChangeDebitType(e) {
-        this.setState({
-            newDType: e.target.value
-        })
-    }
-    deleteDebit(data) {
-        axios.delete(backend_URI.url  + '/debitorsAccount/delete/' + data)
-            .then(res => {
-                console.log(res);
-                this.setState({
-                    snackbaropen: true,
-                    snackbarmsg: res.data.message
-                })
-                window.location.reload();
-            })
-            .catch(err => {
-                console.log(err);
-                this.setState({
-                    snackbaropen: true,
-                    snackbarmsg: err
-                })
-            })
-    }
-    async onNewDebitSubmit() {
-        const obj = getFromStorage('auth-token');
-        if (this.state.newDDebitorId === '' || this.state.newDProductId === '' || this.state.newDQty === '') {
-            this.setState({
-                snackbaropen: true,
-                snackbarmsg: "Please Fill the Missing Fields ..!"
-            })
-        }
-        await axios.get(backend_URI.url  + '/fuelLubricantPrice/get')
-            .then(res => {
-                console.log(res);
-                this.setState({
-                    products: res.data.data
-                })
-                var amount = 0;
-
-                for (var i = 0; i < this.state.products.length; i++) {
-                    if (this.state.products[i].pId === this.state.newDProductId) {
-                        amount = this.state.products[i].sellPrice * this.state.newDQty
-
-                        const data = {
-                            debitorId: this.state.newDDebitorId,
-                            billNo: this.state.newDBillNo,
-                            invoiceNo: this.state.newDInvoiceNo,
-                            vehicleNo: this.state.newDVehicleNo,
-                            productId: this.state.newDProductId,
-                            productName: this.state.products[i].pName,
-                            qty: this.state.newDQty,
-                            size: this.state.products[i].size,
-                            amount: parseFloat(amount).toFixed(2),
-                            pumpId: this.state.newDPumpId,
-                        }
-                        fetch(backend_URI.url  + '/debitorsAccount/add', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'auth-token': obj.token
-                            },
-                            body: JSON.stringify(data),
-                        })
-                            .then(res => res.json())
-                            .then(json => {
-                                console.log(res);
-                                this.setState({
-                                    snackbaropen: true,
-                                    snackbarmsg: json.msg
-                                })
-                            })
-                            .catch(err => {
-                                console.log(err)
-                                this.setState({
-                                    snackbaropen: true,
-                                    snackbarmsg: err
-                                })
-                            })
-                    }
-                }
-            })
-            .catch(err => {
-                console.log(err)
-            })
-
-        const stkData = {
-            pId: this.state.newDProductId,
-            qty: this.state.newDQty,
-        }
-        await fetch(backend_URI.url  + '/fuelLubricantPrice/salesUpdate', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'auth-token': obj.token
-            },
-            body: JSON.stringify(stkData),
-        })
-            .then(res => res.json())
-            .then(json => {
-                this.setState({
-                    snackbaropen: true,
-                    snackbarmsg: json.msg
-                })
-            })
-            .catch(err => {
-                console.log(err)
-                this.setState({
-                    snackbaropen: true,
-                    snackbarmsg: err
-                })
-            })
-    }
-    onMachineSubmit(data) {
-        const obj = {
-            machineNumber: this.state.machineNumber,
-            meterReading: this.state.endReading
-        }
-        if (this.state.endReading === '') {
-            this.setState({
-                snackbaropen: true,
-                snackbarmsg: "Please Fill the Amount ..!"
-            })
-        }
-        fetch(backend_URI.url  + '/machinesData/add', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(obj),
-        })
-            .then(res => res.json())
-            .then(json => {
-                this.setState({
-                    snackbaropen: true,
-                    snackbarmsg: json.msg
-                })
-            })
-            .catch(err => {
-                console.log(err)
-                this.setState({
-                    snackbaropen: true,
-                    snackbarmsg: err
-                })
-            })
-
-    }
-    machineDelete(data) {
-        axios.delete(backend_URI.url  + '/machinesData/delete/' + data)
-            .then(res => {
-                console.log(res);
-                this.setState({
-                    snackbaropen: true,
-                    snackbarmsg: res.data.message
-                })
-                window.location.reload();
-            })
-            .catch(err => {
-                console.log(err);
-                this.setState({
-                    snackbaropen: true,
-                    snackbarmsg: err
-                })
-            })
-    }
-
-    onLocalChange(e) {
-        e.persist = () => { };
-        let store = this.state;
-        store[e.target.name] = e.target.value
-        this.setState(store);
-    }
-
-    onLockerChange(e) {
-        this.setState({
-            lockerAmount: e.target.value
-        })
-    }
-
-    lockerDelete(data) {
-        axios.delete(backend_URI.url  + '/lockerState/delete/' + data)
-            .then(res => {
-                console.log(res);
-                this.setState({
-                    snackbaropen: true,
-                    snackbarmsg: res.data.message
-                })
-                window.location.reload();
-            })
-            .catch(err => {
-                console.log(err);
-                this.setState({
-                    snackbaropen: true,
-                    snackbarmsg: err
-                })
-            })
-    }
-
-    async onLockerSubmit() {
-        const obj = getFromStorage('auth-token');
-
-        const data = {
-            lockerAmount: this.state.lockerAmount
-        }
-
-        if (this.state.lockerAmount === '') {
-            this.setState({
-                snackbaropen: true,
-                snackbarmsg: "Please Fill the Amount ..!"
-            })
-        }
-        await fetch(backend_URI.url  + '/lockerState/add', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'auth-token': obj.token
-            },
-            body: JSON.stringify(data),
-        })
-            .then(res => res.json())
-            .then(json => {
-                this.setState({
-                    snackbaropen: true,
-                    snackbarmsg: json.msg
-                })
-            })
-            .catch(err => {
-                console.log(err)
-                this.setState({
-                    snackbaropen: true,
-                    snackbarmsg: err
-                })
-            })
-    }
-
-    async onLocalSubmit() {
-        const obj = getFromStorage('auth-token');
-
-        if (this.state.salesPId === '') {
-            this.setState({
-                snackbaropen: true,
-                snackbarmsg: "Please Fill the product ID ..!"
-            })
-        }
-        await axios.get(backend_URI.url  + '/fuelLubricantPrice/get')
-            .then(res => {
-                this.setState({
-                    products: res.data.data
-                })
-                for (var i = 0; i < this.state.products.length; i++) {
-                    if (this.state.products[i].pId === this.state.salesPId) {
-                        this.state.salesPrice = this.state.products[i].sellPrice * this.state.salesQty
-
-                        const data = {
-                            pId: this.state.salesPId,
-                            pName: this.state.products[i].pName,
-                            size: this.state.products[i].size,
-                            qty: this.state.salesQty,
-                            price: this.state.salesPrice,
-                        }
-                        fetch(backend_URI.url  + '/dailySales/add', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'auth-token': obj.token
-                            },
-                            body: JSON.stringify(data),
-                        })
-                            .then(res => res.json())
-                            .then(json => {
-                                console.log(res);
-                                this.setState({
-                                    snackbaropen: true,
-                                    snackbarmsg: json.msg
-                                })
-                            })
-                            .catch(err => {
-                                console.log(err)
-                                this.setState({
-                                    snackbaropen: true,
-                                    snackbarmsg: err
-                                })
-                            })
-                    }
-                }
-            })
-            .catch(err => {
-                console.log(err)
-            })
-
-        const stkData = {
-            pId: this.state.salesPId,
-            qty: this.state.salesQty,
-        }
-        await fetch(backend_URI.url  + '/fuelLubricantPrice/salesUpdate', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'auth-token': obj.token
-            },
-            body: JSON.stringify(stkData),
-        })
-            .then(res => res.json())
-            .then(json => {
-                this.setState({
-                    snackbaropen: true,
-                    snackbarmsg: json.msg
-                })
-            })
-            .catch(err => {
-                console.log(err)
-                this.setState({
-                    snackbaropen: true,
-                    snackbarmsg: err
-                })
-            })
-    }
 
     render() {
         return (
             <React.Fragment >
                 <div className="container-fluid">
-                    <Snackbar
-                        open={this.state.snackbaropen}
-                        autoHideDuration={2000}
-                        onClose={this.snackbarClose}
-                        message={<span id="message-id">{this.state.snackbarmsg}</span>}
-                        action={[
-                            <IconButton
-                                key="close"
-                                aria-label="Close"
-                                color="secondary"
-                                onClick={this.snackbarClose}
-                            > x </IconButton>
-                        ]}
+                    <Snackpop
+                        msg={this.state.snackbarmsg}
+                        color={this.state.snackbarcolor}
+                        time={3000}
+                        status={this.state.snackbaropen}
+                        closeAlert={this.closeAlert}
                     />
                     {/* ************************************************************************************************************************************************************************** */}
 
@@ -847,7 +1121,7 @@ export default class dailyPumperCalculations extends Component {
                                                                         </Row>
                                                                         <Row style={{ marginTop: "-40px" }}>
                                                                             <Col xs="12">
-                                                                                <MDBInput outline label="Pump ID" type="text" name="newDPumpId" onChange={this.onDebitChange} />
+                                                                                <MDBInput outline label="Machine ID" type="text" name="newDPumpId" onChange={this.onDebitChange} />
                                                                             </Col>
                                                                         </Row>
                                                                     </div>

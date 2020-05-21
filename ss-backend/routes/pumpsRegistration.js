@@ -14,7 +14,7 @@ router.post('/add', verify, async function (req, res, next) {
         machineNumber: req.body.machineNumber,
         fuelType: req.body.fuelType,
         meterReading: req.body.meterReading,
-        productId : req.body.productId,
+        productId: req.body.productId,
         pumpSet: 'none'
     });
     data.save()
@@ -93,7 +93,7 @@ router.get('/getSet/:id', function (req, res) {
         .exec()
         .then(result => {
             res.status(200).json({
-                message: 'Data Transfer Successfully', data : result
+                message: 'Data Transfer Successfully', data: result
             });
         })
         .catch(error => {
@@ -104,4 +104,11 @@ router.get('/getSet/:id', function (req, res) {
         });
 })
 
+//check pump id is correct or not
+router.get("/checkId/:id", async (req, res) => {
+    // checking if the pId is already in the database
+    const product = await PumpRegistration.findOne({ debtorId: req.params.id });
+    if (!product) return res.json({ state: false, msg: "Not available machine Id..!" })
+    else return res.json({ state: true })
+})
 module.exports = router;
