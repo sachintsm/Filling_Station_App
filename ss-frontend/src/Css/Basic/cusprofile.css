@@ -2,7 +2,7 @@
     margin: auto;
     margin-top: 50px;
     margin-bottom: 50px;
-    width:80%;
+    width:100%;
 }
 
 .sp_table{
@@ -21,4 +21,30 @@
     height: 40px;
     width: 100%;
     background-color: blue;
+}
+
+.cp_head{
+    font-size: 30px;
+    font-family: roboto, monospace;
+    font-weight : bold;
+}
+
+.delete-btn-cp{
+    color: rgb(51, 51, 51);
+}
+.delete-btn-cp:hover{
+    color: rgb(155, 0, 0);
+    transition: 0.5s;
+    cursor: pointer;
+}
+
+.table-cp-head{
+    color: rgb(41, 41, 41);
+    font-weight: 500;
+}
+
+.table-row-cp:hover{
+    background-color: rgb(184, 227, 255);
+    cursor: pointer;
+    transition: 0.5s;
 }

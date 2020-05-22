@@ -7,8 +7,9 @@ import { Row, Col } from 'reactstrap';
 import Card from '@material-ui/core/Card';
 import axios from 'axios'
 import { getFromStorage } from '../../utils/storage';
-import Snackbar from '@material-ui/core/Snackbar'
-import IconButton from '@material-ui/core/IconButton'
+import Snackpop from "../Auth/Snackpop";
+import { confirmAlert } from 'react-confirm-alert';
+import 'react-confirm-alert/src/react-confirm-alert.css'
 
 const backend_URI = require('../Auth/Backend_URI')
 
@@ -19,8 +20,11 @@ export default class dailyPumperCalculations extends Component {
 
         this.state = {
             authState: '',
+
             snackbaropen: false,
             snackbarmsg: '',
+            snackbarcolor: '',
+
             pumpSets: [],
             pumperIds: [],
             amount: '',
@@ -45,6 +49,10 @@ export default class dailyPumperCalculations extends Component {
         this.onSetBlur = this.onSetBlur.bind(this)
     }
 
+    closeAlert = () => {
+        this.setState({ snackbaropen: false });
+    };
+
     onChangeSetId(e) {
         this.setState({
             setId: e.target.value
@@ -56,18 +64,16 @@ export default class dailyPumperCalculations extends Component {
         this.setState({
             pumperNameRes: '',
             pumperIdRes: '',
-            pumperSetRes:'',
+            pumperSetRes: '',
             pumperDateRes: ''
         })
-        console.log(this.state.setId);
         this.state.pumpersCash = [];
         this.state.totAmount = 0.00
-        await axios.get(backend_URI.url  + '/pumpersCash/get/' + this.state.setId)
+        await axios.get(backend_URI.url + '/pumpersCash/get/' + this.state.setId)
             .then(res => {
                 this.setState({
                     pumpersCash: res.data.data
                 })
-                console.log(res);
             })
 
         var tot = 0;
@@ -76,7 +82,7 @@ export default class dailyPumperCalculations extends Component {
         }
         this.setState({ cashDiv: true });
         if (this.state.pumpersCash[0] != null) {
-            await axios.get(backend_URI.url  +'/users/get/' + this.state.pumpersCash[0].pumperId)
+            await axios.get(backend_URI.url + '/users/get/' + this.state.pumpersCash[0].pumperId)
                 .then(res => {
                     this.setState({
                         pumperNameRes: res.data.data[0].fullName
@@ -92,22 +98,22 @@ export default class dailyPumperCalculations extends Component {
         }
     }
 
-    snackbarClose = (event) => {
-        this.setState({ snackbaropen: false })
-    }
+
     componentDidMount = async () => {
         const authState = await verifyAuth();
         this.setState({ authState: authState })
         if (!authState) this.props.history.push('/login');
 
-        axios.get(backend_URI.url  + '/pumpSetRegistration/get')
+        //?get available pump sets
+        axios.get(backend_URI.url + '/pumpSetRegistration/get')
             .then(res => {
                 this.setState({
                     pumpSets: res.data.data
                 })
             })
 
-        axios.get(backend_URI.url  + '/users/getPumpers')
+        //? get active pupmers ids
+        axios.get(backend_URI.url + '/users/getPumpers')
             .then(res => {
                 this.setState({
                     pumperIds: res.data.data
@@ -136,7 +142,8 @@ export default class dailyPumperCalculations extends Component {
         if (this.state.setNumber === '' || this.state.pumperId === '' || this.state.amount === '') {
             this.setState({
                 snackbaropen: true,
-                snackbarmsg: "Please Fill the Data ..!"
+                snackbarmsg: "Please Fill the Data ..!",
+                snackbarcolor: 'error'
             })
         }
         else {
@@ -145,31 +152,57 @@ export default class dailyPumperCalculations extends Component {
                 pumperId: this.state.pumperId,
                 amount: this.state.amount
             }
+            confirmAlert({
+                title: 'Confirm to submit',
+                message: 'Are you sure to do this.',
+                buttons: [
+                    {
+                        label: 'Yes',
+                        onClick: async () => {
 
-            fetch(backend_URI.url  + '/pumpersCash/add', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'auth-token': obj.token
-                },
-                body: JSON.stringify(data),
+                            fetch(backend_URI.url + '/pumpersCash/add', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'auth-token': obj.token
+                                },
+                                body: JSON.stringify(data),
+                            })
+                                .then(res => res.json())
+                                .then(json => {
+                                    if (json.state) {
+                                        this.setState({
+                                            snackbaropen: true,
+                                            snackbarmsg: json.msg,
+                                            snackbarcolor: 'success'
+                                        })
+                                        window.location.reload()
+                                    }
+                                    else {
+                                        this.setState({
+                                            snackbaropen: true,
+                                            snackbarmsg: json.msg,
+                                            snackbarcolor: 'error'
+                                        })
+                                    }
+                                })
+                                .catch(err => {
+                                    this.setState({
+                                        snackbaropen: true,
+                                        snackbarmsg: err,
+                                        snackbarcolor: 'error'
+                                    })
+                                })
+                        }
+                    },
+                    {
+                        label: 'No',
+                        onClick: () => {
+
+                        }
+                    }
+                ]
             })
-                .then(res => res.json())
-                .then(json => {
-                    this.setState({
-                        snackbaropen: true,
-                        snackbarmsg: json.msg
-                    })
-
-                    window.location.reload();
-                })
-                .catch(err => {
-                    console.log(err)
-                    this.setState({
-                        snackbaropen: true,
-                        snackbarmsg: err
-                    })
-                })
         }
 
     }
@@ -196,19 +229,12 @@ export default class dailyPumperCalculations extends Component {
         return (
             <React.Fragment>
                 <div className="container-fluid">
-                    <Snackbar
-                        open={this.state.snackbaropen}
-                        autoHideDuration={2000}
-                        onClose={this.snackbarClose}
-                        message={<span id="message-id">{this.state.snackbarmsg}</span>}
-                        action={[
-                            <IconButton
-                                key="close"
-                                aria-label="Close"
-                                color="secondary"
-                                onClick={this.snackbarClose}
-                            > x </IconButton>
-                        ]}
+                    <Snackpop
+                        msg={this.state.snackbarmsg}
+                        color={this.state.snackbarcolor}
+                        time={3000}
+                        status={this.state.snackbaropen}
+                        closeAlert={this.closeAlert}
                     />
                     <div className="row">
                         <div className="col-md-2" style={{ backgroundColor: "#1c2431" }}>

@@ -21,6 +21,7 @@ import EarlierPumpersCalculations from './Component/Basic/earlierPumperCalculati
 import SalesStocks from './Component/Basic/salesStocks'
 import BankDetails from './Component/Basic/bankDetails'
 import EmployeeSalary from './Component/Basic/employeeSalary'
+import CustomerData from './Component/Basic/customerData'
 
 
 function App() {
@@ -37,7 +38,8 @@ function App() {
           <Route exact path="/login" component={Login}></Route>
           <Route path="/pumpsRegistration" component={Pumps}></Route>
           <Route path="/profile" component={Profile}></Route>
-          <Route path="/cusprofile" component={CusProfile}></Route>
+          <Route path="/cusprofile" exact component={CusProfile}></Route>
+          <Route path="/cusprofile/:id" component={CustomerData}></Route>
 
           <Route path="/daily$pumpers$calculations" component={DailyPumpersCalculations}></Route>
           <Route path="/daily$pumpers$management" component={DailyPumpersManagement}></Route>

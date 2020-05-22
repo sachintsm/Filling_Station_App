@@ -5,24 +5,12 @@ import { verifyAuth } from '../../utils/authentication'
 import '../../Css/Basic/dailyPumperCalculations.css'
 import axios from 'axios'
 import { MDBInput } from "mdbreact";
-import Snackbar from '@material-ui/core/Snackbar'
-import IconButton from '@material-ui/core/IconButton'
 import { getFromStorage } from '../../utils/storage';
 import { Animated } from "react-animated-css";
 import Snackpop from "../Auth/Snackpop";
 import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css';
-import { makeStyles } from '@material-ui/core/styles';
 import CircularProgress from '@material-ui/core/CircularProgress';
-
-const useStyles = makeStyles((theme) => ({
-    root: {
-        display: 'flex',
-        '& > * + *': {
-            marginLeft: theme.spacing(2),
-        },
-    },
-}));
 
 const backend_URI = require('../Auth/Backend_URI')
 
@@ -83,6 +71,7 @@ export default class dailyPumperCalculations extends Component {
             products: [], //get Fuels data
             meterBlock: [], //load final _data
             finalBlock: [],
+            pumperIds: [], //load pumper ids
 
             twostrokeQty: 0.00.toFixed(2),
             twostrokeUnit: 0.00.toFixed(2),
@@ -124,7 +113,6 @@ export default class dailyPumperCalculations extends Component {
         store[e.target.name] = e.target.value
         this.setState(store);
     }
-
     onChangepumperID(e) {
         this.setState({
             pumperId: e.target.value
@@ -136,6 +124,7 @@ export default class dailyPumperCalculations extends Component {
         })
     }
 
+    //?get data from database 
     async getData() {
 
         this.setState({
@@ -262,8 +251,17 @@ export default class dailyPumperCalculations extends Component {
                 })
             })
 
+        //? get active pupmers ids
+        await axios.get(backend_URI.url + '/users/getPumpers')
+            .then(res => {
+                this.setState({
+                    pumperIds: res.data.data
+                })
+            })
+
     }
 
+    //?calculate pumper today data
     async calculate() {
         var twoStrkSale = 0.00
         var engineSale = 0.00
@@ -325,6 +323,7 @@ export default class dailyPumperCalculations extends Component {
         })
     }
 
+    // ? save pumper data intothe database
     async submitNow() {
         const obj = getFromStorage('auth-token');
 
@@ -439,6 +438,17 @@ export default class dailyPumperCalculations extends Component {
     render() {
         const { dataDiv, progressDiv } = this.state;
         const { pumpSetData } = this.state;
+        const { pumperIds } = this.state;
+
+        //? get pumpers ids
+        let pumpIdList = pumperIds.length > 0
+            && pumperIds.map((item, i) => {
+                return (
+                    <option key={i} value={item.userId}>{item.userId}</option>
+                )
+            }, this);
+
+        //?get pumpers list the select 
         let pumpSetList = pumpSetData.length > 0
             && pumpSetData.map((item, i) => {
                 return (
@@ -473,8 +483,11 @@ export default class dailyPumperCalculations extends Component {
                                                     {pumpSetList}
                                                 </select>
                                             </div>
-                                            <div className="col-md-4" style={{ marginTop: "-24px" }}>
-                                                <MDBInput outline label="Pumper ID" type="text" name="pumperId" onChange={this.onChangepumperID} />
+                                            <div className="col-md-4" >
+                                                <select className="form-control" onChange={this.onChangepumperID}>
+                                                    <option>Select Pumer Id</option>
+                                                    {pumpIdList}
+                                                </select>
                                             </div>
                                             <div className="col-md-2">
                                                 <div className="form-group">

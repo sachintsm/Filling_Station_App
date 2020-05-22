@@ -191,10 +191,10 @@ router.get("/profileImage/:filename", function (req, res) {
     res.sendFile(path.join(__dirname, '../local_storage/profile_Images/' + filename))
 })
 
-//get pumpers data 
+//get active pumpers user id and full name
 router.get('/getPumpers', function (req, res) {
     User
-        .find({ userType: 'Pumper' })
+        .find({ userType: 'Pumper' , activeState : true })
         .select('userId fullName')
         .exec()
         .then(data => {

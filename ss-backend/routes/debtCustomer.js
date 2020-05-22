@@ -10,20 +10,16 @@ var jwt = require('jsonwebtoken');
 const verify = require('../authentication');
 
 //User registration
-router.post('/register', function (req, res) {
-    //check fullName 
-    if (req.body.fullName == '') return res.json({ state: false, msg: "Name Empty..!" })
-    if (req.body.debtorId == '') return res.json({ state: false, msg: "Debtor ID Empty..!" })
-    console.log(req.body.debtorId);
-    if (req.body.damount == '') return res.json({ state: false, msg: "Amount Empty..!" })
-    // if (req.body.nic == '') return res.json({ state: false, msg: "NIC Empty..!" })
-    if (req.body.mobile == '') return res.json({ state: false, msg: "Mobile Number Empty..!" })
+router.post('/register', async function (req, res) {
+    //check already exist or not
+    const debtExists = await Debtor.findOne({ debtorId: req.body.debtorId })
+    if (debtExists) return res.json({ state: false, msg: "This Customer ID already in use..!" })
 
     //create a new user
     const newDebtor = new Debtor({
         fullName: req.body.fullName,
         debtorId: req.body.debtorId,
-        damount: req.body.damount,
+        damount: parseFloat(req.body.damount).toFixed(2),
         nic: req.body.nic,
         mobile: req.body.mobile,
         fax: req.body.fax,
@@ -89,6 +85,20 @@ router.get("/checkId/:id", async (req, res) => {
     // checking if the pId is already in the database
     const product = await Debtor.findOne({ debtorId: req.params.id });
     if (!product) return res.json({ state: false, msg: "Not available debitor Id..!" })
-    else return res.json({ state: true})
+    else return res.json({ state: true })
+})
+
+//? get all data from the customer list
+router.get('/customer/:id', async (req, res) => {
+    const id = req.params.id
+    console.log(id)
+    Debtor.find({debtorId : id})
+        .exec()
+        .then(result => {
+            res.json({ state: true, msg: "Data Transfer Successfully..!", data: result });
+        })
+        .catch(error => {
+            res.json({ state: false, msg: "Data Transfering Unsuccessfull..!" });
+        })
 })
 module.exports = router

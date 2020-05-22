@@ -4,21 +4,12 @@ import { Col, Row } from 'react-bootstrap';
 import Sidebar from '../Auth/sidebar';
 import "react-datepicker/dist/react-datepicker.css";
 import '../../Css/Basic/cusprofile.css';
-import Snackbar from '@material-ui/core/Snackbar';
-import IconButton from '@material-ui/core/IconButton';
-
-const Debt = React.memo(props => (
-    <tr>
-        <td>{props.debt.fullName}</td>
-        <td>{props.debt.debtorId}</td>
-        <td>{props.debt.damount}</td>
-        <td>{props.debt.mobile}</td>
-        <td>{props.debt.fax}</td>
-        <td>
-            <button className="btn btn-danger btn-info  " style={{ marginTop: "-8px", marginBottom: "-8px" }} type="delete" onClick={() => props.delete(props.debt._id)}>DELETE</button>
-        </td>
-    </tr>
-));
+import Card from '@material-ui/core/Card';
+import Snackpop from "../Auth/Snackpop";
+import { confirmAlert } from 'react-confirm-alert';
+import 'react-confirm-alert/src/react-confirm-alert.css'
+import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
+import { verifyAuth } from '../../utils/authentication'
 
 const backend_URI = require('../Auth/Backend_URI')
 
@@ -28,6 +19,8 @@ export default class profile extends Component {
         this.state = {
             snackbaropen: false,
             snackbarmsg: '',
+            snackbarcolor: '',
+
             fullName: '',
             debtorId: '',
             damount: '',
@@ -38,109 +31,167 @@ export default class profile extends Component {
             address: '',
             other: '',
             userData: [],
-            users: []
+            users: [],
+
+            Datadiv: false,
         }
         this.onChange = this.onChange.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
         this.handleSearch = this.handleSearch.bind(this);
         this.deleteDebtor = this.deleteDebtor.bind(this);
+        this.showAddCustomer = this.showAddCustomer.bind(this);
     }
 
-    snackbarClose = (event) => {
-        this.setState({ snackbaropen: false })
-    }
-    componentDidMount() {
-        axios.get(backend_URI.url  + '/debtors/get')
-            .then(response => {
-                this.setState({ users: response.data.data });
-            })
-            .catch(function (error) {
-                console.log(error);
-            })
-    }
+    closeAlert = () => {
+        this.setState({ snackbaropen: false });
+    };
+    
 
     handleSearch = e => {
         this.setState({ debtorId: e.target.value });
     };
-
+    showAddCustomer() {
+        this.setState({
+            Datadiv: true,
+        })
+    }
     onChange = (e) => {
         e.persist = () => { };
         let store = this.state;
         store[e.target.name] = e.target.value
         this.setState(store);
     }
+    async componentDidMount() {
+        const authState = await verifyAuth();
+        this.setState({ authState: authState })
+        if (!authState) this.props.history.push('/login');
 
-    UserList() {
-        const local = this.state.debtorId;
-        if (local == null || local === "") {
+        axios.get(backend_URI.url + '/debtors/get')
+            .then(response => {
+                this.setState({ users: response.data.data });
+            })
+    }
 
-            // console.log(this.state.users);
-            return this.state.users.map((currentDebt, i) => {
-                return <Debt delete={this.deleteDebtor} debt={currentDebt} key={i} />;
-            })
-        }
-        else {
-            return this.state.users.map((currentDebt, i) => {
-                if (currentDebt.debtorId === local) {
-                    return <Debt delete={this.deleteDebtor} debt={currentDebt} key={i} />;
-                }
-                return null;
-            })
-        }
+    customerData(data){
+        this.props.history.push('/cusprofile/'+data);
+        
     }
 
     deleteDebtor(data) {
-        axios.delete(backend_URI+'/debtors/deleteDebtor/' + data)
-            .then(res => {
-                console.log(res);
-                this.setState({
-                    snackbaropen: true,
-                    snackbarmsg: res.data.message
-                })
-                window.location.reload();
-            })
-            .catch(err => {
-                console.log(err);
-                this.setState({
-                    snackbaropen: true,
-                    snackbarmsg: err
-                })
-            })
+        console.log(data)
+        confirmAlert({
+            title: 'Confirm to delete?',
+            message: 'Are you sure to do this?',
+            buttons: [
+                {
+                    label: 'Yes',
+                    onClick: async () => {
+                        axios.delete(backend_URI.url + '/debtors/deleteDebtor/' + data)
+                            .then(res => {
+                                this.setState({
+                                    snackbaropen: true,
+                                    snackbarmsg: res.data.message,
+                                    snackbarcolor: 'success'
+                                })
+                                window.location.reload();
+                            })
+                            .catch(err => {
+                                this.setState({
+                                    snackbaropen: true,
+                                    snackbarmsg: err,
+                                    snackbarcolor: 'error'
+                                })
+                            })
+                    }
+                },
+                {
+                    label: 'No',
+                    onClick: () => {
+
+                    }
+                }
+            ]
+        })
     }
 
     onSubmit(e) {
         e.preventDefault();
-        const obj = {
-            fullName: this.state.fullName,
-            debtorId: this.state.debtorId,
-            damount: this.state.damount,
-            nic: this.state.nic,
-            mobile: this.state.mobile,
-            fax: this.state.fax,
-            other: this.state.other,
-        };
+        if (this.state.fullName === '' || this.state.debtorId === '' || this.state.mobile === '') {
+            this.setState({
+                snackbaropen: true,
+                snackbarmsg: 'Please fill the missing fields..!',
+                snackbarcolor: 'error'
+            })
+        }
+        else {
 
-        axios.post(backend_URI.url  + '/debtors/register', obj)
-            .then(res => console.log(res.data));
+            const obj = {
+                fullName: this.state.fullName,
+                debtorId: this.state.debtorId,
+                damount: this.state.damount,
+                nic: this.state.nic,
+                mobile: this.state.mobile,
+                fax: this.state.fax,
+                other: this.state.other,
+            };
+            confirmAlert({
+                title: 'Confirm to submit',
+                message: 'Are you sure to do this.',
+                buttons: [
+                    {
+                        label: 'Yes',
+                        onClick: async () => {
+
+                            axios.post(backend_URI.url + '/debtors/register', obj)
+                                .then(res => {
+                                    console.log(res)
+                                    if (res.data.state) {
+                                        this.setState({
+                                            snackbaropen: true,
+                                            snackbarmsg: res.data.msg,
+                                            snackbarcolor: 'success'
+                                        })
+                                        window.location.reload()
+                                    }
+                                    else {
+                                        this.setState({
+                                            snackbaropen: true,
+                                            snackbarmsg: res.data.msg,
+                                            snackbarcolor: 'error'
+                                        })
+                                    }
+                                })
+                                .catch(err => {
+                                    this.setState({
+                                        snackbaropen: true,
+                                        snackbarmsg: err,
+                                        snackbarcolor: 'error'
+                                    })
+                                })
+                        }
+                    },
+                    {
+                        label: 'No',
+                        onClick: () => {
+
+                        }
+                    }
+                ]
+            })
+        }
     }
 
     render() {
+        const { Datadiv } = this.state;
         return (
             <React.Fragment>
                 <div className="container-fluid">
-                    <Snackbar
-                        open={this.state.snackbaropen}
-                        autoHideDuration={2000}
-                        onClose={this.snackbarClose}
-                        message={<span id="message-id">{this.state.snackbarmsg}</span>}
-                        action={[
-                            <IconButton
-                                key="close"
-                                aria-label="Close"
-                                color="secondary"
-                                onClick={this.snackbarClose}
-                            > x </IconButton>
-                        ]}
+                    <Snackpop
+                        msg={this.state.snackbarmsg}
+                        color={this.state.snackbarcolor}
+                        time={3000}
+                        status={this.state.snackbaropen}
+                        closeAlert={this.closeAlert}
                     />
 
                     <div className="row">
@@ -148,94 +199,114 @@ export default class profile extends Component {
                             <Sidebar />
                         </div>
                         <div className="col-md-10" style={{ backgroundColor: "#f8f9fd" }}>
-                            <h3 style={{ textAlign: "center", marginTop: "50px" }}>DEBTORS</h3>
-                            <div>
-                                <div >
-                                    <div className="form-group" style={{ marginTop: "50px", marginRight: "175px", marginLeft: "60px" }}>
-                                        <button className="btn btn-info my-4 btn-block " type="submit">ADD A NEW DEBTOR</button>
+                            <div className="container">
+                                <div className="row" style={{ marginTop: '50px' }}>
+                                    <div className="col-md-9">
+                                        <p className="cp_head">Customers Data</p>
+                                    </div>
+                                    <div className="col-md-3" style={{ marginTop: '-20px' }}>
+                                        <button className="btn btn-info my-4 btn-block " type="submit" onClick={this.showAddCustomer}> ADD A NEW DEBTOR</button>
                                     </div>
                                 </div>
-                            </div>
-                            <div className="card">
-                                <div>
-                                    <h3 className="sp_head">List of Debtors</h3>
-                                    <form>
-                                        <div className="form-group" style={{ marginTop: "50px", marginLeft: "40px", marginRight: "40px" }} >
-                                            <input className="form-control" type="debtorId" name="debtorId" id="debtorId" placeholder="Search ID here" onChange={this.handleSearch} />
-                                        </div>
-                                    </form>
-                                    <div className="sp_table">
-                                        <table className="table table-striped" style={{ marginTop: 20 }} >
-                                            <thead>
-                                                <tr>
-                                                    <th>Name / Compamy Name</th>
-                                                    <th>Debtor ID</th>
-                                                    <th>Amount</th>
-                                                    <th>Mobile Number</th>
-                                                    <th>Fax Number</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {this.UserList()}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="card">
 
-                                <div style={{ width: "90%", margin: 'auto' }}>
-                                    <div className="row">
+                                {Datadiv && (
+                                    <Card style={{ marginBottom: "20px" }}>
                                         <div style={{ width: "90%", margin: 'auto' }}>
-                                            <form onSubmit={this.onSubmit} >
-                                                <div className="form-group" style={{ marginTop: "50px" }}>
-                                                    <label>Name / Company Name : </label>
-                                                    <input type="text" className="form-control" name="fullName" defaultValue={this.state.fullName} onChange={this.onChange}></input>
-                                                </div>
-                                                <div className="row">
-                                                    <div className="col-md-6">
-                                                        <div className="form-group">
-                                                            <label>Debtor ID : </label>
-                                                            <input type="text" className="form-control" name="debtorId" defaultValue={this.state.debtorId} onChange={this.onChange}></input>
+                                            <div className="row">
+                                                <div style={{ width: "90%", margin: 'auto' }}>
+                                                    <form onSubmit={this.onSubmit} >
+                                                        <div className="form-group" style={{ marginTop: "50px" }}>
+                                                            <label>Name / Company Name : </label>
+                                                            <input type="text" className="form-control" name="fullName" defaultValue={this.state.fullName} onChange={this.onChange}></input>
                                                         </div>
-                                                    </div>
-                                                    <div className="col-md-6">
-                                                        <div className="form-group">
-                                                            <label>Deposited Amount : </label>
-                                                            <input type="text" className="form-control" name="damount" defaultValue={this.state.damount} onChange={this.onChange}></input>
+                                                        <div className="row">
+                                                            <div className="col-md-6">
+                                                                <div className="form-group">
+                                                                    <label>Debtor ID : </label>
+                                                                    <input type="text" className="form-control" name="debtorId" defaultValue={this.state.debtorId} onChange={this.onChange}></input>
+                                                                </div>
+                                                            </div>
+                                                            <div className="col-md-6">
+                                                                <div className="form-group">
+                                                                    <label>Deposited Amount : </label>
+                                                                    <input type="text" className="form-control" name="damount" defaultValue={this.state.damount} onChange={this.onChange}></input>
+                                                                </div>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                </div>
-                                                <Row>
-                                                    <Col>
+                                                        <Row>
+                                                            <Col>
+                                                                <div className="form-group">
+                                                                    <label>Mobile Number : </label>
+                                                                    <input type="text" className="form-control" name="mobile" defaultValue={this.state.mobile} onChange={this.onChange}></input>
+                                                                </div>
+                                                            </Col>
+                                                            <Col>
+                                                                <div className="form-group">
+                                                                    <label>Fax Mumber : </label>
+                                                                    <input type="text" className="form-control" name="fax" defaultValue={this.state.fax} onChange={this.onChange}></input>
+                                                                </div>
+                                                            </Col>
+                                                        </Row>
                                                         <div className="form-group">
-                                                            <label>Mobile Number : </label>
-                                                            <input type="text" className="form-control" name="mobile" defaultValue={this.state.mobile} onChange={this.onChange}></input>
+                                                            <label>Address : </label>
+                                                            <textarea type="text" className="form-control" name="address" defaultValue={this.state.address} onChange={this.onChange}></textarea>
                                                         </div>
-                                                    </Col>
-                                                    <Col>
                                                         <div className="form-group">
-                                                            <label>Fax Mumber : </label>
-                                                            <input type="text" className="form-control" name="fax" defaultValue={this.state.fax} onChange={this.onChange}></input>
+                                                            <label>Others : </label>
+                                                            <textarea type="text" className="form-control" name="other" defaultValue={this.state.other} onChange={this.onChange}></textarea>
                                                         </div>
-                                                    </Col>
-                                                </Row>
-                                                <div className="form-group">
-                                                    <label>Address : </label>
-                                                    <textarea type="text" className="form-control" name="address" defaultValue={this.state.address} onChange={this.onChange}></textarea>
-                                                </div>
-                                                <div className="form-group">
-                                                    <label>Others : </label>
-                                                    <textarea type="text" className="form-control" name="other" defaultValue={this.state.other} onChange={this.onChange}></textarea>
-                                                </div>
 
-                                                <div className="form-group">
-                                                    <button className="btn btn-info my-4 btn-block " type="submit">ADD</button>
+                                                        <div className="form-group">
+                                                            <button className="btn btn-info my-4 btn-block " type="submit">ADD</button>
+                                                        </div>
+                                                    </form>
                                                 </div>
-                                            </form>
+                                            </div>
+                                        </div>
+                                    </Card>
+                                )}
+
+                                <Card style={{ marginBottom: "20px" }}>
+                                    <div>
+                                        <h3 className="sp_head">List of Debtors</h3>
+                                        <form>
+                                            <div className="form-group" style={{ marginTop: "50px", marginLeft: "40px", marginRight: "40px" }} >
+                                                <input className="form-control" type="debtorId" name="debtorId" id="debtorId" placeholder="Search ID here" onChange={this.handleSearch} />
+                                            </div>
+                                        </form>
+                                        <div className="sp_table">
+                                            <table className="table" style={{ marginTop: 20 }} >
+                                                <thead>
+                                                    <tr>
+                                                        <th className="table-cp-head">Name / Compamy Name</th>
+                                                        <th className="table-cp-head">Debtor ID</th>
+                                                        <th className="table-cp-head">Amount</th>
+                                                        <th className="table-cp-head">Mobile Number</th>
+                                                        <th className="table-cp-head">Fax Number</th>
+                                                        <th className="table-cp-head">Action</th>
+
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {this.state.users.map((data) => {
+                                                        return (
+
+                                                            <tr key={data._id} className="table-row-cp" onClick={() => this.customerData(data.debtorId)}>
+                                                                <th>{data.fullName}</th>
+                                                                <th>{data.debtorId}</th>
+                                                                <th>{data.damount}</th>
+                                                                <th>{data.mobile}</th>
+                                                                <th>{data.fax}</th>
+                                                                <th><DeleteForeverIcon className="delete-btn-cp" onClick={() => this.deleteDebtor(data._id)} /></th>
+                                                            </tr>
+                                                        )
+                                                    })}
+                                                </tbody>
+                                            </table>
                                         </div>
                                     </div>
-                                </div>
+                                </Card>
+
                             </div>
                         </div>
                     </div>
