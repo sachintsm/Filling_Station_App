@@ -468,6 +468,7 @@ export default class dailyPumperCalculations extends Component {
                 ]
             })
         }
+        window.location.reload()
     }
 
     //? add new other debit
@@ -508,6 +509,8 @@ export default class dailyPumperCalculations extends Component {
                                         snackbarmsg: json.msg,
                                         snackbarcolor: 'success'
                                     })
+                                    window.location.reload()
+
                                 })
                                 .catch(err => {
                                     console.log(err)
@@ -580,6 +583,7 @@ export default class dailyPumperCalculations extends Component {
                                                     snackbarmsg: json.msg,
                                                     snackbarcolor: 'success'
                                                 })
+                                                window.location.reload()
                                             })
                                             .catch(err => {
                                                 console.log(err)
@@ -643,6 +647,8 @@ export default class dailyPumperCalculations extends Component {
                                         snackbarmsg: json.msg,
                                         snackbarcolor: 'success'
                                     })
+                                    window.location.reload()
+
                                 })
                                 .catch(err => {
                                     console.log(err)
@@ -750,6 +756,8 @@ export default class dailyPumperCalculations extends Component {
                                                     snackbarmsg: json.msg,
                                                     snackbarcolor: 'success'
                                                 })
+                                                window.location.reload()
+
                                             })
                                             .catch(err => {
                                                 console.log(err)

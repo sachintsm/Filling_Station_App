@@ -91,7 +91,6 @@ router.get("/checkId/:id", async (req, res) => {
 //? get all data from the customer list
 router.get('/customer/:id', async (req, res) => {
     const id = req.params.id
-    console.log(id)
     Debtor.find({debtorId : id})
         .exec()
         .then(result => {
@@ -101,4 +100,6 @@ router.get('/customer/:id', async (req, res) => {
             res.json({ state: false, msg: "Data Transfering Unsuccessfull..!" });
         })
 })
+
+
 module.exports = router

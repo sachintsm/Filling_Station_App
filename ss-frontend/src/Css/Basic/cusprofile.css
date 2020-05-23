@@ -41,10 +41,27 @@
 .table-cp-head{
     color: rgb(41, 41, 41);
     font-weight: 500;
+    font-size : 18px;
 }
 
 .table-row-cp:hover{
     background-color: rgb(184, 227, 255);
     cursor: pointer;
     transition: 0.5s;
+}
+
+/* ************************************************************************* */
+
+.cd-head-text{
+    font-size: 20px;
+    font-family: consolas;
+    font-weight: 500;
+    color : #585858;
+}
+
+.cd-body-text{
+    font-size: 20px;
+    font-family: roboto, monospace;
+    font-weight: 500;
+    color : #333333;
 }

@@ -47,3 +47,8 @@
 .txtAlignCenter{
     text-align: center;
 }
+
+.ss-table-body{
+    font-size: 15px;
+    font-weight: 400;
+}

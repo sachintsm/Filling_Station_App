@@ -4,7 +4,7 @@ import DatePicker from "react-datepicker";
 import { verifyAuth } from '../../utils/authentication'
 import '../../Css/Basic/dailyPumperCalculations.css'
 import axios from 'axios'
-
+import CircularProgress from '@material-ui/core/CircularProgress';
 import { Animated } from "react-animated-css";
 import Snackpop from "../Auth/Snackpop";
 import 'react-confirm-alert/src/react-confirm-alert.css'
@@ -42,6 +42,7 @@ export default class dailyPumperCalculations extends Component {
             startDate: new Date(),
             pumperName: '',
             dataDiv: false,
+            progressDiv : false,
             pumperIds: [],
 
             /********************************************************* */
@@ -71,10 +72,10 @@ export default class dailyPumperCalculations extends Component {
 
     onChangeEarlier(e) {
         this.setState({
-            el_pumperId: e.target.value
+            el_pumperId: e.target.value,
         })
     }
-
+    
     async getEarlierData() {
         if (this.state.el_pumperId === '') {
             this.setState({
@@ -84,7 +85,8 @@ export default class dailyPumperCalculations extends Component {
             })
         }
         else {
-
+            this.state.progressDiv = true
+            
             const data = {
                 el_pumperId: this.state.el_pumperId,
                 el_date: this.state.startDate
@@ -210,7 +212,7 @@ export default class dailyPumperCalculations extends Component {
                         }
                     }
                 }
-                this.setState({ dataDiv: true });
+                this.setState({ dataDiv: true , progressDiv : false});
             }
         }
     }
@@ -234,7 +236,7 @@ export default class dailyPumperCalculations extends Component {
         })
     }
     render() {
-        const { dataDiv } = this.state;
+        const { dataDiv, progressDiv } = this.state;
         const { pumperIds } = this.state;
         let pumpIdList = pumperIds.length > 0
             && pumperIds.map((item, i) => {
@@ -259,9 +261,6 @@ export default class dailyPumperCalculations extends Component {
                         </div>
                         <div className="col-md-10" style={{ backgroundColor: "#f5f5f5" }}>
                             <div className="container">
-
-
-
                                 <div className="container main-div-box" >
                                     <div className="container">
 
@@ -289,6 +288,11 @@ export default class dailyPumperCalculations extends Component {
                                         </div>
                                     </div>
                                 </div>
+                                {progressDiv && (
+                                    <div style={{ textAlign: 'center', marginTop: "20px" }}>
+                                        <CircularProgress />
+                                    </div>
+                                )}
                                 {dataDiv && (
                                     <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true} animationInDuration={1200}>
 

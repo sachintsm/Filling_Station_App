@@ -10,6 +10,10 @@ import AddBoxIcon from '@material-ui/icons/AddBox';
 import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
 import ErrorIcon from '@material-ui/icons/Error';
 import NotInterestedIcon from '@material-ui/icons/NotInterested';
+import Snackpop from "../Auth/Snackpop";
+import { confirmAlert } from 'react-confirm-alert';
+import 'react-confirm-alert/src/react-confirm-alert.css'
+
 const backend_URI = require('../Auth/Backend_URI')
 
 class salesStocks extends Component {
@@ -18,6 +22,9 @@ class salesStocks extends Component {
         super(props);
         this.state = {
             snackbaropen: false,
+            snackbarmsg: '',
+            snackbarcolor: '',
+
             pId: '',
             pName: '',
             sellPrice: '',
@@ -30,9 +37,9 @@ class salesStocks extends Component {
         this.onChange = this.onChange.bind(this);
         this.stockAdd = this.stockAdd.bind(this);
     }
-    snackbarClose = (event) => {
-        this.setState({ snackbaropen: false })
-    }
+    closeAlert = () => {
+        this.setState({ snackbaropen: false });
+    };
 
     componentDidMount() {
         axios.get(backend_URI.url + '/fuelLubricantPrice/get')
@@ -58,39 +65,68 @@ class salesStocks extends Component {
         if (this.state.newStock === null || this.state.newStock === '') {
             this.setState({
                 snackbaropen: true,
-                snackbarmsg: "Invalied input..!"
+                snackbarmsg: "Invalied input..!",
+                snackbarcolor : 'error'
             })
         }
         else {
-            var updatedStock = parseFloat(data) + parseFloat(this.state.newStock)
-            console.log(updatedStock);
-            const dt = {
-                pId: pId,
-                updatedStock: updatedStock
-            }
-            fetch(backend_URI.url + '/fuelLubricantPrice/updateAvailableStock', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'auth-token': obj.token
-                },
-                body: JSON.stringify(dt),
+            confirmAlert({
+                title: 'Confirm to delete?',
+                message: 'Are you sure to do this?',
+                buttons: [
+                    {
+                        label: 'Yes',
+                        onClick: async () => {
+                            var updatedStock = parseFloat(data) + parseFloat(this.state.newStock)
+                            console.log(updatedStock);
+                            const dt = {
+                                pId: pId,
+                                updatedStock: updatedStock
+                            }
+                            fetch(backend_URI.url + '/fuelLubricantPrice/updateAvailableStock', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'auth-token': obj.token
+                                },
+                                body: JSON.stringify(dt),
+                            })
+                                .then(res => res.json())
+                                .then(json => {
+                                    if (json.state === false) {
+                                        this.setState({
+                                            snackbaropen: true,
+                                            snackbarmsg: json.msg,
+                                            snackbarcolor: 'error'
+                                        })
+                                    }
+                                    else {
+                                        this.setState({
+                                            snackbaropen: true,
+                                            snackbarmsg: json.msg,
+                                            snackbarcolor: 'success'
+                                        })
+                                        window.location.reload();
+                                    }
+                                })
+                                .catch(err => {
+                                    this.setState({
+                                        snackbaropen: true,
+                                        snackbarmsg: err,
+                                        snackbarcolor: 'error'
+                                    })
+                                    console.log(err)
+                                })
+                        }
+                    },
+                    {
+                        label: 'No',
+                        onClick: () => {
+
+                        }
+                    }
+                ]
             })
-                .then(res => res.json())
-                .then(json => {
-                    this.setState({
-                        snackbaropen: true,
-                        snackbarmsg: json.msg
-                    })
-                    window.location.reload();
-                })
-                .catch(err => {
-                    this.setState({
-                        snackbaropen: true,
-                        snackbarmsg: err
-                    })
-                    console.log(err)
-                })
         }
     }
 
@@ -121,14 +157,13 @@ class salesStocks extends Component {
         let FuleList = products.length > 0 && products.map((props, i) => {
 
             if (props.pType === 'Fuel') {
-
                 return (
                     <tr key={i}>
                         <td>{this.fuelIcon(props.availStock)}</td>
-                        <td>{props.pId}</td>
-                        <td>{props.pName}</td>
-                        <td className="txtAlignCenter">{props.sellPrice}</td>
-                        <td className="txtAlignCenter">{parseFloat(props.availStock).toFixed(3)}</td>
+                        <td className="ss-table-body">{props.pId}</td>
+                        <td className="ss-table-body">{props.pName}</td>
+                        <td className="txtAlignCenter ss-table-body">{props.sellPrice}</td>
+                        <td className="txtAlignCenter ss-table-body">{parseFloat(props.availStock).toFixed(3)}</td>
                         <td>
                             <input type="number" className="form-control" name="newStock" placeholder="0" onChange={this.onChange} />
                         </td>
@@ -145,10 +180,11 @@ class salesStocks extends Component {
                 return (
                     <tr key={i}>
                         <td>{this.gasIcon(props.availStock)}</td>
-                        <td>{props.pId}</td>
-                        <td>{props.pName}</td>
-                        <td className="txtAlignCenter">{props.sellPrice}</td>
-                        <td className="txtAlignCenter">{parseFloat(props.availStock).toFixed(1)}</td>
+                        <td className="ss-table-body">{props.pId}</td>
+                        <td className="ss-table-body">{props.pName}</td>
+                        <td className="txtAlignCenter ss-table-body">{parseFloat(props.size).toFixed(2)}</td>
+                        <td className="txtAlignCenter ss-table-body">{props.sellPrice}</td>
+                        <td className="txtAlignCenter ss-table-body">{parseFloat(props.availStock).toFixed(1)}</td>
                         <td>
                             <input type="number" className="form-control" name="newStock" placeholder="0" onChange={this.onChange} />
                         </td>
@@ -166,10 +202,12 @@ class salesStocks extends Component {
                 return (
                     <tr key={i}>
                         <td>{this.lubricantIcon(props.availStock)}</td>
-                        <td>{props.pId}</td>
-                        <td>{props.pName}</td>
-                        <td className="txtAlignCenter">{props.sellPrice}</td>
-                        <td className="txtAlignCenter">{parseFloat(props.availStock).toFixed(2)}</td>
+                        <td className="ss-table-body">{props.pId}</td>
+                        <td className="ss-table-body">{props.pName}</td>
+                        <td className="txtAlignCenter ss-table-body">{parseFloat(props.size).toFixed(2)}</td>
+
+                        <td className="txtAlignCenter ss-table-body">{props.sellPrice}</td>
+                        <td className="txtAlignCenter ss-table-body">{parseFloat(props.availStock).toFixed(2)}</td>
                         <td>
                             <input type="number" className="form-control" name="newStock" placeholder="0" onChange={this.onChange} />
                         </td>
@@ -186,10 +224,12 @@ class salesStocks extends Component {
                 return (
                     <tr key={i}>
                         <td>{this.otherIcon(props.availStock)}</td>
-                        <td>{props.pId}</td>
-                        <td>{props.pName}</td>
-                        <td className="txtAlignCenter">{props.sellPrice}</td>
-                        <td className="txtAlignCenter">{parseFloat(props.availStock).toFixed(2)}</td>
+                        <td className="ss-table-body">{props.pId}</td>
+                        <td className="ss-table-body">{props.pName}</td>
+                        <td className="txtAlignCenter ss-table-body">{parseFloat(props.size).toFixed(2)}</td>
+
+                        <td className="txtAlignCenter ss-table-body">{props.sellPrice}</td>
+                        <td className="txtAlignCenter ss-table-body">{parseFloat(props.availStock).toFixed(2)}</td>
                         <td>
                             <input type="number" className="form-control" name="newStock" placeholder="0" onChange={this.onChange} />
                         </td>
@@ -207,19 +247,12 @@ class salesStocks extends Component {
         return (
             <React.Fragment>
                 <div className="container-fluid">
-                    <Snackbar
-                        open={this.state.snackbaropen}
-                        autoHideDuration={2000}
-                        onClose={this.snackbarClose}
-                        message={<span id="message-id">{this.state.snackbarmsg}</span>}
-                        action={[
-                            <IconButton
-                                key="close"
-                                aria-label="Close"
-                                color="secondary"
-                                onClick={this.snackbarClose}
-                            > x </IconButton>
-                        ]}
+                <Snackpop
+                        msg={this.state.snackbarmsg}
+                        color={this.state.snackbarcolor}
+                        time={3000}
+                        status={this.state.snackbaropen}
+                        closeAlert={this.closeAlert}
                     />
                     <div className="row">
                         <div className="col-md-2" style={{ backgroundColor: "#1c2431" }}>
@@ -246,11 +279,9 @@ class salesStocks extends Component {
                                                             <th className="txtAlignCenter">Selling Price</th>
                                                             <th className="txtAlignCenter">Available Stock</th>
                                                             <th>Add New Stock</th>
-
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-
                                                         {FuleList}
                                                     </tbody>
                                                 </table>
@@ -274,6 +305,7 @@ class salesStocks extends Component {
                                                             <th>State</th>
                                                             <th>P.ID</th>
                                                             <th>P.Name</th>
+                                                            <th className="txtAlignCenter">P.Size</th>
                                                             <th className="txtAlignCenter">Selling Price</th>
                                                             <th className="txtAlignCenter">Available Stock</th>
                                                             <th>Add New Stock</th>
@@ -305,6 +337,8 @@ class salesStocks extends Component {
                                                             <th>State</th>
                                                             <th>P.ID</th>
                                                             <th>P.Name</th>
+                                                            <th className="txtAlignCenter">P.Size</th>
+
                                                             <th className="txtAlignCenter">Selling Price</th>
                                                             <th className="txtAlignCenter">Available Stock</th>
                                                             <th>Add New Stock</th>
@@ -336,6 +370,7 @@ class salesStocks extends Component {
                                                             <th>State</th>
                                                             <th>P.ID</th>
                                                             <th>P.Name</th>
+                                                            <th className="txtAlignCenter">P.Size</th>
                                                             <th className="txtAlignCenter">Selling Price</th>
                                                             <th className="txtAlignCenter">Available Stock</th>
                                                             <th>Add New Stock</th>

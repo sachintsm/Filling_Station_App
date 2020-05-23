@@ -24,7 +24,7 @@ router.post('/add', verify, function (req, res) {
         debitType: 'products',
         pumpId: req.body.pumpId,
         state: 'Pending',
-        timeStamp: dt/1000
+        timeStamp: dt / 1000
     })
 
     data.save()
@@ -41,7 +41,7 @@ router.post('/addOther', verify, function (req, res) {
 
     var today = new Date();
     var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
-    var dt = Date.parse(req.body.dip_date)
+    var dt = Date.parse(today)
 
     const data = new DebitorAccount({
         date: date,
@@ -49,7 +49,7 @@ router.post('/addOther', verify, function (req, res) {
         debitAmount: req.body.newDOamount,
         debitType: 'other',
         state: 'Pending',
-        timeStamp: dt/1000
+        timeStamp: dt / 1000
     })
 
     data.save()
@@ -60,6 +60,8 @@ router.post('/addOther', verify, function (req, res) {
             res.send({ state: false, msg: "Data Adding Not Successfull..!" })
         })
 })
+
+//? GET TODAY MAIN DEBIT
 router.get('/get', function (req, res) {
     var today = new Date();
     var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
@@ -72,6 +74,8 @@ router.get('/get', function (req, res) {
             res.send({ state: false, msg: "data Tranfr Unsuccessful..!" })
         })
 })
+
+//? GET TODAY OTHER DEBIT
 router.get('/getOther', function (req, res) {
     var today = new Date();
     var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
@@ -106,19 +110,20 @@ router.delete('/delete/:id', function (req, res) {
         });
 })
 
+//? ADD OTHER CREDIT RECEIVEINGS
 router.post('/addOtherCredit', verify, function (req, res) {
     // console.log(req.body);
-// 
+    // 
     var today = new Date();
     var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
-    var dt = Date.parse(req.body.dip_date)
+    var dt = Date.parse(today)
 
     const data = new DebitorAccount({
         date: date,
         debitorId: req.body.newCOname,
         creditAmount: req.body.newCOamount,
         debitType: 'other',
-        timeStamp: dt/1000
+        timeStamp: dt / 1000
     })
 
     data.save()
@@ -130,20 +135,21 @@ router.post('/addOtherCredit', verify, function (req, res) {
         })
 })
 
+//? ADD CUSTOMERS CREDITS
 router.post('/addCredit', verify, function (req, res) {
     // console.log(req.body);
 
     var today = new Date();
     var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
-    var dt = Date.parse(req.body.dip_date)
+    var dt = Date.parse(today)
 
     const data = new DebitorAccount({
         date: date,
         debitorId: req.body.debitorId,
         creditAmount: req.body.creditAmount,
-        chequeNo : req.body.chequeNo,
+        chequeNo: req.body.chequeNo,
         debitType: 'products',
-        timeStamp: dt/1000
+        timeStamp: dt / 1000
     })
 
     data.save()
@@ -154,15 +160,18 @@ router.post('/addCredit', verify, function (req, res) {
             res.send({ state: false, msg: "Data Adding Not Successfull..!" })
         })
 })
+
+//?? DATE CONVERTION FUNCTION
 function convertToday(str) {
     var date = new Date(str),
         mnth = ("" + (date.getMonth() + 1)).slice(-2),
         day = ("" + date.getDate()).slice(-2);
     return [date.getFullYear(), mnth, day].join("-");
 }
-//get by date
+
+//? GET SPESIFIC DATE DEBITS
 router.get('/get/:date', function (req, res) {
-    var date = convertToday(req.params.date) 
+    var date = convertToday(req.params.date)
     DebitorAccount.find({ date: date, debitType: 'products' })
         .then(data => {
             res.send({ state: true, msg: "Data Transefer Done..!", data: data })
@@ -170,6 +179,40 @@ router.get('/get/:date', function (req, res) {
         .catch(err => {
             res.send({ state: false, msg: "data Tranfr Unsuccessful..!" })
         })
+})
+
+//?GET SPESIFIC SUCTOMER ALL ACCOUNT DETAILS
+router.get('/getAccountDetails/:id', async (req, res) => {
+    var id = req.params.id
+    DebitorAccount
+        .find({ debitorId: id })
+        .sort({ timeStamp: -1 })
+        .exec()
+        .then(data => {
+            res.send({ state: true, msg: "Data Transefer Done..!", data: data })
+        })
+        .catch(err => {
+            res.send({ state: false, msg: "data Tranfr Unsuccessful..!" })
+        })
+})
+
+//? delete customer account row
+router.delete('/deleteDebAccountRow/:id', (req, res) => {
+    const id = req.params.id
+    DebitorAccount
+        .remove({ _id: id })
+        .exec()
+        .then(result => {
+            res.status(200).json({
+                message: 'Deleted Successfully'
+            });
+        })
+        .catch(error => {
+            console.log(error);
+            res.status(500).json({
+                error: error
+            });
+        });
 })
 
 module.exports = router

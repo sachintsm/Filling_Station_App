@@ -25,12 +25,10 @@ export default class profile extends Component {
             debtorId: '',
             damount: '',
             nic: '',
-            birthday: '',
             mobile: '',
             fax: '',
             address: '',
             other: '',
-            userData: [],
             users: [],
 
             Datadiv: false,
@@ -45,7 +43,7 @@ export default class profile extends Component {
     closeAlert = () => {
         this.setState({ snackbaropen: false });
     };
-    
+
 
     handleSearch = e => {
         this.setState({ debtorId: e.target.value });
@@ -72,13 +70,12 @@ export default class profile extends Component {
             })
     }
 
-    customerData(data){
-        this.props.history.push('/cusprofile/'+data);
-        
+    customerData(data) {
+        this.props.history.push('/cusprofile/' + data);
+
     }
 
     deleteDebtor(data) {
-        console.log(data)
         confirmAlert({
             title: 'Confirm to delete?',
             message: 'Are you sure to do this?',
@@ -88,12 +85,22 @@ export default class profile extends Component {
                     onClick: async () => {
                         axios.delete(backend_URI.url + '/debtors/deleteDebtor/' + data)
                             .then(res => {
-                                this.setState({
-                                    snackbaropen: true,
-                                    snackbarmsg: res.data.message,
-                                    snackbarcolor: 'success'
-                                })
-                                window.location.reload();
+                                if (res.data.state === false) {
+                                    this.setState({
+                                        snackbaropen: true,
+                                        snackbarmsg: res.data.message,
+                                        snackbarcolor: 'error'
+                                    })
+                                }
+                                else {
+                                    this.setState({
+                                        snackbaropen: true,
+                                        snackbarmsg: res.data.message,
+                                        snackbarcolor: 'success'
+                                    })
+                                    window.location.reload();
+                                }
+
                             })
                             .catch(err => {
                                 this.setState({
