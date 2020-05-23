@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { verifyAuth } from '../../utils/authentication'
 import axios from 'axios';
 import { Col, Row } from 'react-bootstrap';
-import Sidebar from '../Auth/sidebar';
 import "react-datepicker/dist/react-datepicker.css";
 import '../../Css/Basic/cusprofile.css';
 import Card from '@material-ui/core/Card';

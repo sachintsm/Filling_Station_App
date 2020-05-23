@@ -11,7 +11,7 @@ router.post('/add', verify, async function (req, res) {
 
     const data = new BankAccounts({
         bankName: req.body.bankName,
-        accountName:req.body.accountName,
+        accountName: req.body.accountName,
         accountNumber: req.body.accountNumber,
     })
 
@@ -26,15 +26,35 @@ router.post('/add', verify, async function (req, res) {
         })
 })
 
-router.get('/getAccountNames', function (req, res){
+router.get('/getAccountNames', function (req, res) {
     BankAccounts
         .find()
         .exec()
         .then(result => {
-            res.json({state: true, msg: "Data Transfer Success..!", data : result})
+            res.json({ state: true, msg: "Data Transfer Success..!", data: result })
         })
         .catch(err => {
-            res.json({state: false, msg: "Data Transfer Error..!"})
+            res.json({ state: false, msg: "Data Transfer Error..!" })
         })
+})
+
+//? delete the account 
+router.delete('/delete/:id', async (req, res) => {
+
+    const id = req.params.id
+    BankAccounts
+        .remove({ _id: id })
+        .exec()
+        .then(result => {
+            res.status(200).json({
+                message: 'Deleted Successfully'
+            });
+        })
+        .catch(error => {
+            console.log(error);
+            res.status(500).json({
+                error: error
+            });
+        });
 })
 module.exports = router

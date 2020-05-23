@@ -3,8 +3,6 @@ import Sidebar from '../Auth/sidebar'
 import { verifyAuth } from '../../utils/authentication'
 import axios from 'axios'
 import { MDBInput } from "mdbreact";
-import Snackbar from '@material-ui/core/Snackbar'
-import IconButton from '@material-ui/core/IconButton'
 import { Button, Row, Col } from 'reactstrap';
 import '../../Css/Basic/bankDetails.css'
 import Tab from 'react-bootstrap/Tab';
@@ -13,6 +11,9 @@ import { getFromStorage } from "../../utils/storage";
 import DatePicker from "react-datepicker";
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import { Animated } from "react-animated-css";
+import Snackpop from "../Auth/Snackpop";
+import { confirmAlert } from 'react-confirm-alert';
+import 'react-confirm-alert/src/react-confirm-alert.css'
 
 const backend_URI = require('../Auth/Backend_URI')
 
@@ -22,6 +23,8 @@ export default class bankDetails extends Component {
 
         this.state = {
             snackbaropen: false,
+            snackbarmsg: '',
+            snackbarcolor: '',
 
             bankName: '',
             accountNumber: '',
@@ -56,9 +59,10 @@ export default class bankDetails extends Component {
         this.onChangeDate2 = this.onChangeDate2.bind(this)
 
     }
-    snackbarClose = (event) => {
-        this.setState({ snackbaropen: false })
-    }
+    closeAlert = () => {
+        this.setState({ snackbaropen: false });
+    };
+
     onChangeDate = date => {
         this.setState(prevState => ({
             dip_date: date
@@ -74,19 +78,20 @@ export default class bankDetails extends Component {
             date2_date: date
         }))
     }
+
     componentDidMount = async () => {
         const authState = await verifyAuth();
         this.setState({ authState: authState })
         if (!authState) this.props.history.push('/login');
 
-        axios.get(backend_URI.url  + '/bankAccountRegistration/getAccountNames')
+        axios.get(backend_URI.url + '/bankAccountRegistration/getAccountNames')
             .then(res => {
                 this.setState({
                     BankAccount: res.data.data
                 })
             })
 
-        axios.get(backend_URI.url  + '/bankAccountData/getLastSeven')
+        axios.get(backend_URI.url + '/bankAccountData/getLastSeven')
             .then(res => {
                 this.setState({
                     lastSeven: res.data.data
@@ -103,12 +108,15 @@ export default class bankDetails extends Component {
         this.setState(store);
     }
 
+    //? register new bank account
     onRegisterAccount() {
         const obj = getFromStorage('auth-token');
-        if (this.state.bankName === '' || this.state.accountNumber === '') {
+        console.log(this.state.bankName + this.state.accountName + this.state.accountNumber)
+        if (this.state.bankName === '' || this.state.accountNumber === '' || this.state.accountName === '') {
             this.setState({
                 snackbaropen: true,
-                snackbarmsg: "Please Fill the Missing Fields ..!"
+                snackbarmsg: "Please Fill the Missing Fields ..!",
+                snackbarcolor: 'error'
             })
         }
         else {
@@ -119,29 +127,58 @@ export default class bankDetails extends Component {
                 accountNumber: this.state.accountNumber,
             }
 
-            fetch(backend_URI.url  + '/bankAccountRegistration/add', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'auth-token': obj.token
-                },
-                body: JSON.stringify(data),
+            confirmAlert({
+                title: 'Confirm to delete?',
+                message: 'Are you sure to do this?',
+                buttons: [
+                    {
+                        label: 'Yes',
+                        onClick: async () => {
+                            fetch(backend_URI.url + '/bankAccountRegistration/add', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'auth-token': obj.token
+                                },
+                                body: JSON.stringify(data),
+                            })
+                                .then(res => res.json())
+                                .then(json => {
+                                    console.log(json);
+                                    if (json.state === false) {
+                                        this.setState({
+                                            snackbaropen: true,
+                                            snackbarmsg: json.msg,
+                                            snackbarcolor: 'error'
+                                        })
+                                    }
+                                    else {
+                                        this.setState({
+                                            snackbaropen: true,
+                                            snackbarmsg: json.msg,
+                                            snackbarcolor: 'success'
+                                        })
+                                        // window.location.reload();
+                                    }
+
+                                })
+                                .catch(err => {
+                                    this.setState({
+                                        snackbaropen: true,
+                                        snackbarmsg: err,
+                                        snackbarcolor: 'error'
+                                    })
+                                })
+                        }
+                    },
+                    {
+                        label: 'No',
+                        onClick: () => {
+
+                        }
+                    }
+                ]
             })
-                .then(res => res.json())
-                .then(json => {
-                    console.log(json);
-                    this.setState({
-                        snackbaropen: true,
-                        snackbarmsg: json.msg
-                    })
-                })
-                .catch(err => {
-                    console.log(err)
-                    this.setState({
-                        snackbaropen: true,
-                        snackbarmsg: err
-                    })
-                })
         }
     }
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -168,46 +205,67 @@ export default class bankDetails extends Component {
 
     onDiposit() {
         const obj = getFromStorage('auth-token');
-        if (this.state.dip_amount === '') {
+        if (this.state.dip_amount === '' || this.state.dip_account === '' || this.state.dip_type === '') {
             this.setState({
                 snackbaropen: true,
-                snackbarmsg: "Please Fill the Missing Fields ..!"
+                snackbarmsg: "Please Fill the Missing Fields ..!",
+                snackbarcolor: 'error'
             })
         }
 
-        console.log(this.state.dip_account);
+        else {
 
-        const data = {
-            dip_account: this.state.dip_account,
-            dip_type: this.state.dip_type,
-            dip_amount: this.state.dip_amount,
-            dip_cheque: this.state.dip_cheque,
-            dip_date: this.state.dip_date,
+            const data = {
+                dip_account: this.state.dip_account,
+                dip_type: this.state.dip_type,
+                dip_amount: this.state.dip_amount,
+                dip_cheque: this.state.dip_cheque,
+                dip_date: this.state.dip_date,
+            }
+            confirmAlert({
+                title: 'Confirm to deposit?',
+                message: 'Are you sure to do this?',
+                buttons: [
+                    {
+                        label: 'Yes',
+                        onClick: async () => {
+                            fetch(backend_URI.url + '/bankAccountData/add', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'auth-token': obj.token
+                                },
+                                body: JSON.stringify(data),
+                            })
+                                .then(res => res.json())
+                                .then(json => {
+                                    console.log(json);
+                                    this.setState({
+                                        snackbaropen: true,
+                                        snackbarmsg: json.msg,
+                                        snackbarcolor: 'success'
+                                    })
+                                    window.location.reload();
+                                })
+                                .catch(err => {
+                                  
+                                    this.setState({
+                                        snackbaropen: true,
+                                        snackbarmsg: err,
+                                        snackbarcolor: 'error'
+                                    })
+                                })
+                        }
+                    },
+                    {
+                        label: 'No',
+                        onClick: () => {
+
+                        }
+                    }
+                ]
+            })
         }
-
-        fetch(backend_URI.url  + '/bankAccountData/add', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'auth-token': obj.token
-            },
-            body: JSON.stringify(data),
-        })
-            .then(res => res.json())
-            .then(json => {
-                console.log(json);
-                this.setState({
-                    snackbaropen: true,
-                    snackbarmsg: json.msg
-                })
-            })
-            .catch(err => {
-                console.log(err)
-                this.setState({
-                    snackbaropen: true,
-                    snackbarmsg: err
-                })
-            })
     }
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -216,7 +274,7 @@ export default class bankDetails extends Component {
             date1: this.state.date1_date,
             date2: this.state.date2_date
         }
-        axios.post(backend_URI.url  + '/bankAccountData/getLastMonth', data)
+        axios.post(backend_URI.url + '/bankAccountData/getLastMonth', data)
             .then(res => {
                 this.setState({
                     lastMonth: res.data.data
@@ -225,24 +283,80 @@ export default class bankDetails extends Component {
         this.setState({ dataDiv: true });
 
     }
+    deleteAccount(data) {
+        confirmAlert({
+            title: 'Confirm to delete?',
+            message: 'Are you sure to do this?',
+            buttons: [
+                {
+                    label: 'Yes',
+                    onClick: async () => {
+                        axios.delete(backend_URI.url + '/bankAccountRegistration/delete/' + data)
+                            .then(res => {
+                                console.log(res);
+                                this.setState({
+                                    snackbaropen: true,
+                                    snackbarmsg: res.data.message,
+                                    snackbarcolor: 'success'
+                                })
+                                window.location.reload();
+                            })
+                            .catch(err => {
+                                console.log(err);
+                                this.setState({
+                                    snackbaropen: true,
+                                    snackbarmsg: err,
+                                    snackbarcolor: 'error'
+                                })
+                            })
+                    }
+                },
+                {
+                    label: 'No',
+                    onClick: () => {
+
+                    }
+                }
+            ]
+        })
+    }
 
     bankDelete(data) {
-        axios.delete(backend_URI.url  + '/bankAccountData/delete/' + data)
-            .then(res => {
-                console.log(res);
-                this.setState({
-                    snackbaropen: true,
-                    snackbarmsg: res.data.message
-                })
-                window.location.reload();
-            })
-            .catch(err => {
-                console.log(err);
-                this.setState({
-                    snackbaropen: true,
-                    snackbarmsg: err
-                })
-            })
+        confirmAlert({
+            title: 'Confirm to delete?',
+            message: 'Are you sure to do this?',
+            buttons: [
+                {
+                    label: 'Yes',
+                    onClick: async () => {
+                        axios.delete(backend_URI.url + '/bankAccountData/delete/' + data)
+                            .then(res => {
+                                console.log(res);
+                                this.setState({
+                                    snackbaropen: true,
+                                    snackbarmsg: res.data.message,
+                                    snackbarcolor: 'success'
+                                })
+                                window.location.reload();
+                            })
+                            .catch(err => {
+                                console.log(err);
+                                this.setState({
+                                    snackbaropen: true,
+                                    snackbarmsg: err,
+                                    snackbarcolor: 'error'
+                                })
+                            })
+                    }
+                },
+                {
+                    label: 'No',
+                    onClick: () => {
+
+                    }
+                }
+            ]
+        })
     }
 
     render() {
@@ -258,19 +372,12 @@ export default class bankDetails extends Component {
         return (
             <React.Fragment>
                 <div className="container-fluid">
-                    <Snackbar
-                        open={this.state.snackbaropen}
-                        autoHideDuration={2000}
-                        onClose={this.snackbarClose}
-                        message={<span id="message-id">{this.state.snackbarmsg}</span>}
-                        action={[
-                            <IconButton
-                                key="close"
-                                aria-label="Close"
-                                color="secondary"
-                                onClick={this.snackbarClose}
-                            > x </IconButton>
-                        ]}
+                    <Snackpop
+                        msg={this.state.snackbarmsg}
+                        color={this.state.snackbarcolor}
+                        time={3000}
+                        status={this.state.snackbaropen}
+                        closeAlert={this.closeAlert}
                     />
                     <div className="row">
                         <div className="col-md-2" style={{ backgroundColor: "#1c2431" }}>
@@ -389,6 +496,40 @@ export default class bankDetails extends Component {
                                                 </div>
                                             </div>
                                         </div>
+
+                                        <p className="topic">Registered Accounts</p>
+                                        <div style={{ bgcolor: "#ffffff", marginTop: "10px" }}>
+                                            <div className="container" style={{ backgroundColor: "#ffffff", borderRadius: "4px" }}>
+                                                <div className="row">
+                                                    <div className="container">
+
+                                                        <table className="table table-striped" style={{ marginTop: 20 }} >
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Bank Name</th>
+                                                                    <th>Account Name</th>
+                                                                    <th>Account Number</th>
+                                                                    <th>Action</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                {this.state.BankAccount.map(data => {
+                                                                    return (
+                                                                        <tr key={data._id}>
+                                                                            <th>{data.bankName}</th>
+                                                                            <th>{data.accountName}</th>
+                                                                            <th>{data.accountNumber}</th>
+                                                                            <th><DeleteForeverIcon className="delete-btn-cp" onClick={() => this.deleteAccount(data._id)} /></th>
+                                                                        </tr>
+                                                                    )
+                                                                })}
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
                                         <p className="topic">Past Bank Details</p>
                                         <Row>
                                             <Col xs="2">

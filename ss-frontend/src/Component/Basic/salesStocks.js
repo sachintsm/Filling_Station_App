@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import Sidebar from '../Auth/sidebar'
 import '../../Css/Basic/salesStocks.css'
-import Snackbar from '@material-ui/core/Snackbar'
-import IconButton from '@material-ui/core/IconButton'
 import axios from 'axios'
 import { getFromStorage } from '../../utils/storage';
 import { Card } from 'react-bootstrap';
@@ -374,7 +372,6 @@ class salesStocks extends Component {
                                                             <th className="txtAlignCenter">Selling Price</th>
                                                             <th className="txtAlignCenter">Available Stock</th>
                                                             <th>Add New Stock</th>
-
                                                         </tr>
                                                     </thead>
                                                     <tbody>

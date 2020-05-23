@@ -4,8 +4,9 @@ import { verifyAuth } from '../../utils/authentication'
 import axios from 'axios'
 import { MDBInput } from "mdbreact";
 import Card from '@material-ui/core/Card'
-import Snackbar from '@material-ui/core/Snackbar'
-import IconButton from '@material-ui/core/IconButton'
+import Snackpop from "../Auth/Snackpop";
+import { confirmAlert } from 'react-confirm-alert';
+import 'react-confirm-alert/src/react-confirm-alert.css'
 import { Button, Row, Col } from 'reactstrap';
 import '../../Css/Basic/employeeSalary.css'
 import Tab from 'react-bootstrap/Tab';
@@ -14,6 +15,7 @@ import { getFromStorage } from "../../utils/storage";
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import DatePicker from "react-datepicker";
 import { Animated } from "react-animated-css";
+
 const backend_URI = require('../Auth/Backend_URI')
 
 export default class employeeSalary extends Component {
@@ -71,7 +73,9 @@ export default class employeeSalary extends Component {
         this.addProfit = this.addProfit.bind(this)
         this.onChangeProfitType = this.onChangeProfitType.bind(this)
     }
-
+    closeAlert = () => {
+        this.setState({ snackbaropen: false });
+    };
     onChangeStartDate = date => {
         this.setState(prevState => ({
             startDate: date
@@ -91,14 +95,15 @@ export default class employeeSalary extends Component {
         })
     }
 
-    addProfit() {
+    addProfit = async () => {
         const obj = getFromStorage('auth-token');
 
 
         if (this.state.profitPumperId === '' || this.state.profitAmount === '' || this.state.profitType === '') {
             this.setState({
                 snackbaropen: true,
-                snackbarmsg: "Please Fill the Data ..!"
+                snackbarmsg: "Please Fill the Data ..!",
+                snackbarcolor: 'error'
             })
         }
         else {
@@ -110,31 +115,64 @@ export default class employeeSalary extends Component {
                 type: this.state.profitType
             }
             console.log(data)
+            confirmAlert({
+                title: 'Confirm to Add?',
+                message: 'Are you sure to do this?',
+                buttons: [
+                    {
+                        label: 'Yes',
+                        onClick: async () => {
+                            console.log("sachin");
 
-            fetch(backend_URI.url + '/pumperProfitPayment/add', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'auth-token': obj.token
-                },
-                body: JSON.stringify(data),
+                            await axios.get(backend_URI.url + '/users/checkUserId/' + this.state.profitPumperId)
+                                .then((res) => {
+                                    console.log("muhumala");
+
+                                    if (res.data.state) {
+                                        fetch(backend_URI.url + '/pumperProfitPayment/add', {
+                                            method: 'POST',
+                                            headers: {
+                                                'Content-Type': 'application/json',
+                                                'auth-token': obj.token
+                                            },
+                                            body: JSON.stringify(data),
+                                        })
+                                            .then(res => res.json())
+                                            .then(json => {
+                                                // alert(json.msg)
+                                                this.setState({
+                                                    snackbaropen: true,
+                                                    snackbarmsg: json.msg,
+                                                    snackbarcolor: 'success'
+                                                })
+                                                window.location.reload();
+                                            })
+                                            .catch(err => {
+                                                this.setState({
+                                                    snackbaropen: true,
+                                                    snackbarmsg: err,
+                                                    snackbarcolor: 'error'
+                                                })
+                                            })
+                                    }
+                                    else {
+                                        this.setState({
+                                            snackbaropen: true,
+                                            snackbarmsg: res.data.msg,
+                                            snackbarcolor: 'error'
+                                        })
+                                    }
+                                })
+                        }
+                    },
+                    {
+                        label: 'No',
+                        onClick: () => {
+
+                        }
+                    }
+                ]
             })
-                .then(res => res.json())
-                .then(json => {
-                    // alert(json.msg)
-                    this.setState({
-                        snackbaropen: true,
-                        snackbarmsg: json.msg
-                    })
-                    // window.location.reload();
-                })
-                .catch(err => {
-                    this.setState({
-                        snackbaropen: true,
-                        snackbarmsg: err
-                    })
-                    console.log(err)
-                })
         }
     }
 
@@ -218,46 +256,76 @@ export default class employeeSalary extends Component {
         this.setState(store);
     }
 
-    addSalary = () => {
+    addSalary = async () => {
         const obj = getFromStorage('auth-token');
-
-
         if (this.state.empId === '' || this.state.empAmount === '') {
             this.setState({
                 snackbaropen: true,
-                snackbarmsg: "Please Fill the Data ..!"
+                snackbarmsg: "Please Fill the Data ..!",
+                snackbarcolor: 'error'
             })
         }
         else {
-            const data = {
-                empId: this.state.empId,
-                amount: this.state.empAmount
-            }
+            confirmAlert({
+                title: 'Confirm to Add?',
+                message: 'Are you sure to do this?',
+                buttons: [
+                    {
+                        label: 'Yes',
+                        onClick: async () => {
+                            await axios.get(backend_URI.url + '/users/checkUserId/' + this.state.empId)
+                                .then((res) => {
+                                    if (res.data.state) {
+                                        const data = {
+                                            empId: this.state.empId,
+                                            amount: this.state.empAmount
+                                        }
 
-            fetch(backend_URI.url + '/employeeSalary/add', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'auth-token': obj.token
-                },
-                body: JSON.stringify(data),
+                                        fetch(backend_URI.url + '/employeeSalary/add', {
+                                            method: 'POST',
+                                            headers: {
+                                                'Content-Type': 'application/json',
+                                                'auth-token': obj.token
+                                            },
+                                            body: JSON.stringify(data),
+                                        })
+                                            .then(res => res.json())
+                                            .then(json => {
+                                                this.setState({
+                                                    snackbaropen: true,
+                                                    snackbarmsg: json.msg,
+                                                    snackbarcolor: 'success'
+                                                })
+                                                window.location.reload();
+                                            })
+                                            .catch(err => {
+                                                this.setState({
+                                                    snackbaropen: true,
+                                                    snackbarmsg: err,
+                                                    snackbarcolor: 'error'
+                                                })
+                                            })
+                                    }
+                                    else {
+                                        this.setState({
+                                            snackbaropen: true,
+                                            snackbarmsg: res.data.msg,
+                                            snackbarcolor: 'error'
+                                        })
+                                    }
+                                })
+
+                        }
+                    },
+                    {
+                        label: 'No',
+                        onClick: () => {
+
+                        }
+                    }
+                ]
             })
-                .then(res => res.json())
-                .then(json => {
-                    // alert(json.msg)
-                    this.setState({
-                        snackbaropen: true,
-                        snackbarmsg: json.msg
-                    })
-                    // window.location.reload();
-                })
-                .catch(err => {
-                    this.setState({
-                        snackbaropen: true,
-                        snackbarmsg: err
-                    })
-                    console.log(err)
-                })
+
         }
     }
 
@@ -269,22 +337,41 @@ export default class employeeSalary extends Component {
     }
 
     onSalaryDelete = (data) => {
-        axios.delete(backend_URI.url + '/employeeSalary/delete/' + data)
-            .then((res) => {
-                console.log(res);
-                this.setState({
-                    snackbaropen: true,
-                    snackbarmsg: res.data.message
-                })
-                window.location.reload();
-            })
-            .catch(err => {
-                console.log(err);
-                this.setState({
-                    snackbaropen: true,
-                    snackbarmsg: err
-                })
-            })
+        confirmAlert({
+            title: 'Confirm to delete?',
+            message: 'Are you sure to do this?',
+            buttons: [
+                {
+                    label: 'Yes',
+                    onClick: async () => {
+                        axios.delete(backend_URI.url + '/employeeSalary/delete/' + data)
+                            .then((res) => {
+                                console.log(res);
+                                this.setState({
+                                    snackbaropen: true,
+                                    snackbarmsg: res.data.message,
+                                    snackbarcolor: 'success'
+                                })
+                                window.location.reload();
+                            })
+                            .catch(err => {
+                                console.log(err);
+                                this.setState({
+                                    snackbaropen: true,
+                                    snackbarmsg: err,
+                                    snackbarcolor: 'error'
+                                })
+                            })
+                    }
+                },
+                {
+                    label: 'No',
+                    onClick: () => {
+
+                    }
+                }
+            ]
+        })
     }
 
     /*********************************************************** */
@@ -311,7 +398,8 @@ export default class employeeSalary extends Component {
         if (this.state.loanEmpId === '' || this.state.loanAmount === '' || this.state.loanType === '') {
             this.setState({
                 snackbaropen: true,
-                snackbarmsg: "Please Fill the Data ..!"
+                snackbarmsg: "Please Fill the Data ..!",
+                snackbarcolor: 'error'
             })
         }
         else {
@@ -321,37 +409,65 @@ export default class employeeSalary extends Component {
                 type: this.state.loanType
             }
 
-            fetch(backend_URI.url + '/employeeLoan/add', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'auth-token': obj.token
-                },
-                body: JSON.stringify(data),
+            confirmAlert({
+                title: 'Confirm to submit?',
+                message: 'Are you sure to do this?',
+                buttons: [
+                    {
+                        label: 'Yes',
+                        onClick: async () => {
+                            await axios.get(backend_URI.url + '/users/checkUserId/' + this.state.loanEmpId)
+                                .then((res) => {
+                                    if (res.data.state) {
+                                        fetch(backend_URI.url + '/employeeLoan/add', {
+                                            method: 'POST',
+                                            headers: {
+                                                'Content-Type': 'application/json',
+                                                'auth-token': obj.token
+                                            },
+                                            body: JSON.stringify(data),
+                                        })
+                                            .then(res => res.json())
+                                            .then(json => {
+                                                this.setState({
+                                                    snackbaropen: true,
+                                                    snackbarmsg: json.msg,
+                                                    snackbarcolor: 'success'
+                                                })
+                                                window.location.reload();
+                                            })
+                                            .catch(err => {
+                                                this.setState({
+                                                    snackbaropen: true,
+                                                    snackbarmsg: err,
+                                                    snackbarcolor: 'error'
+                                                })
+                                            })
+                                    }
+                                    else {
+                                        this.setState({
+                                            snackbaropen: true,
+                                            snackbarmsg: res.data.msg,
+                                            snackbarcolor: 'error'
+                                        })
+                                    }
+                                })
+                        }
+                    },
+                    {
+                        label: 'No',
+                        onClick: () => {
+
+                        }
+                    }
+                ]
             })
-                .then(res => res.json())
-                .then(json => {
-                    // alert(json.msg)
-                    this.setState({
-                        snackbaropen: true,
-                        snackbarmsg: json.msg
-                    })
-                    // window.location.reload();
-                })
-                .catch(err => {
-                    this.setState({
-                        snackbaropen: true,
-                        snackbarmsg: err
-                    })
-                    console.log(err)
-                })
         }
     }
 
     onLoanDelete = (data) => {
         axios.delete(backend_URI.url + '/employeeLoan/delete/' + data)
             .then((res) => {
-                console.log(res);
                 this.setState({
                     snackbaropen: true,
                     snackbarmsg: res.data.message
@@ -398,19 +514,12 @@ export default class employeeSalary extends Component {
         return (
             <React.Fragment>
                 <div className="container-fluid">
-                    <Snackbar
-                        open={this.state.snackbaropen}
-                        autoHideDuration={2000}
-                        onClose={this.snackbarClose}
-                        message={<span id="message-id">{this.state.snackbarmsg}</span>}
-                        action={[
-                            <IconButton
-                                key="close"
-                                aria-label="Close"
-                                color="secondary"
-                                onClick={this.snackbarClose}
-                            > x </IconButton>
-                        ]}
+                    <Snackpop
+                        msg={this.state.snackbarmsg}
+                        color={this.state.snackbarcolor}
+                        time={3000}
+                        status={this.state.snackbaropen}
+                        closeAlert={this.closeAlert}
                     />
                     <div className="row">
                         <div className="col-md-2" style={{ backgroundColor: "#1c2431" }}>
@@ -536,8 +645,8 @@ export default class employeeSalary extends Component {
                                                                 <Col xls="3" style={{ marginTop: "23px" }}>
                                                                     <select className="form-control" onChange={this.onChangeType}>
                                                                         <option>Select Type</option>
-                                                                        <option value="credit">Credit</option>
-                                                                        <option value="debit">Debit</option>
+                                                                        <option value="credit">From Employee</option>
+                                                                        <option value="debit">To Employee</option>
                                                                     </select>
                                                                 </Col>
                                                                 <Col xs="3" style={{ marginTop: "18px" }}>
@@ -559,7 +668,7 @@ export default class employeeSalary extends Component {
                                                                     </Col>
                                                                 </Row>
                                                             </div>
-                                                            <div className="container" style={{ marginTop: "-10px" }}>``
+                                                            <div className="container" style={{ marginTop: "-10px" }}>
                                                                 <hr style={{ marginLeft: "-3px" }}></hr>
                                                             </div>
                                                             <div className="container">
@@ -571,10 +680,10 @@ export default class employeeSalary extends Component {
                                                                         <p className="tbl-head">Emp ID</p>
                                                                     </Col>
                                                                     <Col xs="3" style={{ textAlign: "center" }}>
-                                                                        <p className="tbl-head">Credit</p>
+                                                                        <p className="tbl-head">From Employee</p>
                                                                     </Col>
                                                                     <Col xs="3" style={{ textAlign: "center" }}>
-                                                                        <p className="tbl-head">Debit</p>
+                                                                        <p className="tbl-head">To Employee</p>
                                                                     </Col>
                                                                     <Col xs="2" style={{ textAlign: "center" }}>
                                                                         <p className="tbl-head">Action</p>
@@ -628,8 +737,7 @@ export default class employeeSalary extends Component {
                                                                         }
                                                                     }
                                                                     else {
-                                                                        if(this.state.loanSearch === data.empId){
-
+                                                                        if (this.state.loanSearch === data.empId) {
                                                                             if (data.type === 'credit') {
                                                                                 return (
                                                                                     <Row key={data._id}>
@@ -702,172 +810,172 @@ export default class employeeSalary extends Component {
                                             </Card>
 
                                             {dataDiv && (
-                                    <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true} animationInDuration={1200}>
+                                                <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true} animationInDuration={1200}>
 
-                                                <Row style={{ marginTop: "20px" }}>
-                                                    <Col xs="4">
-                                                        <Card>
-                                                            <div className="container">
-                                                                <Row>
-                                                                    <Col xs="6">
-                                                                        <p className="tbl-head">Date</p>
-                                                                    </Col>
-                                                                    <Col xs="6" style={{ textAlign: "center" }}>
-                                                                        <p className="tbl-head">Profit</p>
-                                                                    </Col>
+                                                    <Row style={{ marginTop: "20px" }}>
+                                                        <Col xs="4">
+                                                            <Card>
+                                                                <div className="container">
+                                                                    <Row>
+                                                                        <Col xs="6">
+                                                                            <p className="tbl-head">Date</p>
+                                                                        </Col>
+                                                                        <Col xs="6" style={{ textAlign: "center" }}>
+                                                                            <p className="tbl-head">Profit</p>
+                                                                        </Col>
 
-                                                                </Row>
-                                                            </div>
-                                                            {this.state.thisMonthProfit.map((data) => {
-                                                                return (
+                                                                    </Row>
+                                                                </div>
+                                                                {this.state.thisMonthProfit.map((data) => {
+                                                                    return (
 
-                                                                    <div className="container" key={data._id}>
-                                                                        <Row>
-                                                                            <Col xs="6">
-                                                                                <p className="tbl-body">{data.date}</p>
-                                                                            </Col>
-                                                                            <Col xs="6" style={{ textAlign: "right" }}>
-                                                                                <p className="tbl-body">{data.profit}</p>
-                                                                            </Col>
-
-                                                                        </Row>
-                                                                    </div>
-
-                                                                )
-                                                            })}
-                                                        </Card>
-                                                    </Col>
-
-                                                    <Col xs="8">
-                                                        <Card className="profitCard" style={{ minHeight: "400px" }}>
-                                                            <div className="container" style={{ marginTop: "20px" }}>
-                                                                <Row>
-                                                                    <Col xs="8">
-                                                                        <Row>
-                                                                            <Col xs="6">
-                                                                                <p className="tbl-body">Start Date</p>
-                                                                            </Col>
-                                                                            <Col xs="6">
-                                                                                <p className="tbl-body">End Date</p>
-                                                                            </Col>
-                                                                        </Row>
-                                                                        <Row>
-                                                                            <Col xs="6">
-                                                                                <div className="form-group">
-                                                                                    <DatePicker
-                                                                                        className="form-control"
-                                                                                        selected={this.state.startDate}
-                                                                                        onChange={this.onChangeStartDate}
-                                                                                        dateFormat="yyyy-MM-dd"
-                                                                                    />
-                                                                                </div>
-                                                                            </Col>
-                                                                            <Col xs="6">
-                                                                                <div className="form-group">
-                                                                                    <DatePicker
-                                                                                        className="form-control"
-                                                                                        selected={this.state.endDate}
-                                                                                        onChange={this.onChangeEndDate}
-                                                                                        dateFormat="yyyy-MM-dd"
-                                                                                    />
-                                                                                </div>
-                                                                            </Col>
-                                                                        </Row>
-                                                                        <Row style={{ textAlign: "center", marginTop: "-20px" }}>
-                                                                            <Col xs="6" >
-                                                                                <MDBInput outline style={{ width: "96%" }} label="Pumper ID" type="text" name="profitPumperId" onChange={this.onChangeProfit} />
-                                                                            </Col>
-                                                                            <Col xs="6">
-                                                                                <MDBInput outline style={{ width: "96%" }} label="Amount" type="text" name="profitAmount" onChange={this.onChangeProfit} />
-                                                                            </Col>
-                                                                        </Row>
-                                                                    </Col>
-                                                                    <Col xs="4" style={{ marginTop: "38px" }}>
-                                                                        <select className="form-control" style={{ marginTop: "5px" }} onChange={this.onChangeProfitType}>
-                                                                            <option>Select Type</option>
-                                                                            <option value="credit">To Employee</option>
-                                                                            <option value="debit">From Employee</option>
-                                                                        </select>
-                                                                        <button style={{ height: "40px", marginTop: "20px", marginLeft: "0px" }} className="btn btn-primary sub-btn" onClick={this.addProfit}>submit</button>
-                                                                    </Col>
-                                                                </Row>
-
-                                                            </div>
-
-
-                                                            <div className="container" style={{ marginTop: "20px" }}>
-                                                                <hr style={{ marginLeft: "0px" }}></hr>
-                                                                <Row>
-                                                                    <Col xs="3">
-                                                                        <p className="tbl-body">Start Date</p>
-                                                                    </Col>
-                                                                    <Col xs="3">
-                                                                        <p className="tbl-body">End Date</p>
-                                                                    </Col>
-
-                                                                    <Col xs="2">
-                                                                        <p className="tbl-body">From</p>
-                                                                    </Col>
-                                                                    <Col xs="2">
-                                                                        <p className="tbl-body">To</p>
-                                                                    </Col>
-
-                                                                </Row>
-                                                            </div>
-                                                            <div className="container">
-
-                                                                {this.state.profitPayment.map(data => {
-
-                                                                    if (data.type === 'credit') {
-                                                                        return (
-                                                                            <Row key={data._id}>
-                                                                                <Col xs="3">
-                                                                                    <p className="tbl-body">{data.startDate}</p>
+                                                                        <div className="container" key={data._id}>
+                                                                            <Row>
+                                                                                <Col xs="6">
+                                                                                    <p className="tbl-body">{data.date}</p>
                                                                                 </Col>
-                                                                                <Col xs="3">
-                                                                                    <p className="tbl-body">{data.endDate}</p>
+                                                                                <Col xs="6" style={{ textAlign: "right" }}>
+                                                                                    <p className="tbl-body">{data.profit}</p>
                                                                                 </Col>
-                                                                                <Col xs="2">
-                                                                                    <p className="tbl-body">-</p>
-                                                                                </Col>
-                                                                                <Col xs="2">
-                                                                                    <p className="tbl-body colorGreen">{data.amount}</p>
-                                                                                </Col>
-                                                                                <Col xs="2" style={{ textAlign: "center" }}>
-                                                                                    <DeleteForeverIcon className="del-btn" onClick={() => this.onProfitDelete(data._id)} />
-                                                                                </Col>
+
                                                                             </Row>
-                                                                        )
-                                                                    }
-                                                                    else {
-                                                                        return (
-                                                                            <Row key={data._id}>
-                                                                                <Col xs="3">
-                                                                                    <p className="tbl-body">{data.startDate}</p>
-                                                                                </Col>
-                                                                                <Col xs="3">
-                                                                                    <p className="tbl-body">{data.endDate}</p>
-                                                                                </Col>
-                                                                                <Col xs="2">
-                                                                                    <p className="tbl-body colorRed">{data.amount}</p>
-                                                                                </Col>
-                                                                                <Col xs="2">
-                                                                                    <p className="tbl-body">-</p>
-                                                                                </Col>
-                                                                                <Col xs="2" style={{ textAlign: "center" }}>
-                                                                                    <DeleteForeverIcon className="del-btn" onClick={() => this.onProfitDelete(data._id)} />
-                                                                                </Col>
-                                                                            </Row>
-                                                                        )
-                                                                    }
+                                                                        </div>
 
+                                                                    )
                                                                 })}
-                                                            </div>
+                                                            </Card>
+                                                        </Col>
+
+                                                        <Col xs="8">
+                                                            <Card className="profitCard" style={{ minHeight: "400px" }}>
+                                                                <div className="container" style={{ marginTop: "20px" }}>
+                                                                    <Row>
+                                                                        <Col xs="8">
+                                                                            <Row>
+                                                                                <Col xs="6">
+                                                                                    <p className="tbl-body">Start Date</p>
+                                                                                </Col>
+                                                                                <Col xs="6">
+                                                                                    <p className="tbl-body">End Date</p>
+                                                                                </Col>
+                                                                            </Row>
+                                                                            <Row>
+                                                                                <Col xs="6">
+                                                                                    <div className="form-group">
+                                                                                        <DatePicker
+                                                                                            className="form-control"
+                                                                                            selected={this.state.startDate}
+                                                                                            onChange={this.onChangeStartDate}
+                                                                                            dateFormat="yyyy-MM-dd"
+                                                                                        />
+                                                                                    </div>
+                                                                                </Col>
+                                                                                <Col xs="6">
+                                                                                    <div className="form-group">
+                                                                                        <DatePicker
+                                                                                            className="form-control"
+                                                                                            selected={this.state.endDate}
+                                                                                            onChange={this.onChangeEndDate}
+                                                                                            dateFormat="yyyy-MM-dd"
+                                                                                        />
+                                                                                    </div>
+                                                                                </Col>
+                                                                            </Row>
+                                                                            <Row style={{ textAlign: "center", marginTop: "-20px" }}>
+                                                                                <Col xs="6" >
+                                                                                    <MDBInput outline style={{ width: "96%" }} label="Pumper ID" type="text" name="profitPumperId" onChange={this.onChangeProfit} />
+                                                                                </Col>
+                                                                                <Col xs="6">
+                                                                                    <MDBInput outline style={{ width: "96%" }} label="Amount" type="text" name="profitAmount" onChange={this.onChangeProfit} />
+                                                                                </Col>
+                                                                            </Row>
+                                                                        </Col>
+                                                                        <Col xs="4" style={{ marginTop: "38px" }}>
+                                                                            <select className="form-control" style={{ marginTop: "5px" }} onChange={this.onChangeProfitType}>
+                                                                                <option>Select Type</option>
+                                                                                <option value="credit">To Employee</option>
+                                                                                <option value="debit">From Employee</option>
+                                                                            </select>
+                                                                            <button style={{ height: "40px", marginTop: "20px", marginLeft: "0px" }} className="btn btn-primary sub-btn" onClick={this.addProfit}>submit</button>
+                                                                        </Col>
+                                                                    </Row>
+
+                                                                </div>
 
 
-                                                        </Card>
-                                                    </Col>
-                                                </Row>
+                                                                <div className="container" style={{ marginTop: "20px" }}>
+                                                                    <hr style={{ marginLeft: "0px" }}></hr>
+                                                                    <Row>
+                                                                        <Col xs="3">
+                                                                            <p className="tbl-body">Start Date</p>
+                                                                        </Col>
+                                                                        <Col xs="3">
+                                                                            <p className="tbl-body">End Date</p>
+                                                                        </Col>
+
+                                                                        <Col xs="2">
+                                                                            <p className="tbl-body">From</p>
+                                                                        </Col>
+                                                                        <Col xs="2">
+                                                                            <p className="tbl-body">To</p>
+                                                                        </Col>
+
+                                                                    </Row>
+                                                                </div>
+                                                                <div className="container">
+
+                                                                    {this.state.profitPayment.map(data => {
+
+                                                                        if (data.type === 'credit') {
+                                                                            return (
+                                                                                <Row key={data._id}>
+                                                                                    <Col xs="3">
+                                                                                        <p className="tbl-body">{data.startDate}</p>
+                                                                                    </Col>
+                                                                                    <Col xs="3">
+                                                                                        <p className="tbl-body">{data.endDate}</p>
+                                                                                    </Col>
+                                                                                    <Col xs="2">
+                                                                                        <p className="tbl-body">-</p>
+                                                                                    </Col>
+                                                                                    <Col xs="2">
+                                                                                        <p className="tbl-body colorGreen">{data.amount}</p>
+                                                                                    </Col>
+                                                                                    <Col xs="2" style={{ textAlign: "center" }}>
+                                                                                        <DeleteForeverIcon className="del-btn" onClick={() => this.onProfitDelete(data._id)} />
+                                                                                    </Col>
+                                                                                </Row>
+                                                                            )
+                                                                        }
+                                                                        else {
+                                                                            return (
+                                                                                <Row key={data._id}>
+                                                                                    <Col xs="3">
+                                                                                        <p className="tbl-body">{data.startDate}</p>
+                                                                                    </Col>
+                                                                                    <Col xs="3">
+                                                                                        <p className="tbl-body">{data.endDate}</p>
+                                                                                    </Col>
+                                                                                    <Col xs="2">
+                                                                                        <p className="tbl-body colorRed">{data.amount}</p>
+                                                                                    </Col>
+                                                                                    <Col xs="2">
+                                                                                        <p className="tbl-body">-</p>
+                                                                                    </Col>
+                                                                                    <Col xs="2" style={{ textAlign: "center" }}>
+                                                                                        <DeleteForeverIcon className="del-btn" onClick={() => this.onProfitDelete(data._id)} />
+                                                                                    </Col>
+                                                                                </Row>
+                                                                            )
+                                                                        }
+
+                                                                    })}
+                                                                </div>
+
+
+                                                            </Card>
+                                                        </Col>
+                                                    </Row>
                                                 </Animated>
                                             )}
 

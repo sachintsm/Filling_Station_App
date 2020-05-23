@@ -4,15 +4,14 @@ import { Card, Col, Row } from 'react-bootstrap';
 import Sidebar from '../Auth/sidebar';
 import "react-datepicker/dist/react-datepicker.css";
 import '../../Css/Basic/profile.css';
-// import DatePicker from "react-datepicker";
 import normal from '../../Assets/images/normal.png';
 import { getFromStorage } from '../../utils/storage';
 import Snackbar from '@material-ui/core/Snackbar'
 import IconButton from '@material-ui/core/IconButton'
+import Snackpop from "../Auth/Snackpop";
+import { confirmAlert } from 'react-confirm-alert';
+import 'react-confirm-alert/src/react-confirm-alert.css'
 
-
-// import AddImage from "../../Components/AddServiceImage.component";
-// import Delete from "../../Components/Delete.component";
 const backend_URI = require('../Auth/Backend_URI')
 
 export default class profile extends Component {
@@ -24,6 +23,8 @@ export default class profile extends Component {
         this.state = {
             snackbaropen: false,
             snackbarmsg: '',
+            snackbarcolor: '',
+
             fullName: '',
             password: '',
             userId: '',
@@ -40,12 +41,12 @@ export default class profile extends Component {
             file: '',
             signup_completed: false,
             userData: [],
-            users:[]
+            users: []
         }
     }
-    snackbarClose = (event) => {
-        this.setState({ snackbaropen: false })
-    }
+    closeAlert = () => {
+        this.setState({ snackbaropen: false });
+    };
     componentDidMount() {
         const userData = getFromStorage('auth-user')
         console.log(userData.userId)
@@ -75,7 +76,6 @@ export default class profile extends Component {
     onSubmit(e) {
 
         const userData = getFromStorage('auth-user')
-        console.log(this.state.epf)
 
         e.preventDefault();
         const obj = {
@@ -94,19 +94,32 @@ export default class profile extends Component {
             other: this.state.other,
             signup_completed: this.state.signup_completed
         };
+        confirmAlert({
+            title: 'Confirm to update?',
+            message: 'Are you sure to do this?',
+            buttons: [
+                {
+                    label: 'Yes',
+                    onClick: async () => {
+                        axios.post(backend_URI.url + '/users/updateuser/' + userData.userId, obj)
+                            .then(res => {
+                                this.setState({
+                                    snackbaropen: true,
+                                    snackbarmsg: res.data.msg,
+                                    snackbarcolor: 'success'
+                                })
+                                window.location.reload()
+                            });
+                    }
+                },
+                {
+                    label: 'No',
+                    onClick: () => {
 
-        axios.post(backend_URI.url + '/users/updateuser/' + userData.userId, obj)
-            .then(res => console.log(res.data));
-
-        // const obj2 = {
-        //     signup_password: this.state.signup_password,
-        //     signup_completed: this.state.signup_completed
-        // };
-        // if (this.state.signup_password) {
-        //     axios.post('/mazzevents/updatepassword/' + this.props.id, obj2)
-        //         .then(res => console.log(res.data));
-        // }
-        //this.props.history.push('/customer/photo');
+                    }
+                }
+            ]
+        })
     }
 
     render() {
@@ -140,39 +153,30 @@ export default class profile extends Component {
                                 <div style={{ width: "90%", margin: 'auto' }}>
                                     <div className="row">
                                         <div className="col-md-4">
-                                        {this.state.users.map((data) => {
-                                                console.log(data.path);
-                                                
+                                            {this.state.users.map((data) => {
+                                                return (
+                                                    <Card style={{ width: '250px' }} key={data.userId}>
+                                                        <div className="overflow">
+                                                            <Card.Img variant="top" src={!(backend_URI.url + '/users/profileImage/' + data.path) ? normal : (backend_URI.url + '/users/profileImage/' + data.path)} />
+                                                        </div>
+                                                        <Card.Body>
+                                                            <Card.Title><center>{data.fullName} </center></Card.Title>
+                                                            <Card.Text>
+                                                                Contact Number 1: {data.mobileOne}<br />
+                                                                Contact Number 2: {data.mobileTwo}<br />
 
-                                            return (
+                                                            </Card.Text>
+                                                            <br />
 
-                                            <Card style={{ width: '18rem' }} key={data.userId}>
-                                                <div className="overflow">
-                                                    <Card.Img variant="top" src={!(backend_URI.url + '/users/profileImage/' + data.path) ? normal : (backend_URI.url + '/users/profileImage/' + data.path)} />
-                                                </div>
-                                                <Card.Body>
-                                                    <Card.Title><center>{data.fullName} </center></Card.Title>
-                                                    <Card.Text>
-                                                        Contact Number 1: {data.mobileOne}<br />
-                                                        Contact Number 2: {data.mobileTwo}<br />
-
-                                                    </Card.Text>
-                                                    <br />
-                                                    {/* <center>
-    <AddImage />
-</center> */}
-                                                </Card.Body>
-                                            </Card>
-                                                 )
-                                                })} 
+                                                        </Card.Body>
+                                                    </Card>
+                                                )
+                                            })}
                                         </div>
 
                                         <div className="col-md-8">
                                             {this.state.users.map((data) => {
-                                                console.log(data.epf);
-                                                
-
-                                            return (
+                                                return (
                                                     <form onSubmit={this.onSubmit} key={data.userId}>
                                                         <div className="row" >
                                                             <div className="col-md-4">
@@ -198,11 +202,6 @@ export default class profile extends Component {
                                                                 </div>
                                                             </div>
                                                         </div>
-
-
-
-
-
 
                                                         <div className="row">
                                                             <div className="col-md-6">
@@ -247,8 +246,8 @@ export default class profile extends Component {
                                                         </div>
 
                                                     </form>
-                                              )
-                                          })} 
+                                                )
+                                            })}
                                         </div>
                                     </div>
                                 </div>

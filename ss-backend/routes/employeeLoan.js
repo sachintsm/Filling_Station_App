@@ -39,6 +39,7 @@ router.get('/get', function (req, res) {
                 $gte: date1,
             }
         })
+        .sort({ timeStamp: -1 })
         .then(data => {
             res.send({ state: true, msg: "Data Transefer Done..!", data: data })
         })

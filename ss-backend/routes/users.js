@@ -223,4 +223,12 @@ router.get('/getPumperName/:id', async function (req, res) {
         })
 })
 
+//check userId available of not
+router.get('/checkUserId/:id', async function (req, res) {
+    //checking if the userId is already in the database
+    const userIdExist = await User.findOne({ userId: req.params.id })
+    if (!userIdExist) return res.json({ state: false, msg: "This userId does not exists..!" })
+    else return res.json({ state: true})
+})
+
 module.exports = router
