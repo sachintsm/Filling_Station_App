@@ -22,7 +22,7 @@ import SalesStocks from './Component/Basic/salesStocks'
 import BankDetails from './Component/Basic/bankDetails'
 import EmployeeSalary from './Component/Basic/employeeSalary'
 import CustomerData from './Component/Basic/customerData'
-
+import DailySalesHistory from './Component/Basic/dailySalesHistory'
 
 function App() {
   return (
@@ -49,6 +49,7 @@ function App() {
           <Route path="/salesStocks" component={SalesStocks}></Route>
           <Route path="/bank$details" component={BankDetails}></Route>
           <Route path="/emp$salary" component={EmployeeSalary}></Route>
+          <Route path="/dailySalesHistory" exact component={DailySalesHistory}></Route>
 
         </Switch>
 

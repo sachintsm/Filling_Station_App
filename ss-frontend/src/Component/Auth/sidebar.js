@@ -13,7 +13,7 @@ import PeopleIcon from '@material-ui/icons/People';
 import HistoryIcon from '@material-ui/icons/History';
 import AccountBalanceIcon from '@material-ui/icons/AccountBalance';
 import LocalAtmIcon from '@material-ui/icons/LocalAtm';
-
+import YoutubeSearchedForIcon from '@material-ui/icons/YoutubeSearchedFor';
 
 export default class sidebar extends Component {
 
@@ -34,6 +34,18 @@ export default class sidebar extends Component {
                     </Link>
                 </div>
 
+                <div className="side-row-div">
+                    <Link to={'/dailySalesHistory'}>
+                        <div className="row">
+                            <div className="col-md-2 side-icn">
+                                <YoutubeSearchedForIcon />
+                            </div>
+                            <div className="col-md-10 side-txt">
+                                <p>Daily Sales History</p>
+                            </div>
+                        </div>
+                    </Link>
+                </div>
 
                 <div className="side-row-div" >
                     <Link to={'/pumpsRegistration'}>

@@ -28,22 +28,29 @@ export default class dailyPumperCalculations extends Component {
             snackbarmsg: '',
             snackbarcolor: '',
 
+            finalBalance: '',
+            yesFinalLocker: '',
+            todayFinalBalance: 0,
+            todayDiffrence: '',
+
             salesPId: '',
             salesQty: '',
-            products: [],
             salesPrice: '',
-            sales: [],
-            locker: [],
             lockerTotal: 0.00,
             salesTotal: 0,
-            morningReading: [],
             endReading: '',
-            endReadingArray: [],
             machineNumber: '',
+
+            products: [],
+            sales: [],
+            locker: [],
             debitorsData: [],
+            endReadingArray: [],
+            morningReading: [],
             todayPetroleumDebit: [],
             todayOtherDebit: [],
             debitProducts: [],
+
             newDebits: {
                 newDDebitorId: '',
                 newDBillNo: '',
@@ -69,7 +76,7 @@ export default class dailyPumperCalculations extends Component {
                 otherCredit: '',
                 mainDebit: '',
                 mainCredit: '',
-            }
+            },
         }
 
         this.onLocalChange = this.onLocalChange.bind(this)
@@ -80,13 +87,14 @@ export default class dailyPumperCalculations extends Component {
         this.onMachineChange = this.onMachineChange.bind(this)
         this.onMachineSubmit = this.onMachineSubmit.bind(this)
         this.machineDelete = this.machineDelete.bind(this)
-        this.onChangeDebitType = this.onChangeDebitType.bind(this)
         this.onDebitChange = this.onDebitChange.bind(this)
         this.onNewDebitSubmit = this.onNewDebitSubmit.bind(this)
         this.deleteDebit = this.deleteDebit.bind(this)
         this.onNewOtherDebitSubmit = this.onNewOtherDebitSubmit.bind(this)
         this.onNewCreditSubmit = this.onNewCreditSubmit.bind(this)
         this.onNewOtherCeditSubmit = this.onNewOtherCeditSubmit.bind(this)
+        this.onfinalBalance = this.onfinalBalance.bind(this)
+        this.onfinalBalanceSubmit = this.onfinalBalanceSubmit.bind(this)
     }
 
     closeAlert = () => {
@@ -105,11 +113,7 @@ export default class dailyPumperCalculations extends Component {
         store[e.target.name] = e.target.value
         this.setState(store);
     }
-    onChangeDebitType(e) {
-        this.setState({
-            newDType: e.target.value
-        })
-    }
+
     onLocalChange(e) {
         e.persist = () => { };
         let store = this.state;
@@ -119,6 +123,11 @@ export default class dailyPumperCalculations extends Component {
     onLockerChange(e) {
         this.setState({
             lockerAmount: e.target.value
+        })
+    }
+    onfinalBalance(e) {
+        this.setState({
+            finalBalance: e.target.value
         })
     }
 
@@ -822,6 +831,69 @@ export default class dailyPumperCalculations extends Component {
         })
     }
 
+    onfinalBalanceSubmit() {
+        const obj = getFromStorage('auth-token');
+
+        if (this.state.finalBalance === '') {
+            this.setState({
+                snackbaropen: true,
+                snackbarmsg: "Please Fill the Missing Fields ..!",
+                snackbarcolor: 'error'
+            })
+        }
+
+        else {
+            confirmAlert({
+                title: 'Confirm to submit',
+                message: 'Are you sure to do this.',
+                buttons: [
+                    {
+                        label: 'Yes',
+                        onClick: async () => {
+
+
+                            const data = {
+                                amount: this.state.finalBalance,
+                            }
+                            fetch(backend_URI.url + '/finalLocker/add', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'auth-token': obj.token
+                                },
+                                body: JSON.stringify(data),
+                            })
+                                .then(res => res.json())
+                                .then(json => {
+                                    this.setState({
+                                        snackbaropen: true,
+                                        snackbarmsg: json.msg,
+                                        snackbarcolor: 'success'
+                                    })
+                                    window.location.reload()
+                                })
+                                .catch(err => {
+                                    console.log(err)
+                                    this.setState({
+                                        snackbaropen: true,
+                                        snackbarmsg: err,
+                                        snackbarcolor: 'error'
+                                    })
+                                })
+
+                        }
+                    },
+                    {
+                        label: 'No',
+                        onClick: () => {
+
+                        }
+                    }
+                ]
+            })
+        }
+    }
+
     componentDidMount = async () => {
         const authState = await verifyAuth();
         this.setState({ authState: authState })
@@ -925,6 +997,70 @@ export default class dailyPumperCalculations extends Component {
                 })
 
             })
+
+        //get yersterday final locker amount
+        await axios.get(backend_URI.url + '/finalLocker/yesterday')
+            .then(res => {
+
+                this.setState({
+                    yesFinalLocker: res.data.data[0].amount
+                })
+            })
+
+        //get yersterday final locker amount
+        await axios.get(backend_URI.url + '/finalLocker/today')
+            .then(res => {
+                
+                if(res.data.data[0] != null){
+                    this.setState({
+                        todayFinalBalance: res.data.data[0].amount,
+                    })
+                }
+            })
+
+        await this.setState({
+            todayDiffrence: this.state.todayFinalBalance - this.state.yesFinalLocker
+        })
+    }
+
+    deleteTodayFinalLocker() {
+
+        confirmAlert({
+            title: 'Confirm to submit',
+            message: 'Are you sure to do this.',
+            buttons: [
+                {
+                    label: 'Yes',
+                    onClick: async () => {
+                        axios.delete(backend_URI.url + '/finalLocker/delete')
+                            .then(res => {
+                                console.log(res);
+                                this.setState({
+                                    snackbaropen: true,
+                                    snackbarmsg: res.data.msg,
+                                    snackbarcolor: 'success'
+                                })
+                                window.location.reload();
+                            })
+                            .catch(err => {
+                                console.log(err);
+                                this.setState({
+                                    snackbaropen: true,
+                                    snackbarmsg: err,
+                                    snackbarcolor: 'error'
+                                })
+                            })
+                    }
+                },
+                {
+                    label: 'No',
+                    onClick: () => {
+
+                    }
+                }
+            ]
+        })
+
     }
 
 
@@ -1023,7 +1159,7 @@ export default class dailyPumperCalculations extends Component {
                                                 </div>
 
                                                 <div className="col-md-5">
-                                                    <p className="first-topic">Locker State</p>
+                                                    <p className="first-topic">Safe Locker State</p>
 
                                                     <div className="row" style={{ marginBottom: "30px" }}>
                                                         <Card className="container">
@@ -1078,7 +1214,60 @@ export default class dailyPumperCalculations extends Component {
                                                             </div>
                                                         </div>
                                                     </div>
+                                                    <p className="first-topic">Locker Final Balance</p>
+
+                                                    <div className="row" style={{ marginBottom: "30px" }}>
+                                                        <Card className="container">
+                                                            <div className="row">
+                                                                <div className="col-md-8">
+                                                                    <MDBInput outline label="Amount" type="number" name="finalBalance" onChange={this.onfinalBalance} />
+                                                                </div>
+
+                                                                <div className="col-md-4" style={{ marginTop: "16px" }}>
+                                                                    <Button className="sub-btn" color="primary" onClick={this.onfinalBalanceSubmit}>Submit</Button>
+                                                                </div>
+                                                            </div>
+
+                                                            <div className="row" >
+                                                                <div className="col-md-7">
+                                                                    <p className="topic-product">Yesterday Balance : </p>
+                                                                </div>
+                                                                <div className="col-md-5" style={{ textAlign: "right" }}>
+                                                                    <p className="topic-product">{this.state.yesFinalLocker}</p>
+                                                                </div>
+
+                                                            </div>
+                                                            <div className="row" >
+                                                                <div className="col-md-7">
+                                                                    <p className="topic-product">Today Balance : </p>
+                                                                </div>
+                                                                <div className="col-md-4" style={{ textAlign: "right" }}>
+                                                                    <p className="topic-product" >{parseFloat(this.state.todayFinalBalance).toFixed(2)}</p>
+                                                                </div>
+                                                                <div className="col-md-1" style={{marginLeft: "-10px"}}>
+                                                                    <DeleteForeverIcon className="del-btn" onClick={() => this.deleteTodayFinalLocker()} />
+                                                                </div>
+
+                                                            </div>
+                                                            <div className="row" >
+                                                                <div className="col-md-7">
+                                                                    <p className="topic-product">Today Diffrence : </p>
+                                                                </div>
+                                                                <div className="col-md-5" style={{ textAlign: "right" }}>
+                                                                    <p className="topic-product" >{this.state.todayDiffrence}</p>
+                                                                </div>
+                                                            </div>
+
+
+                                                        </Card>
+                                                    </div>
+
+
+
+
                                                 </div>
+
+
                                             </div>
                                         </div>
                                         {/******************************************************************************************/}
