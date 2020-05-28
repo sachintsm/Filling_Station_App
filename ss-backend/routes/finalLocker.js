@@ -79,4 +79,17 @@ router.delete('/delete', function (req, res) {
             res.send({ state: false, msg: "Recored does not delete..!" })
         })
 })
+
+//? get history  final locker data
+router.get('/get/:date', function (req, res) {
+   
+    FinalLocker.find({ date: req.params.date })
+        .then(data => {
+            res.send({ state: true, msg: "Data Transefer Done..!", data: data })
+        })
+        .catch(err => {
+            res.send({ state: false, msg: "data Tranfr Unsuccessful..!" })
+        })
+})
+
 module.exports = router;

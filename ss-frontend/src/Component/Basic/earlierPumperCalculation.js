@@ -22,6 +22,7 @@ class finalBlock {
         this.gross = gross
     }
 }
+
 class totDebit {
     constructor(pumpId, debit) {
         this.pumpId = pumpId;
@@ -42,7 +43,7 @@ export default class dailyPumperCalculations extends Component {
             startDate: new Date(),
             pumperName: '',
             dataDiv: false,
-            progressDiv : false,
+            progressDiv: false,
             pumperIds: [],
 
             /********************************************************* */
@@ -75,7 +76,7 @@ export default class dailyPumperCalculations extends Component {
             el_pumperId: e.target.value,
         })
     }
-    
+
     async getEarlierData() {
         if (this.state.el_pumperId === '') {
             this.setState({
@@ -86,7 +87,7 @@ export default class dailyPumperCalculations extends Component {
         }
         else {
             this.state.progressDiv = true
-            
+
             const data = {
                 el_pumperId: this.state.el_pumperId,
                 el_date: this.state.startDate
@@ -95,7 +96,6 @@ export default class dailyPumperCalculations extends Component {
             this.state.el_pumpNames = [];
             this.state.el_yesterday = [];
             this.state.el_today = [];
-            this.state.el_yesterday = [];
             this.state.distinctDebit = [];
             this.state.el_dataArray = [];
 
@@ -122,8 +122,10 @@ export default class dailyPumperCalculations extends Component {
                     })
                 })
 
+            //get pumper name
             await axios.get(backend_URI.url + '/users/getPumperName/' + this.state.el_pumperId)
                 .then(res => {
+
                     if (res.data.state === false) {
                         this.setState({
                             snackbaropen: true,
@@ -150,6 +152,7 @@ export default class dailyPumperCalculations extends Component {
             //get yesterday meter reading
             await axios.get(backend_URI.url + '/machinesData/getYes/' + this.state.startDate)
                 .then(res => {
+
                     this.setState({
                         el_yesterday: res.data.data
                     })
@@ -171,6 +174,7 @@ export default class dailyPumperCalculations extends Component {
                 })
             }
             else {
+                //? get pumps data (name, set, ...)
                 await axios.get(backend_URI.url + '/pumpsRegistration/getSet/' + this.state.el_dataArray.setNumber)
                     .then(res => {
                         this.setState({
@@ -212,7 +216,7 @@ export default class dailyPumperCalculations extends Component {
                         }
                     }
                 }
-                this.setState({ dataDiv: true , progressDiv : false});
+                this.setState({ dataDiv: true, progressDiv: false });
             }
         }
     }

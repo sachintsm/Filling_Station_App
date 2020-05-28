@@ -215,4 +215,19 @@ router.delete('/deleteDebAccountRow/:id', (req, res) => {
         });
 })
 
+
+/************************************************************************* */
+
+//? GET HISTORY OF DEBIT
+router.get('/getall/:date', function (req, res) {
+    console.log('GET HISTORY OF DEBIT')
+    DebitorAccount.find({ date: req.params.date})
+        .then(data => {
+            res.send({ state: true, msg: "Data Transefer Done..!", data: data })
+        })
+        .catch(err => {
+            res.send({ state: false, msg: "data Tranfr Unsuccessful..!" })
+        })
+})
+
 module.exports = router

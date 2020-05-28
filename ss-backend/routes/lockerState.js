@@ -26,7 +26,7 @@ router.post('/add', verify, function (req, res) {
             res.send({ state: false, msg: "Data Adding Not Successfull..!" })
         })
 })
-
+// get today locker data
 router.get('/get', function (req, res) {
     var today = new Date();
     var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
@@ -60,4 +60,16 @@ router.delete('/delete/:id', function (req, res) {
         });
 })
 
+
+//? get history safe data
+router.get('/get/:date', function (req, res) {
+   
+    LockerState.find({ date: req.params.date })
+        .then(data => {
+            res.send({ state: true, msg: "Data Transefer Done..!", data: data })
+        })
+        .catch(err => {
+            res.send({ state: false, msg: "data Tranfr Unsuccessful..!" })
+        })
+})
 module.exports = router

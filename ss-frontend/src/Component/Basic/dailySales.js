@@ -16,6 +16,14 @@ import 'react-confirm-alert/src/react-confirm-alert.css'
 
 const backend_URI = require('../Auth/Backend_URI')
 
+class meterBlock {
+    constructor(pumpId, fuelType, units, amount) {
+        this.pumpId = pumpId;
+        this.fuelType = fuelType;
+        this.units = units;
+        this.amount = amount;
+    }
+}
 export default class dailyPumperCalculations extends Component {
 
     constructor(props) {
@@ -77,6 +85,14 @@ export default class dailyPumperCalculations extends Component {
                 mainDebit: '',
                 mainCredit: '',
             },
+            registeredMachines: [],
+            getFuelUnitPrice: [],
+            meterBlock: [],
+            fuelbtn: false,
+            fueldiv: false,
+
+            todaySubTotal: 0.00,
+            saleDiv: false
         }
 
         this.onLocalChange = this.onLocalChange.bind(this)
@@ -95,6 +111,9 @@ export default class dailyPumperCalculations extends Component {
         this.onNewOtherCeditSubmit = this.onNewOtherCeditSubmit.bind(this)
         this.onfinalBalance = this.onfinalBalance.bind(this)
         this.onfinalBalanceSubmit = this.onfinalBalanceSubmit.bind(this)
+        this.calculateTotal = this.calculateTotal.bind(this)
+        this.calculateWholeSale = this.calculateWholeSale.bind(this)
+        this.todaySubmit = this.todaySubmit.bind(this)
     }
 
     closeAlert = () => {
@@ -182,6 +201,7 @@ export default class dailyPumperCalculations extends Component {
                                                         snackbaropen: true,
                                                         snackbarmsg: json.msg
                                                     })
+                                                    window.location.reload()
                                                 })
                                                 .catch(err => {
                                                     console.log(err)
@@ -344,7 +364,7 @@ export default class dailyPumperCalculations extends Component {
     }
 
     //? add new dail debit
-    async onNewDebitSubmit() {
+    onNewDebitSubmit() {
         const obj = getFromStorage('auth-token');
         if (this.state.newDDebitorId === '' || this.state.newDProductId === '' || this.state.newDQty === '' || this.state.newDQty === '' || this.state.newDDebitorId === undefined || this.state.newDProductId === undefined || this.state.newDQty === undefined) {
             this.setState({
@@ -355,8 +375,8 @@ export default class dailyPumperCalculations extends Component {
         }
         else {
             confirmAlert({
-                title: 'Confirm to submit',
-                message: 'Are you sure to do this.',
+                title: 'Confirm to submit?',
+                message: 'Are you sure to do this?',
                 buttons: [
                     {
                         label: 'Yes',
@@ -445,6 +465,7 @@ export default class dailyPumperCalculations extends Component {
                                                         snackbarmsg: json.msg,
                                                         snackbarcolor: 'success'
                                                     })
+                                                    window.location.reload()
                                                 }
                                                 else {
                                                     this.setState({
@@ -477,7 +498,6 @@ export default class dailyPumperCalculations extends Component {
                 ]
             })
         }
-        window.location.reload()
     }
 
     //? add new other debit
@@ -923,9 +943,39 @@ export default class dailyPumperCalculations extends Component {
                     this.state.lockerTotal = this.state.lockerTotal + parseFloat(this.state.locker[i].lockerAmount)
                 }
                 this.setState({
-                    lockerTotal: this.state.lockerTotal
+                    lockerTotal: parseFloat(this.state.lockerTotal).toFixed(2)
                 })
             })
+
+        //get yersterday final locker amount
+        await axios.get(backend_URI.url + '/finalLocker/yesterday')
+            .then(res => {
+                if (res.data.data[0] != null) {
+                    this.setState({
+                        yesFinalLocker: res.data.data[0].amount
+                    })
+                }
+                else {
+                    this.setState({
+                        yesFinalLocker: 0.00
+                    })
+                }
+            })
+
+        //get yersterday final locker amount
+        await axios.get(backend_URI.url + '/finalLocker/today')
+            .then(res => {
+
+                if (res.data.data[0] != null) {
+                    this.setState({
+                        todayFinalBalance: res.data.data[0].amount,
+                    })
+                }
+            })
+
+        await this.setState({
+            todayDiffrence: (this.state.todayFinalBalance - this.state.yesFinalLocker).toFixed(2)
+        })
 
         //get yesterday merter reading
         await axios.get(backend_URI.url + '/machinesData/getYesterday')
@@ -998,29 +1048,10 @@ export default class dailyPumperCalculations extends Component {
 
             })
 
-        //get yersterday final locker amount
-        await axios.get(backend_URI.url + '/finalLocker/yesterday')
-            .then(res => {
-
-                this.setState({
-                    yesFinalLocker: res.data.data[0].amount
-                })
-            })
-
-        //get yersterday final locker amount
-        await axios.get(backend_URI.url + '/finalLocker/today')
-            .then(res => {
-                
-                if(res.data.data[0] != null){
-                    this.setState({
-                        todayFinalBalance: res.data.data[0].amount,
-                    })
-                }
-            })
-
-        await this.setState({
-            todayDiffrence: this.state.todayFinalBalance - this.state.yesFinalLocker
+        this.setState({
+            fuelbtn: true,
         })
+
     }
 
     deleteTodayFinalLocker() {
@@ -1064,7 +1095,148 @@ export default class dailyPumperCalculations extends Component {
     }
 
 
+    calculateTotal = async () => {
+        this.setState({
+            meterBlock: [],
+        })
+        await axios.get(backend_URI.url + '/pumpsRegistration/get')
+            .then(res => {
+                // console.log(res.data.data);
+
+                this.setState({
+                    registeredMachines: res.data.data
+                })
+            })
+
+        await axios.get(backend_URI.url + '/fuelLubricantPrice/getFuelPrice')
+            .then(res => {
+                // console.log(res.data.data);
+
+                this.setState({
+                    getFuelUnitPrice: res.data.data
+                })
+            })
+        var fuelTotal = 0;
+        for (var i = 0; i < this.state.registeredMachines.length; i++) {
+            for (var j = 0; j < this.state.getFuelUnitPrice.length; j++) {
+                for (var k = 0; k < this.state.morningReading.length; k++) {
+                    for (var l = 0; l < this.state.endReadingArray.length; l++) {
+                        if (this.state.registeredMachines[i].productId === this.state.getFuelUnitPrice[j].pId
+                            && this.state.registeredMachines[i].machineNumber === this.state.morningReading[k].machineNumber
+                            && this.state.endReadingArray[l].machineNumber === this.state.registeredMachines[i].machineNumber
+                        ) {
+                            var units = (this.state.endReadingArray[l].meterReading - this.state.morningReading[k].meterReading).toFixed(3)
+                            var amount = (units * this.state.getFuelUnitPrice[j].sellPrice).toFixed(2)
+                            var block = new meterBlock(this.state.registeredMachines[i].machineNumber, this.state.registeredMachines[i].fuelType, units, amount)
+                            this.state.meterBlock.push(block)
+                            console.log(block.amount);
+
+                            fuelTotal = fuelTotal + parseFloat(amount)
+                        }
+                    }
+                }
+            }
+
+        }
+        this.setState({
+            fueldiv: true,
+            fuelSellingTotal: (fuelTotal).toFixed(2)
+        })
+    }
+
+    calculateWholeSale() {
+        let Received = parseFloat(this.state.lockerTotal) + parseFloat(this.state.todayDiffrence) + parseFloat(this.state.otherDebit) + parseFloat(this.state.mainDebit)
+        let Given = parseFloat(this.state.salesTotal) + parseFloat(this.state.otherCredit) + parseFloat(this.state.mainCredit) + parseFloat(this.state.fuelSellingTotal)
+
+        let Subtotal = (Received - Given).toFixed(2)
+
+        this.setState({
+            saleDiv: true,
+            todaySubTotal: Subtotal
+        })
+
+    }
+
+    todaySubmit() {
+        const obj = getFromStorage('auth-token');
+
+        confirmAlert({
+            title: 'Confirm to submit',
+            message: 'Are you sure to do this.',
+            buttons: [
+                {
+                    label: 'Yes',
+                    onClick: async () => {
+
+
+                        const data = {
+                            fuels: this.state.meterBlock,
+                            totalProfit : this.state.todaySubTotal
+                        }
+
+                        fetch(backend_URI.url + '/dailySales/addDailyFinal', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'auth-token': obj.token
+                            },
+                            body: JSON.stringify(data),
+                        })
+                            .then(res => res.json())
+                            .then(json => {
+                                this.setState({
+                                    snackbaropen: true,
+                                    snackbarmsg: json.msg,
+                                    snackbarcolor: 'success'
+                                })
+                                window.location.reload()
+                            })
+                            .catch(err => {
+                                console.log(err)
+                                this.setState({
+                                    snackbaropen: true,
+                                    snackbarmsg: err,
+                                    snackbarcolor: 'error'
+                                })
+                            })
+
+                    }
+                },
+                {
+                    label: 'No',
+                    onClick: () => {
+
+                    }
+                }
+            ]
+        })
+    }
+
     render() {
+        const { fuelbtn, fueldiv, saleDiv } = this.state
+
+        let subTotalList
+        if (this.state.todaySubTotal < 0) {
+            subTotalList = <div className="row">
+                < div className="col-md-6" >
+                    <p className="topic-product" style={{ color: 'red' }}> Other Credit Total</p>
+                </div >
+                <div className="col-md-6">
+                    <p className="topic-product" style={{ textAlign: "right", color: 'red' }}>{this.state.todaySubTotal}</p>
+                </div>
+            </div>
+        }
+        else {
+            subTotalList = <div className="row">
+                < div className="col-md-6" >
+                    <p className="topic-product" style={{ color: 'green' }}> Other Credit Total</p>
+                </div >
+                <div className="col-md-6">
+                    <p className="topic-product" style={{ textAlign: "right", color: 'green' }}>{this.state.todaySubTotal}</p>
+                </div>
+            </div>
+        }
+
         return (
             <React.Fragment >
                 <div className="container-fluid">
@@ -1084,7 +1256,7 @@ export default class dailyPumperCalculations extends Component {
                         <div className="col-md-10" style={{ backgroundColor: "#f5f5f5", minHeight: "1000px" }}>
                             <div className="container">
 
-                                <Tabs defaultActiveKey="sales" id="uncontrolled-tab-example" style={{ marginTop: "20px" }}>
+                                <Tabs defaultActiveKey="summery" id="uncontrolled-tab-example" style={{ marginTop: "20px" }}>
 
                                     <Tab eventKey="sales" title="Sales Management">
                                         <div className="first-div">
@@ -1210,7 +1382,7 @@ export default class dailyPumperCalculations extends Component {
                                                                 <p className="topic-product">Locker Balance : </p>
                                                             </div>
                                                             <div className="col-md-3" style={{ textAlign: "right" }}>
-                                                                <p className="topic-product">{this.state.lockerTotal}.00</p>
+                                                                <p className="topic-product">{this.state.lockerTotal}</p>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -1244,7 +1416,7 @@ export default class dailyPumperCalculations extends Component {
                                                                 <div className="col-md-4" style={{ textAlign: "right" }}>
                                                                     <p className="topic-product" >{parseFloat(this.state.todayFinalBalance).toFixed(2)}</p>
                                                                 </div>
-                                                                <div className="col-md-1" style={{marginLeft: "-10px"}}>
+                                                                <div className="col-md-1" style={{ marginLeft: "-10px" }}>
                                                                     <DeleteForeverIcon className="del-btn" onClick={() => this.deleteTodayFinalLocker()} />
                                                                 </div>
 
@@ -1486,10 +1658,10 @@ export default class dailyPumperCalculations extends Component {
                                                             <Col xs="1">
                                                                 <p className="debitor-tbl-body">{data.qty}</p>
                                                             </Col>
-                                                            <Col xs="1">
+                                                            <Col xs="1" style={{ textAlign: 'right' }}>
                                                                 <p className="debitor-tbl-body">{data.debitAmount}</p>
                                                             </Col>
-                                                            <Col xs="1">
+                                                            <Col xs="1" style={{ textAlign: 'right' }}>
                                                                 <p className="debitor-tbl-body">{data.creditAmount}</p>
                                                             </Col>
                                                             <Col xs="1">
@@ -1502,7 +1674,7 @@ export default class dailyPumperCalculations extends Component {
                                                     )
                                                 })}
                                             </Card>
-                                            <div className="container" style={{ marginTop: "10px" }}>
+                                            <div style={{ marginTop: "10px" }}>
                                                 <Row>
                                                     <Col xs="8">
                                                     </Col>
@@ -1562,7 +1734,7 @@ export default class dailyPumperCalculations extends Component {
                                                     )
                                                 })}
                                             </Card>
-                                            <div className="container">
+                                            <div>
                                                 <Row style={{ marginTop: "10px" }}>
                                                     <Col xs="7">
                                                     </Col>
@@ -1661,6 +1833,159 @@ export default class dailyPumperCalculations extends Component {
                                                                 )
                                                             })}
                                                         </Card>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </Tab>
+
+                                    <Tab eventKey="summery" title="Today Summery">
+                                        <div className="row" style={{ marginTop: "20px" }}>
+                                            <div className="col-md-12">
+                                                <div className="container">
+
+                                                    <p className="first-topic">Today Summery</p>
+                                                    <div className="row" style={{ marginBottom: "30px" }}>
+                                                        <Card className="container">
+                                                            <div className="row" style={{ marginTop: "10px" }}>
+                                                                <div className="col-md-6">
+                                                                    <p className="topic-product">Sales Total</p>
+                                                                </div>
+                                                                <div className="col-md-6">
+                                                                    <p className="topic-product" style={{ textAlign: "right" }}>{this.state.salesTotal}</p>
+                                                                </div>
+                                                                <hr style={{ marginTop: "-10px", width: "98%", marginLeft: "10px" }}></hr>
+                                                            </div>
+                                                            <div className="row" >
+                                                                <div className="col-md-6">
+                                                                    <p className="topic-product">Locker Safe Total</p>
+                                                                </div>
+                                                                <div className="col-md-6">
+                                                                    <p className="topic-product" style={{ textAlign: "right" }}>{this.state.lockerTotal}</p>
+                                                                </div>
+                                                                <hr style={{ marginTop: "-10px", width: "98%", marginLeft: "10px" }}></hr>
+
+                                                            </div>
+
+                                                            <div className="row" >
+                                                                <div className="col-md-6">
+                                                                    <p className="topic-product">Locker final Balance</p>
+                                                                </div>
+                                                                <div className="col-md-6">
+                                                                    <p className="topic-product" style={{ textAlign: "right" }}>{this.state.todayDiffrence}</p>
+                                                                </div>
+
+                                                                <hr style={{ marginTop: "-10px", width: "98%", marginLeft: "10px" }}></hr>
+
+                                                            </div>
+
+                                                            <div className="row" >
+                                                                <div className="col-md-6">
+                                                                    <p className="topic-product">Product Debits Total</p>
+                                                                </div>
+                                                                <div className="col-md-6">
+                                                                    <p className="topic-product" style={{ textAlign: "right" }}>{this.state.mainDebit}</p>
+                                                                </div>
+                                                                <hr style={{ marginTop: "-10px", width: "98%", marginLeft: "10px" }}></hr>
+
+                                                            </div>
+
+                                                            <div className="row" >
+                                                                <div className="col-md-6">
+                                                                    <p className="topic-product">Other Debits Total</p>
+                                                                </div>
+                                                                <div className="col-md-6">
+                                                                    <p className="topic-product" style={{ textAlign: "right" }}>{this.state.otherDebit}</p>
+                                                                </div>
+                                                                <hr style={{ marginTop: "-10px", width: "98%", marginLeft: "10px" }}></hr>
+
+                                                            </div>
+
+                                                            <div className="row" >
+                                                                <div className="col-md-6">
+                                                                    <p className="topic-product">Product Credit Total</p>
+                                                                </div>
+                                                                <div className="col-md-6">
+                                                                    <p className="topic-product" style={{ textAlign: "right" }}>{this.state.mainCredit}</p>
+                                                                </div>
+                                                                <hr style={{ marginTop: "-10px", width: "98%", marginLeft: "10px" }}></hr>
+                                                            </div>
+
+                                                            <div className="row" >
+                                                                <div className="col-md-6">
+                                                                    <p className="topic-product">Other Credit Total</p>
+                                                                </div>
+                                                                <div className="col-md-6">
+                                                                    <p className="topic-product" style={{ textAlign: "right" }}>{this.state.otherCredit}</p>
+                                                                </div>
+                                                                <hr style={{ marginTop: "-10px", width: "98%", marginLeft: "10px" }}></hr>
+
+                                                            </div>
+                                                            {fuelbtn && (
+                                                                <div style={{ marginBottom: "20px" }}>
+                                                                    <Button className="btn btn-info" onClick={this.calculateTotal} >Calculate Fuel Sale</Button>
+                                                                </div>
+                                                            )}
+                                                            {fueldiv && (
+                                                                <div>
+                                                                    <div className="row" >
+                                                                        <div className="col-md-6">
+                                                                            <p className="topic-product">Fuel Sales</p>
+                                                                        </div>
+                                                                    </div>
+                                                                    {this.state.meterBlock.map((data => {
+                                                                        return (
+                                                                            <div className="row" key={data.pumpId}>
+                                                                                <div className="col-md-1">
+                                                                                </div>
+                                                                                <div className="col-md-2">
+                                                                                    <p className="">{data.pumpId}</p>
+                                                                                </div>
+                                                                                <div className="col-md-5">
+                                                                                    <p className="">{data.fuelType}</p>
+                                                                                </div>
+                                                                                <div className="col-md-2">
+                                                                                    <p className="">{data.units}</p>
+                                                                                </div>
+                                                                                <div className="col-md-2">
+                                                                                    <p className="" style={{ textAlign: "right" }}>{data.amount}</p>
+
+                                                                                </div>
+                                                                            </div>
+                                                                        )
+                                                                    }))}
+                                                                    <hr style={{ marginTop: "-10px", width: "100%", marginLeft: "0px" }}></hr>
+
+                                                                    <div className="row" >
+                                                                        <div className="col-md-8">
+                                                                        </div>
+                                                                        <div className="col-md-2">
+                                                                            <p className="topic-product">Total</p>
+                                                                        </div>
+                                                                        <div className="col-md-2">
+                                                                            <p className="topic-product" style={{ textAlign: "right", }}>{this.state.fuelSellingTotal}</p>
+                                                                        </div>
+                                                                        <hr style={{ marginTop: "-10px", width: "98%", marginLeft: "10px" }}></hr>
+                                                                    </div>
+
+                                                                    <div style={{ marginBottom: "20px" }}>
+                                                                        <Button className="btn btn-info" onClick={this.calculateWholeSale} >Calculate Whole Today sale</Button>
+                                                                    </div>
+
+                                                                </div>
+                                                            )}
+                                                        </Card>
+                                                        {saleDiv && (
+
+                                                            <Card className="container" style={{ marginTop: "20px" }}>
+                                                                <div className="container" style={{ marginTop: "20px" }}>
+                                                                    {subTotalList}
+                                                                </div>
+                                                                <div style={{ marginBottom: "20px" }}>
+                                                                    <Button className="btn btn-info" onClick={this.todaySubmit} >Submit Now</Button>
+                                                                </div>
+                                                            </Card>
+                                                        )}
                                                     </div>
                                                 </div>
                                             </div>

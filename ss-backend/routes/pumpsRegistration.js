@@ -107,8 +107,8 @@ router.get('/getSet/:id', function (req, res) {
 //check pump id is correct or not
 router.get("/checkId/:id", async (req, res) => {
     // checking if the pId is already in the database
-    const product = await PumpRegistration.findOne({ debtorId: req.params.id });
-    if (!product) return res.json({ state: false, msg: "Not available machine Id..!" })
+    const machine = await PumpRegistration.findOne({ machineNumber: req.params.id });
+    if (!machine) return res.json({ state: false, msg: "Not available machine Id..!" })
     else return res.json({ state: true })
 })
 module.exports = router;

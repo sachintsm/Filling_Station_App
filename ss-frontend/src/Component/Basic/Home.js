@@ -232,7 +232,7 @@ export default class Home extends Component {
                                             </Link>
                                         </div>
                                         <div className="one-link">
-                                            <Link to="/daily$pumpers$calculations">
+                                            <Link to="/daily$pumpers$management">
                                                 <Row>
                                                     <Col xs="2" className="icon-div">
                                                         <EvStationIcon style={{ fontSize: "40px", marginTop: "5px" }} className="icon" />

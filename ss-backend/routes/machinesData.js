@@ -52,6 +52,7 @@ router.get('/getToday', function (req, res) {
     var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
 
     MachineData.find({ date: date })
+        .sort({ machineNumber: 1 })
         .then(data => {
             res.send({ state: true, msg: "Data Transefer Done..!", data: data })
         })
@@ -66,6 +67,7 @@ router.get('/getYesterday', function (req, res) {
     var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + (today.getDate() - 1);
 
     MachineData.find({ date: date })
+        .sort({ machineNumber: 1 })
         .then(data => {
             res.send({ state: true, msg: "Data Transefer Done..!", data: data })
         })
