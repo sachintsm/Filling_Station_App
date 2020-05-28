@@ -1256,7 +1256,7 @@ export default class dailyPumperCalculations extends Component {
                         <div className="col-md-10" style={{ backgroundColor: "#f5f5f5", minHeight: "1000px" }}>
                             <div className="container">
 
-                                <Tabs defaultActiveKey="summery" id="uncontrolled-tab-example" style={{ marginTop: "20px" }}>
+                                <Tabs defaultActiveKey="sales" id="uncontrolled-tab-example" style={{ marginTop: "20px" }}>
 
                                     <Tab eventKey="sales" title="Sales Management">
                                         <div className="first-div">

@@ -24,6 +24,8 @@ export default class fuelLubricantPrice extends Component {
             snackbarcolor: '',
 
             authState: '',
+            authUser: '',
+
             pId: '',
             pName: '',
             size: '',
@@ -72,6 +74,13 @@ export default class fuelLubricantPrice extends Component {
         this.setState({ authState: authState })
         if (!authState) this.props.history.push('/login');
 
+        const user = getFromStorage('auth-user');
+        if (user != null) {
+            this.setState({
+                authUser: user.userType
+            })
+        }
+
         axios.get(backend_URI.url + '/fuelLubricantPrice/get')
             .then(res => {
                 this.setState({
@@ -106,67 +115,77 @@ export default class fuelLubricantPrice extends Component {
     }
 
     onSubmit() {
-        const obj = getFromStorage('auth-token');
-        const data = {
-            pId: this.state.pId,
-            pName: this.state.pName,
-            size: this.state.size,
-            buyPrice: this.state.buyPrice,
-            sellPrice: this.state.sellPrice,
-            pType: this.state.pType,
-        }
+        if (this.state.authUser === 'Administrator') {
+            const obj = getFromStorage('auth-token');
+            const data = {
+                pId: this.state.pId,
+                pName: this.state.pName,
+                size: this.state.size,
+                buyPrice: this.state.buyPrice,
+                sellPrice: this.state.sellPrice,
+                pType: this.state.pType,
+            }
 
-        if (this.state.pId === '' || this.state.pName === '' || this.state.buyPrice === '' || this.state.sellPrice === '' || this.state.pType === '') {
+            if (this.state.pId === '' || this.state.pName === '' || this.state.buyPrice === '' || this.state.sellPrice === '' || this.state.pType === '') {
+                this.setState({
+                    snackbaropen: true,
+                    snackbarcolor: 'error',
+                    snackbarmsg: "Please Fill the Data ..!"
+                })
+            }
+            else {
+                confirmAlert({
+                    title: 'Confirm to submit',
+                    message: 'Are you sure to do this.',
+                    buttons: [
+                        {
+                            label: 'Yes',
+                            onClick: async () => {
+
+                                fetch(backend_URI.url + '/fuelLubricantPrice/add', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'auth-token': obj.token
+                                    },
+                                    body: JSON.stringify(data),
+                                })
+                                    .then(res => res.json())
+                                    .then(json => {
+                                        this.setState({
+                                            snackbaropen: true,
+                                            snackbarmsg: json.msg,
+                                            snackbarcolor: 'success'
+                                        })
+                                        window.location.reload();
+                                    })
+                                    .catch(err => {
+                                        this.setState({
+                                            snackbaropen: true,
+                                            snackbarmsg: err,
+                                            snackbarcolor: 'error'
+                                        })
+                                        console.log(err)
+                                    })
+                            }
+                        },
+                        {
+                            label: 'No',
+                            onClick: () => {
+                            }
+                        }
+                    ]
+                })
+            }
+        }
+        else {
             this.setState({
                 snackbaropen: true,
                 snackbarcolor: 'error',
-                snackbarmsg: "Please Fill the Data ..!"
+                snackbarmsg: "Please Sign In as Administrator ..!"
             })
         }
-        else {
-            confirmAlert({
-                title: 'Confirm to submit',
-                message: 'Are you sure to do this.',
-                buttons: [
-                    {
-                        label: 'Yes',
-                        onClick: async () => {
 
-                            fetch(backend_URI.url + '/fuelLubricantPrice/add', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'auth-token': obj.token
-                                },
-                                body: JSON.stringify(data),
-                            })
-                                .then(res => res.json())
-                                .then(json => {
-                                    this.setState({
-                                        snackbaropen: true,
-                                        snackbarmsg: json.msg,
-                                        snackbarcolor: 'success'
-                                    })
-                                    window.location.reload();
-                                })
-                                .catch(err => {
-                                    this.setState({
-                                        snackbaropen: true,
-                                        snackbarmsg: err,
-                                        snackbarcolor: 'error'
-                                    })
-                                    console.log(err)
-                                })
-                        }
-                    },
-                    {
-                        label: 'No',
-                        onClick: () => {
-                        }
-                    }
-                ]
-            })
-        }
     }
     onBuyPriceChange(e) {
         this.setState({
@@ -181,113 +200,135 @@ export default class fuelLubricantPrice extends Component {
 
     async onBuyPriceBlur(data) {
 
-        var myHeaders = new Headers();
-        myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+        if (this.state.authUser === 'Administrator') {
 
-        var urlencoded = new URLSearchParams();
-        urlencoded.append("pId", data.pId);
-        urlencoded.append("buyPrice", this.state.buyPrice);
-        urlencoded.append("sellPrice", data.sellPrice);
+            var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
 
-        var requestOptions = {
-            method: 'POST',
-            headers: myHeaders,
-            body: urlencoded,
-            redirect: 'follow'
-        };
-        confirmAlert({
-            title: 'Confirm to submit',
-            message: 'Are you sure to do this.',
-            buttons: [
-                {
-                    label: 'Yes',
-                    onClick: async () => {
+            var urlencoded = new URLSearchParams();
+            urlencoded.append("pId", data.pId);
+            urlencoded.append("buyPrice", this.state.buyPrice);
+            urlencoded.append("sellPrice", data.sellPrice);
 
-                        fetch(backend_URI.url + "/fuelLubricantPrice/updateProductPrice", requestOptions)
-                            .then(response => response.json())
-                            .then(result => {
-                                if (result.state) {
-                                    this.setState({
-                                        snackbaropen: true,
-                                        snackbarmsg: result.msg,
-                                        snackbarcolor: 'success'
-                                    })
-                                    window.location.reload()
-                                }
-                                else {
-                                    this.setState({
-                                        snackbaropen: true,
-                                        snackbarmsg: result.msg,
-                                        snackbarcolor: 'error'
-                                    })
-                                }
-                            })
-                            .catch(error => console.log('error', error));
+            var requestOptions = {
+                method: 'POST',
+                headers: myHeaders,
+                body: urlencoded,
+                redirect: 'follow'
+            };
+            confirmAlert({
+                title: 'Confirm to submit',
+                message: 'Are you sure to do this.',
+                buttons: [
+                    {
+                        label: 'Yes',
+                        onClick: async () => {
+
+                            fetch(backend_URI.url + "/fuelLubricantPrice/updateProductPrice", requestOptions)
+                                .then(response => response.json())
+                                .then(result => {
+                                    if (result.state) {
+                                        this.setState({
+                                            snackbaropen: true,
+                                            snackbarmsg: result.msg,
+                                            snackbarcolor: 'success'
+                                        })
+                                        window.location.reload()
+                                    }
+                                    else {
+                                        this.setState({
+                                            snackbaropen: true,
+                                            snackbarmsg: result.msg,
+                                            snackbarcolor: 'error'
+                                        })
+                                    }
+                                })
+                                .catch(error => console.log('error', error));
+                        }
+                    },
+                    {
+                        label: 'No',
+                        onClick: () => {
+                            window.location.reload()
+                        }
                     }
-                },
-                {
-                    label: 'No',
-                    onClick: () => {
-                        window.location.reload()
-                    }
-                }
-            ]
-        })
+                ]
+            })
+        }
+        else {
+            this.setState({
+                snackbaropen: true,
+                snackbarcolor: 'error',
+                snackbarmsg: "Please Sign In as Administrator ..!"
+            })
+
+        }
+
     }
     async onSellPriceBlur(data) {
-        var myHeaders = new Headers();
-        myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+        if (this.state.authUser === 'Administrator') {
+            var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
 
-        var urlencoded = new URLSearchParams();
-        urlencoded.append("pId", data.pId);
-        urlencoded.append("sellPrice", this.state.sellPrice);
-        urlencoded.append("buyPrice", data.buyPrice);
+            var urlencoded = new URLSearchParams();
+            urlencoded.append("pId", data.pId);
+            urlencoded.append("sellPrice", this.state.sellPrice);
+            urlencoded.append("buyPrice", data.buyPrice);
 
-        var requestOptions = {
-            method: 'POST',
-            headers: myHeaders,
-            body: urlencoded,
-            redirect: 'follow'
-        };
-        confirmAlert({
-            title: 'Confirm to submit',
-            message: 'Are you sure to do this.',
-            buttons: [
-                {
-                    label: 'Yes',
-                    onClick: async () => {
+            var requestOptions = {
+                method: 'POST',
+                headers: myHeaders,
+                body: urlencoded,
+                redirect: 'follow'
+            };
+            confirmAlert({
+                title: 'Confirm to submit',
+                message: 'Are you sure to do this.',
+                buttons: [
+                    {
+                        label: 'Yes',
+                        onClick: async () => {
 
 
-                        fetch(backend_URI.url + "/fuelLubricantPrice/updateProductPrice", requestOptions)
-                            .then(response => response.json())
-                            .then(result => {
-                                if (result.state) {
-                                    this.setState({
-                                        snackbaropen: true,
-                                        snackbarmsg: result.msg,
-                                        snackbarcolor: 'success'
-                                    })
-                                    window.location.reload()
-                                }
-                                else {
-                                    this.setState({
-                                        snackbaropen: true,
-                                        snackbarmsg: result.msg,
-                                        snackbarcolor: 'error'
-                                    })
-                                }
-                            })
-                            .catch(error => console.log('error', error));
+                            fetch(backend_URI.url + "/fuelLubricantPrice/updateProductPrice", requestOptions)
+                                .then(response => response.json())
+                                .then(result => {
+                                    if (result.state) {
+                                        this.setState({
+                                            snackbaropen: true,
+                                            snackbarmsg: result.msg,
+                                            snackbarcolor: 'success'
+                                        })
+                                        window.location.reload()
+                                    }
+                                    else {
+                                        this.setState({
+                                            snackbaropen: true,
+                                            snackbarmsg: result.msg,
+                                            snackbarcolor: 'error'
+                                        })
+                                    }
+                                })
+                                .catch(error => console.log('error', error));
+                        }
+                    },
+                    {
+                        label: 'No',
+                        onClick: () => {
+                            window.location.reload()
+                        }
                     }
-                },
-                {
-                    label: 'No',
-                    onClick: () => {
-                        window.location.reload()
-                    }
-                }
-            ]
-        })
+                ]
+            })
+        }
+        else {
+            this.setState({
+                snackbaropen: true,
+                snackbarcolor: 'error',
+                snackbarmsg: "Please Sign In as Administrator ..!"
+            })
+
+        }
     }
 
     onRefresh() {
@@ -295,42 +336,54 @@ export default class fuelLubricantPrice extends Component {
     }
 
     deleteProduct(data) {
-        confirmAlert({
-            title: 'Confirm to submit',
-            message: 'Are you sure to do this.',
-            buttons: [
-                {
-                    label: 'Yes',
-                    onClick: async () => {
+        if (this.state.authUser === 'Administrator') {
 
-                        axios.delete(backend_URI.url + '/fuelLubricantPrice/deleteProduct/' + data)
-                            .then(res => {
-                                console.log(res);
-                                this.setState({
-                                    snackbaropen: true,
-                                    snackbarmsg: res.data.msg,
-                                    snackbarcolor: 'success'
-                                })
-                                window.location.reload();
-                            })
-                            .catch(err => {
-                                console.log(err);
-                                this.setState({
-                                    snackbaropen: true,
-                                    snackbarmsg: err,
-                                    snackbarcolor: 'error'
-                                })
-                            })
-                    }
-                },
-                {
-                    label: 'No',
-                    onClick: () => {
 
+            confirmAlert({
+                title: 'Confirm to submit',
+                message: 'Are you sure to do this.',
+                buttons: [
+                    {
+                        label: 'Yes',
+                        onClick: async () => {
+
+                            axios.delete(backend_URI.url + '/fuelLubricantPrice/deleteProduct/' + data)
+                                .then(res => {
+                                    console.log(res);
+                                    this.setState({
+                                        snackbaropen: true,
+                                        snackbarmsg: res.data.msg,
+                                        snackbarcolor: 'success'
+                                    })
+                                    window.location.reload();
+                                })
+                                .catch(err => {
+                                    console.log(err);
+                                    this.setState({
+                                        snackbaropen: true,
+                                        snackbarmsg: err,
+                                        snackbarcolor: 'error'
+                                    })
+                                })
+                        }
+                    },
+                    {
+                        label: 'No',
+                        onClick: () => {
+
+                        }
                     }
-                }
-            ]
-        })
+                ]
+            })
+        }
+        else {
+            this.setState({
+                snackbaropen: true,
+                snackbarcolor: 'error',
+                snackbarmsg: "Please Sign In as Administrator ..!"
+            })
+
+        }
     }
 
     render() {

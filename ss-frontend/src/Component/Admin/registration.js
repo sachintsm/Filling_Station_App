@@ -9,6 +9,7 @@ import { verifyAuth } from '../../utils/authentication';
 import Snackpop from "../Auth/Snackpop";
 import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css'
+import { getFromStorage } from '../../utils/storage';
 
 const backend_URI = require('../Auth/Backend_URI')
 
@@ -49,6 +50,7 @@ export default class registration extends Component {
     closeAlert = () => {
         this.setState({ snackbaropen: false });
     };
+
 
     onSubmit(e) {
         e.preventDefault();
@@ -125,12 +127,15 @@ export default class registration extends Component {
 
     async componentDidMount() {
         const authState = await verifyAuth()
-        console.log(authState);
+        const user = getFromStorage('auth-user');
+
         this.setState({
             authState: authState
         })
-        if (!authState) {
+
+        if (!authState || user.userType !== 'Administrator') {
             this.props.history.push('/login')
+            alert('Please sign in as Administrator !')
         }
     }
 

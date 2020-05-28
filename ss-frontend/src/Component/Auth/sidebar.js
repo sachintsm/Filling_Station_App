@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import '../../Css/Auth/sidebar.css'
 import { Link } from 'react-router-dom';
+import { getFromStorage } from '../../utils/storage';
 
 import LocalGasStationIcon from '@material-ui/icons/LocalGasStation';
 import PersonAddIcon from '@material-ui/icons/PersonAdd';
@@ -15,10 +16,31 @@ import AccountBalanceIcon from '@material-ui/icons/AccountBalance';
 import LocalAtmIcon from '@material-ui/icons/LocalAtm';
 import YoutubeSearchedForIcon from '@material-ui/icons/YoutubeSearchedFor';
 
+
 export default class sidebar extends Component {
 
+    constructor(props) {
+        super(props);
+        this.state = {
+            authState: '',
+            authUser: '',
+        }
+    }
+
+    componentDidMount() {
+        
+        const user = getFromStorage('auth-user');
+        if (user != null) {
+            this.setState({
+                authUser: user.userType
+            })
+        }
+
+    }
+
     render() {
-       
+        const {authUser} = this.state;
+
         return (
             <div className="container-fluid" >
                 <div className="side-row-div">
@@ -60,7 +82,8 @@ export default class sidebar extends Component {
                         </div>
                     </Link>
                 </div>
-                <div className="side-row-div">
+                {authUser === 'Administrator' && (
+                    <div className="side-row-div">
                     <Link to={'/registration'}>
                         <div className="row">
 
@@ -73,6 +96,7 @@ export default class sidebar extends Component {
                         </div>
                     </Link>
                 </div>
+                    )}
 
                 <div className="side-row-div">
                     <Link to={'/daily$pumpers$calculations'}>

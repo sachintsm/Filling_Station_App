@@ -82,8 +82,8 @@ router.delete('/delete', function (req, res) {
 
 //? get history  final locker data
 router.get('/get/:date', function (req, res) {
-   
-    FinalLocker.find({ date: req.params.date })
+    const date = req.params.date
+    FinalLocker.find({ date:date })
         .then(data => {
             res.send({ state: true, msg: "Data Transefer Done..!", data: data })
         })

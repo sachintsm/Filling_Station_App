@@ -8,7 +8,6 @@ import normal from '../../Assets/images/normal.png';
 import { getFromStorage } from '../../utils/storage';
 import Snackbar from '@material-ui/core/Snackbar'
 import IconButton from '@material-ui/core/IconButton'
-import Snackpop from "../Auth/Snackpop";
 import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css'
 

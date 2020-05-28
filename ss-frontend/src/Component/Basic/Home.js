@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { verifyAuth } from '../../utils/authentication';
 import { Row, Col } from 'reactstrap';
 
+import YoutubeSearchedForIcon from '@material-ui/icons/YoutubeSearchedFor';
 import LocalGasStationIcon from '@material-ui/icons/LocalGasStation';
 import PersonAddIcon from '@material-ui/icons/PersonAdd';
 import EvStationIcon from '@material-ui/icons/EvStation';
@@ -87,7 +88,18 @@ export default class Home extends Component {
                                         </Row>
                                     </Link>
                                 </div>
-
+                                <div className="one-link">
+                                    <Link to="/dailySalesHistory">
+                                        <Row>
+                                            <Col xs="2" className="icon-div">
+                                                <YoutubeSearchedForIcon style={{ fontSize: "40px", marginTop: "5px" }} className="icon" />
+                                            </Col>
+                                            <Col xs="10" className="text-div">
+                                                <p className="text" style={{ marginTop: "10px" }}>Daily Sales History</p>
+                                            </Col>
+                                        </Row>
+                                    </Link>
+                                </div>
                                 <div className="one-link">
                                     <Row onClick={this.registrationDiv}>
                                         <Col xs="2" className="icon-div">

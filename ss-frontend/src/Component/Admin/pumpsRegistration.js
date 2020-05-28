@@ -21,6 +21,7 @@ export default class pumpsRegistration extends Component {
 
         this.state = {
             authState: '',
+            authUser: '',
             machineNumber: '',
             fuelType: '',
             productId: '',
@@ -83,6 +84,13 @@ export default class pumpsRegistration extends Component {
         const authState = await verifyAuth();
         this.setState({ authState: authState })
         if (!authState) this.props.history.push('/login');
+
+        const user = getFromStorage('auth-user');
+        if (user != null) {
+            this.setState({
+                authUser: user.userType
+            })
+        }
 
         axios.get(backend_URI.url + '/pumpsRegistration/get')
             .then(res => {
@@ -369,7 +377,7 @@ export default class pumpsRegistration extends Component {
 
     render() {
 
-        const { pumpSetData } = this.state;
+        const { pumpSetData, authUser } = this.state;
 
         let countriesList = pumpSetData.length > 0
             && pumpSetData.map((item, i) => {
@@ -398,64 +406,69 @@ export default class pumpsRegistration extends Component {
                         <div className="col-md-10" style={{ backgroundColor: "#f8f9fd", minHeight: "1000px" }}>
                             <div className="container" >
                                 <div className="row" style={{ marginTop: "20px" }}>
-                                    <div className="col-md-4">
-                                        <p className="tpic">Add Pump Set</p>
+                                    {authUser === 'Administrator' && (
+                                        <div className="col-md-4">
+                                            <p className="tpic">Add Pump Set</p>
 
-                                        <Card>
-                                            <form>
-                                                <div className="container">
+                                            <Card>
+                                                <form>
+                                                    <div className="container">
 
-                                                    <div className="row">
-                                                        <div className="col-md-7">
-                                                            <MDBInput outline label="Set Number" type="text" name="setNumber" onChange={this.onChangeSetNumber} />
-                                                            <p style={{ color: "gray", fontWeight: "400", marginTop: "-22px", fontSize: "12px", marginLeft: "10px" }}>
-                                                                i.e : 1 , 2 , ....
+                                                        <div className="row">
+                                                            <div className="col-md-7">
+                                                                <MDBInput outline label="Set Number" type="text" name="setNumber" onChange={this.onChangeSetNumber} />
+                                                                <p style={{ color: "gray", fontWeight: "400", marginTop: "-22px", fontSize: "12px", marginLeft: "10px" }}>
+                                                                    i.e : 1 , 2 , ....
                                                             </p>
-                                                        </div>
-                                                        <div className="col-md-5" style={{ marginTop: "20px" }}>
-                                                            <Button className="reg-btn" color="primary" onClick={this.onAddPumpSet}>+ SET</Button>
+                                                            </div>
+                                                            <div className="col-md-5" style={{ marginTop: "20px" }}>
+                                                                <Button className="reg-btn" color="primary" onClick={this.onAddPumpSet}>+ SET</Button>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            </form>
-                                        </Card>
-                                    </div>
-                                    <div className="col-md-8">
-                                        <p className="tpic">Add New Machine</p>
-                                        <Card>
-                                            <form>
-                                                <div className="container">
+                                                </form>
+                                            </Card>
+                                        </div>
+                                    )}
+                                    {authUser === 'Administrator' && (
 
-                                                    <div className="row">
-                                                        <div className="col-md-3">
-                                                            <MDBInput outline label="Machine Number" type="text" name="machineNumber" onChange={this.onChangeMachineNumber} />
-                                                            <p style={{ color: "gray", fontWeight: "400", marginTop: "-22px", fontSize: "12px", marginLeft: "10px" }}>
-                                                                i.e : SD01
+                                        <div className="col-md-8">
+                                            <p className="tpic">Add New Machine</p>
+                                            <Card>
+                                                <form>
+                                                    <div className="container">
+
+                                                        <div className="row">
+                                                            <div className="col-md-3">
+                                                                <MDBInput outline label="Machine Number" type="text" name="machineNumber" onChange={this.onChangeMachineNumber} />
+                                                                <p style={{ color: "gray", fontWeight: "400", marginTop: "-22px", fontSize: "12px", marginLeft: "10px" }}>
+                                                                    i.e : SD01
                                                             </p>
-                                                        </div>
+                                                            </div>
 
-                                                        <div className="col-md-3 fuel-selector">
-                                                            <select className="form-control" onChange={this.onChangeFuelType}>
-                                                                <option >Select the fuel</option>
-                                                                <option value="Lanka Auto Diesel">Lanka Auto Diesel</option>
-                                                                <option value="Lanka Super Diesel">Lanka Super Diesel</option>
-                                                                <option value="Lanka Karesine-oil">Lanka Karesine-oil</option>
-                                                                <option value="Petrol Octane 92">Petrol Octane 92</option>
-                                                                <option value="Petrol Octane 95">Petrol Octane 95</option>
-                                                            </select>
+                                                            <div className="col-md-3 fuel-selector">
+                                                                <select className="form-control" onChange={this.onChangeFuelType}>
+                                                                    <option >Select the fuel</option>
+                                                                    <option value="Lanka Auto Diesel">Lanka Auto Diesel</option>
+                                                                    <option value="Lanka Super Diesel">Lanka Super Diesel</option>
+                                                                    <option value="Lanka Karesine-oil">Lanka Karesine-oil</option>
+                                                                    <option value="Petrol Octane 92">Petrol Octane 92</option>
+                                                                    <option value="Petrol Octane 95">Petrol Octane 95</option>
+                                                                </select>
 
-                                                        </div>
-                                                        <div className="col-md-3">
-                                                            <MDBInput outline label="Product Id" type="text" name="productId" onChange={this.onChangeMeterReading} />
-                                                        </div>
-                                                        <div className="col-md-3" style={{ marginTop: "20px" }}>
-                                                            <Button className="reg-btn" color="primary" onClick={this.onSubmit}>+ Machine</Button>
+                                                            </div>
+                                                            <div className="col-md-3">
+                                                                <MDBInput outline label="Product Id" type="text" name="productId" onChange={this.onChangeMeterReading} />
+                                                            </div>
+                                                            <div className="col-md-3" style={{ marginTop: "20px" }}>
+                                                                <Button className="reg-btn" color="primary" onClick={this.onSubmit}>+ Machine</Button>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            </form>
-                                        </Card>
-                                    </div>
+                                                </form>
+                                            </Card>
+                                        </div>
+                                    )}
                                 </div>
                                 <p className="tpic" style={{ marginTop: "20px", marginBottom: "-10px" }}>Pumps</p>
 
@@ -474,9 +487,11 @@ export default class pumpsRegistration extends Component {
                                             <div className="col-md-3">
                                                 <label className="topic-pump"> Assumed Pumper</label>
                                             </div>
-                                            <div className="col-md-1" style={{ textAlign: "left" }}>
-                                                <label className="topic-pump"> Actions</label>
-                                            </div>
+                                            {authUser === 'Administrator' && (
+                                                <div className="col-md-1" style={{ textAlign: "left" }}>
+                                                    <label className="topic-pump"> Actions</label>
+                                                </div>
+                                            )}
                                         </div>
 
                                     </div>
@@ -499,9 +514,11 @@ export default class pumpsRegistration extends Component {
                                                             {countriesList}
                                                         </select>
                                                     </div>
-                                                    <div className="col-md-1" style={{ textAlign: "center" }}>
-                                                        <DeleteForeverIcon className="del-btn" onClick={() => this.deletePump(pump._id)} />
-                                                    </div>
+                                                    {authUser === 'Administrator' && (
+                                                        <div className="col-md-1" style={{ textAlign: "center" }}>
+                                                            <DeleteForeverIcon className="del-btn" onClick={() => this.deletePump(pump._id)} />
+                                                        </div>
+                                                    )}
                                                 </div>
                                             )
                                         }
@@ -517,31 +534,35 @@ export default class pumpsRegistration extends Component {
                                     </div>
 
                                 </Card>
-                                <p className="tpic">Pump Sets</p>
+                                {authUser === 'Administrator' && (
+                                    <div>
+                                        <p className="tpic">Pump Sets</p>
 
-                                <Card style={{ marginBottom: "20px" }}>
-                                    <form>
-                                        <div className="container">
+                                        <Card style={{ marginBottom: "20px" }}>
+                                            <form>
+                                                <div className="container">
 
-                                            <div className="row">
-                                                {this.state.pumpSetData.map((data) => {
-                                                    return (
-                                                        <div className="col-md-3" style={{ marginTop: "20px" }} key={data._id}>
-                                                            <div className="row" >
-                                                                <div className="col-md-3">
-                                                                    <p>{data.setNumber}</p>
+                                                    <div className="row">
+                                                        {this.state.pumpSetData.map((data) => {
+                                                            return (
+                                                                <div className="col-md-3" style={{ marginTop: "20px" }} key={data._id}>
+                                                                    <div className="row" >
+                                                                        <div className="col-md-3">
+                                                                            <p>{data.setNumber}</p>
+                                                                        </div>
+                                                                        <div className="col-md-6">
+                                                                            <DeleteForeverIcon className="del-btn" onClick={() => this.onDeleteSet(data._id)} />
+                                                                        </div>
+                                                                    </div>
                                                                 </div>
-                                                                <div className="col-md-6">
-                                                                    <DeleteForeverIcon className="del-btn" onClick={() => this.onDeleteSet(data._id)} />
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    )
-                                                })}
-                                            </div>
-                                        </div>
-                                    </form>
-                                </Card>
+                                                            )
+                                                        })}
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </Card>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>

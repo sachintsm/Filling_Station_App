@@ -9,6 +9,7 @@ import Snackpop from "../Auth/Snackpop";
 import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css'
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
+import { getFromStorage } from '../../utils/storage';
 
 const backend_URI = require('../Auth/Backend_URI')
 
@@ -32,6 +33,7 @@ class customerData extends Component {
             snackbaropen: false,
             snackbarmsg: '',
             snackbarcolor: '',
+            authUser: '',
         }
     }
     closeAlert = () => {
@@ -42,6 +44,13 @@ class customerData extends Component {
         const authState = await verifyAuth();
         this.setState({ authState: authState })
         if (!authState) this.props.history.push('/login');
+
+        const user = getFromStorage('auth-user');
+        if (user != null) {
+            this.setState({
+                authUser: user.userType
+            })
+        }
 
         //? get debitor bio data
         await axios.get(backend_URI.url + '/debtors/customer/' + this.props.match.params.id)
@@ -83,40 +92,50 @@ class customerData extends Component {
     }
 
     deleteRow(data) {
-        confirmAlert({
-            title: 'Confirm to submit',
-            message: 'Are you sure to do this.',
-            buttons: [
-                {
-                    label: 'Yes',
-                    onClick: async () => {
-                        axios.delete(backend_URI.url + '/debitorsAccount/deleteDebAccountRow/' + data)
-                            .then(res => {
-                                this.setState({
-                                    snackbaropen: true,
-                                    snackbarmsg: res.data.message,
-                                    snackbarcolor: 'success'
-                                })
-                                window.location.reload();
-                            })
-                            .catch(err => {
-                                this.setState({
-                                    snackbaropen: true,
-                                    snackbarmsg: err,
-                                    snackbarcolor: 'error'
-                                })
-                            })
+        if (this.state.authUser === 'Administrator') {
 
-                    }
-                },
-                {
-                    label: 'No',
-                    onClick: () => {
+            confirmAlert({
+                title: 'Confirm to submit',
+                message: 'Are you sure to do this.',
+                buttons: [
+                    {
+                        label: 'Yes',
+                        onClick: async () => {
+                            axios.delete(backend_URI.url + '/debitorsAccount/deleteDebAccountRow/' + data)
+                                .then(res => {
+                                    this.setState({
+                                        snackbaropen: true,
+                                        snackbarmsg: res.data.message,
+                                        snackbarcolor: 'success'
+                                    })
+                                    window.location.reload();
+                                })
+                                .catch(err => {
+                                    this.setState({
+                                        snackbaropen: true,
+                                        snackbarmsg: err,
+                                        snackbarcolor: 'error'
+                                    })
+                                })
 
+                        }
+                    },
+                    {
+                        label: 'No',
+                        onClick: () => {
+
+                        }
                     }
-                }
-            ]
-        })
+                ]
+            })
+        }
+        else {
+            this.setState({
+                snackbaropen: true,
+                snackbarcolor: 'error',
+                snackbarmsg: "Please Sign In as Administrator ..!"
+            })
+        }
     }
 
     render() {

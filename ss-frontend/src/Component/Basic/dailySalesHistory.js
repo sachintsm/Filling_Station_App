@@ -99,6 +99,17 @@ export default class dailySalesHistory extends Component {
                 this.setState({ dailySalesTotal: total.toFixed(2), })
             })
 
+        // ? get final locker blance
+        await axios.get(backend_URI.url + "/finalLocker/get/" + dt)
+            .then(res => {
+                if (res.data.data[0] != null) {
+                    this.setState({ lockerFinal: res.data.data[0].amount })
+                }
+                else {
+                    this.setState({ lockerFinal: 0.00 })
+                }
+            })
+
         //? get dailt sales data
         await axios.get(backend_URI.url + "/dailySales/getfinal/" + dt)
             .then(res => {
@@ -112,17 +123,6 @@ export default class dailySalesHistory extends Component {
                         total = total + parseFloat(this.state.dailySalesFuel[i].price)
                     }
                     this.setState({ dailySalesFuelTotal: total.toFixed(2) })
-                }
-            })
-
-        // ? get final locker blance
-        await axios.get(backend_URI.url + "/finalLocker/get/" + dt)
-            .then(res => {
-                if (res.data.data[0] = ! null) {
-                    this.setState({ lockerFinal: res.data.data[0].amount })
-                }
-                else {
-                    this.setState({ lockerFinal: 0.00 })
                 }
             })
 
