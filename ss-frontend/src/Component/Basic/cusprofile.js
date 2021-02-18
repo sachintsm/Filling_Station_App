@@ -72,7 +72,6 @@ export default class profile extends Component {
 
     customerData(data) {
         this.props.history.push('/cusprofile/' + data);
-
     }
 
     deleteDebtor(data) {
